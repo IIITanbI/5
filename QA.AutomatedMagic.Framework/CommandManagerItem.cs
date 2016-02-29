@@ -18,9 +18,8 @@
 
         [MetaTypeValue("Command manager name", IsRequired = false)]
         public string Name { get; set; } = null;
-
-        [MetaTypeValue("Manager config")]
-        [MetaLocation(true)]
-        public XElement Config { get; set; }
+        
+        [MetaTypeObject("Configuration object for manager", IsAssignableTypesAllowed = true, IsRequired = false)]
+        public BaseMetaObject Config { get; set; }
     }
 }

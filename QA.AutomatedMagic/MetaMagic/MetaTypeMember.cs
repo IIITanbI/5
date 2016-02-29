@@ -15,10 +15,12 @@
         public Type MemberType { get; private set; }
         public bool IsRequired { get; private set; } = true;
 
+        public MetaConstraint Constraint { get; private set; } = null;
+
         private Func<object, object> Getter { get; set; }
         private Action<object, object> Setter { get; set; }
 
-        private MetaTypeMember(MetaType parentType, string name, MetaTypeMemberAttribute memberAttribute, List<MetaLocationAttribute> locationAttributes)
+        private MetaTypeMember(MetaType parentType, string name, MetaTypeMemberAttribute memberAttribute, List<MetaLocationAttribute> locationAttributes, MemberInfo memberInfo)
         {
             ParentType = parentType;
             InitSourceResolver(memberAttribute.SourceResolverType);
@@ -27,18 +29,25 @@
 
             Info = new MetaInfo { Name = name, Description = memberAttribute.Description };
             Location = new MetaLocation(locationAttributes);
+
+            var constraintAttributes = memberInfo.GetCustomAttributes<MetaConstraintAttribute>(true).ToList();
+            if (constraintAttributes.Count > 0)
+            {
+                Constraint = new MetaConstraint(parentType, constraintAttributes);
+            }
         }
 
         public MetaTypeMember(MetaType parentType, PropertyInfo propertyInfo, MetaTypeMemberAttribute memberAttribute, List<MetaLocationAttribute> locationAttributes)
-            : this(parentType, propertyInfo.Name, memberAttribute, locationAttributes)
+            : this(parentType, propertyInfo.Name, memberAttribute, locationAttributes, propertyInfo)
         {
             Getter = new Func<object, object>(obj => propertyInfo.GetValue(obj));
             Setter = new Action<object, object>((obj, value) => propertyInfo.SetValue(obj, value));
+
             MemberType = propertyInfo.PropertyType;
         }
 
         public MetaTypeMember(MetaType parentType, FieldInfo fieldInfo, MetaTypeMemberAttribute memberAttribute, List<MetaLocationAttribute> locationAttributes)
-            : this(parentType, fieldInfo.Name, memberAttribute, locationAttributes)
+            : this(parentType, fieldInfo.Name, memberAttribute, locationAttributes, fieldInfo)
         {
             Getter = new Func<object, object>(obj => fieldInfo.GetValue(obj));
             Setter = new Action<object, object>((obj, value) => fieldInfo.SetValue(obj, value));
@@ -55,7 +64,7 @@
             Setter(obj, value);
         }
 
-        public abstract object Parse(object source);
+        public abstract object Parse(object source, IContext context = null);
         public abstract void InitSourceResolver(Type type);
 
         public override string ToString()

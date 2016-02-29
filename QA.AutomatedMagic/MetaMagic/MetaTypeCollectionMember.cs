@@ -99,7 +99,7 @@
                 : ParentType.SourceResolver.GetCollectionSourceReolver();
         }
 
-        public override object Parse(object source)
+        public override object Parse(object source, IContext context = null)
         {
             var childrenResolvedSources = CollectionSourceResolver.ResolveCollection(source, this);
 
@@ -126,7 +126,7 @@
                 {
                     foreach (var childResolvedSource in childrenResolvedSources)
                     {
-                        var childValue = ChildrenMetaType.Value.Parse(childResolvedSource);
+                        var childValue = ChildrenMetaType.Value.Parse(childResolvedSource, context);
                         childObjs.Add(childValue);
                     }
                 }
@@ -136,7 +136,7 @@
                     {
                         var name = ParentType.SourceResolver.GetSourceNodeName(childResolvedSource);
                         var assignableType = ChildrenMetaType.Value.AssignableTypes.First(at => at.Location.PossibleNames.Contains(name));
-                        var childValue = assignableType.Parse(childResolvedSource);
+                        var childValue = assignableType.Parse(childResolvedSource, context);
                         childObjs.Add(childValue);
                     }
                 }

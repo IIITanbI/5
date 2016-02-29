@@ -12,6 +12,7 @@
 
     public class MetaType
     {
+        #region Static
         public static Type DefaultSourceResolverType { get; set; } = typeof(BaseMetaObjectXmlSourceResolver);
         public static Type DefaultManagingFillerType { get; set; } = typeof(BaseMetaObjectWpfFiller);
         public static List<IValueParser> ValueParsers { get; set; } = new List<IValueParser>
@@ -29,21 +30,21 @@
             new ArrayWrapper()
         };
 
-        public static object Parse(Type type, object source)
+        public static object Parse(Type type, object source, IContext context = null)
         {
             var metaType = ReflectionManager.GetMetaType(type);
-            return metaType.Parse(source);
+            return metaType.Parse(source, context);
         }
-        public static T Parse<T>(object source)
+        public static T Parse<T>(object source, IContext context = null)
         {
-            return (T)Parse(typeof(T), source);
+            return (T)Parse(typeof(T), source, context);
         }
-
         public static object SerializeObject(object obj)
         {
             var metaType = ReflectionManager.GetMetaType(obj.GetType());
             return metaType.SourceResolver.GetObjectSourceResolver().Serialize(obj, metaType, metaType.Info.Name, false);
         }
+        #endregion
 
         public Type TargetType { get; private set; }
         public MetaInfo Info { get; private set; }
@@ -55,7 +56,9 @@
         public ISourceResolver SourceResolver { get; private set; }
         public IManagingFiller ManagingFiller { get; private set; }
 
-        private string _keyName;
+        private string _keyName = null;
+        private Type _sourceResolverType = null;
+        private Type _managingFillerType = null;
 
         public MetaType(Type type)
         {
@@ -65,8 +68,26 @@
             Info = new MetaInfo { Name = type.Name, Description = metaTypeAttribute.Description };
             _keyName = metaTypeAttribute.KeyName;
 
-            SourceResolver = (ISourceResolver)Activator.CreateInstance(metaTypeAttribute.SourceResolverType ?? DefaultSourceResolverType);
-            ManagingFiller = (IManagingFiller)Activator.CreateInstance(metaTypeAttribute.ManagingFillerType ?? DefaultManagingFillerType);
+            var curBase = type.BaseType;
+            while (curBase != null && curBase != typeof(object))
+            {
+                var baseMetaTypeAttribute = curBase.GetCustomAttribute<MetaTypeAttribute>();
+                if (baseMetaTypeAttribute == null) break;
+
+                if (_keyName == null && baseMetaTypeAttribute.KeyName != null)
+                    _keyName = baseMetaTypeAttribute.KeyName;
+
+                if (_sourceResolverType == null && baseMetaTypeAttribute.SourceResolverType != null)
+                    _sourceResolverType = baseMetaTypeAttribute.SourceResolverType;
+
+                if (_managingFillerType == null && baseMetaTypeAttribute.ManagingFillerType != null)
+                    _managingFillerType = baseMetaTypeAttribute.ManagingFillerType;
+
+                curBase = curBase.BaseType;
+            }
+
+            SourceResolver = (ISourceResolver)Activator.CreateInstance(_sourceResolverType ?? DefaultSourceResolverType);
+            ManagingFiller = (IManagingFiller)Activator.CreateInstance(_managingFillerType ?? DefaultManagingFillerType);
 
             var locationAttributes = type.GetCustomAttributes<MetaLocationAttribute>().ToList();
             locationAttributes.Add(new MetaLocationAttribute(TargetType.Name));
@@ -150,18 +171,73 @@
             Members.Add(member);
         }
 
-        public object Parse(object source)
+        public object Parse(object source, IContext context = null)
         {
+            object key = null;
+            if (context != null && Key != null)
+            {
+                key = Key.Parse(source);
+                if (key != null)
+                {
+                    if (context.Contains(TargetType, key.ToString()))
+                    {
+                        return context.ResolveValue(TargetType, key.ToString());
+                    }
+                }
+            }
+
             var createdObject = Activator.CreateInstance(TargetType);
 
-            foreach (var member in Members)
+            var parsedMembersDict = new Dictionary<MetaTypeMember, bool>();
+            Members.ForEach(m => parsedMembersDict.Add(m, false));
+
+            while (parsedMembersDict.Any(m => !m.Value))
             {
-                var memberValue = member.Parse(source);
-                if (memberValue != null)
-                    member.SetValue(createdObject, memberValue);
+                var memberToParse = parsedMembersDict.First(m => !m.Value).Key;
+                if (memberToParse == Key && key != null)
+                {
+                    memberToParse.SetValue(createdObject, key);
+                    parsedMembersDict[memberToParse] = true;
+                    continue;
+                }
+
+                ParseMember(source, context, createdObject, parsedMembersDict, memberToParse);
             }
 
             return createdObject;
+        }
+
+        private void ParseMember(object source, IContext context, object createdObject, Dictionary<MetaTypeMember, bool> parsedMembersDict, MetaTypeMember memberToParse)
+        {
+            if (memberToParse.Constraint != null)
+            {
+                foreach (var constrEntry in memberToParse.Constraint.Constraints.Values)
+                {
+                    foreach (var memberConstr in constrEntry)
+                    {
+                        if (!parsedMembersDict[memberConstr.Member.Value])
+                            ParseMember(source, context, createdObject, parsedMembersDict, memberConstr.Member.Value);
+                    }
+
+                    if (!constrEntry.All(ce =>
+                            {
+                                if (ce.IsPositive)
+                                    return ce.Values.Contains(ce.Member.Value.GetValue(createdObject));
+                                else
+                                    return !ce.Values.Contains(ce.Member.Value.GetValue(createdObject));
+                            })
+                        )
+                    {
+                        parsedMembersDict[memberToParse] = true;
+                        return;
+                    }
+                }
+            }
+
+            var memberValue = memberToParse.Parse(source, context);
+            if (memberValue != null)
+                memberToParse.SetValue(createdObject, memberValue);
+            parsedMembersDict[memberToParse] = true;
         }
 
         public override string ToString()

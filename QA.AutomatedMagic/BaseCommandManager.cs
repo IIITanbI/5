@@ -6,11 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public abstract class BaseCommandManager
+    public interface ICommandManager
     {
-        public BaseCommandManager(BaseMetaObject managerConfig)
-        {
-
-        }
     }
 }

@@ -8,11 +8,13 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
+    using CommandsMagic;
 
     public static class ReflectionManager
     {
         private static List<string> _loadedAssemblies = new List<string>();
         private static Dictionary<Type, MetaType> _type_metaType = new Dictionary<Type, MetaType>();
+        private static Dictionary<Type, CommandManager> _type_commandManager = new Dictionary<Type, CommandManager>();
 
         public static void LoadAssemblies(string pathToLibFolder = null)
         {
@@ -35,8 +37,6 @@
 
                 }
             }
-
-            var loadedAssemblies = new List<Assembly>();
 
             foreach (var assembly in assemblies)
             {
@@ -70,15 +70,34 @@
 
             _loadedAssemblies.Add(assemblyName);
         }
+
+        public static CommandManager GetCommandManagerByTypeName(string managerTypeName)
+        {
+            return _type_commandManager.First(tcm => tcm.Key.Name == managerTypeName).Value;
+        }
+
         public static void LoadType(Type type)
         {
             if (typeof(IMetaObject).IsAssignableFrom(type))
             {
                 var metaType = new MetaType(type);
                 if (_type_metaType.ContainsKey(type))
-                    throw new Exception($"Found duped xmlType for type: {type}");
+                    throw new Exception($"Found duped metaType for type: {type}");
 
                 _type_metaType.Add(type, metaType);
+            }
+
+            if (typeof(ICommandManager).IsAssignableFrom(type))
+            {
+                var commandManagerAttribute = type.GetCustomAttribute<CommandManagerAttribute>();
+
+                if (commandManagerAttribute != null)
+                {
+                    var commandManager = new CommandManager(commandManagerAttribute, type);
+                    if (_type_commandManager.ContainsKey(type))
+                        throw new Exception($"Found duped commandManager for type: {type}");
+                    _type_commandManager.Add(type, commandManager);
+                }
             }
         }
 

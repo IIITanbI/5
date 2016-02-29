@@ -79,7 +79,7 @@
             Messages.Add(new LogMessage { Time = DateTime.UtcNow, Level = level, Message = message, Ex = exception });
             foreach (var log in _parentLoggers)
             {
-                if (log.Value >= level)
+                if (log.Value <= level)
                 {
                     switch (level)
                     {

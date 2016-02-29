@@ -50,12 +50,15 @@
     <Compile Include="BaseCommandManager.cs" />
     <Compile Include="BaseMetaObject.cs" />
     <Compile Include="BaseMetaObjectWpfFiller.cs" />
+    <Compile Include="BaseNamedMetaObject.cs" />
     <Compile Include="CollectionWrappers\ArrayWrapper.cs" />
     <Compile Include="CollectionWrappers\DictionaryWrapper.cs" />
     <Compile Include="CollectionWrappers\LinkedListWrapper.cs" />
     <Compile Include="CollectionWrappers\ListWrapper.cs" />
+    <Compile Include="CommandsMagic\Command.cs" />
     <Compile Include="CommandsMagic\CommandAbortException.cs" />
     <Compile Include="CommandsMagic\CommandAttribute.cs" />
+    <Compile Include="CommandsMagic\CommandManager.cs" />
     <Compile Include="CommandsMagic\CommandManagerAttribute.cs" />
     <Compile Include="ICollectionSourceResolver.cs" />
     <Compile Include="ICollectionWrapper.cs" />
@@ -73,6 +76,8 @@
     <Compile Include="IManagingValueFiller.cs" />
     <Compile Include="LogLevel.cs" />
     <Compile Include="ManagingFillerException.cs" />
+    <Compile Include="MetaMagic\MetaConstraint.cs" />
+    <Compile Include="MetaMagic\MetaConstraintAttribute.cs" />
     <Compile Include="MetaMagic\MetaTypeAttribute.cs" />
     <Compile Include="MetaMagic\MetaInfo.cs" />
     <Compile Include="MetaMagic\MetaLocation.cs" />

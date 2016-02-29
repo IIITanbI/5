@@ -10,19 +10,18 @@
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class CommandManagerAttribute : Attribute
     {
-        public List<string> Names { get; private set; }
-        public string Description { get; set; }
-        public Type ConfigType { get; private set; }
-        public CommandManagerAttribute(Type configType, params string[] names)
+        public string Description { get; private set; }
+        public Type ConfigType { get; private set; } = null;
+
+        public CommandManagerAttribute(Type configType, string description)
         {
-            Names = names.ToList();
             ConfigType = configType;
+            Description = description;
         }
 
-        public CommandManagerAttribute(params string[] names)
+        public CommandManagerAttribute(string description)
         {
-            Names = names.ToList();
-            ConfigType = null;
+            Description = description;
         }
     }
 }

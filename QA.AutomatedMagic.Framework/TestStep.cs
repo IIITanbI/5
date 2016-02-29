@@ -50,6 +50,7 @@
 
             var managerParts = Manager.Split('.');
             var managerTypeName = managerParts[0];
+
             string managerName = null;
             if (managerParts.Length == 2)
                 managerName = managerParts[1];
@@ -58,7 +59,7 @@
 
             var manager = ReflectionManager.GetCommandManagerByTypeName(managerTypeName);
             var command = manager.Commands.First(c => c.PossibleNames.Contains(CommandName));
-            var parameterInfos = command.ParameterInfos;
+            var parameterInfos = command.Parameters;
 
             var managerObj = context.Managers[managerTypeName][managerName ?? managerTypeName];
             var curParamStrIndex = 0;

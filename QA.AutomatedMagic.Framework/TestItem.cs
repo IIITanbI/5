@@ -57,7 +57,6 @@
                     {
                         step.Build();
                     }
-                    Context.Build();
                     return new List<TestItem> { this };
 
                 case SourceType.External:

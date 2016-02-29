@@ -28,11 +28,6 @@
         public Dictionary<string, Dictionary<string, object>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, object>>();
         public Dictionary<string, Dictionary<string, object>> Managers = new Dictionary<string, Dictionary<string, object>>();
 
-        public void Build()
-        {
-            
-        }
-
         public void Initialize()
         {
             ContextValues.ToList().ForEach(cv => cv.Value.Clear());
@@ -49,59 +44,43 @@
                     }
                 }
 
-                if (Managers.Count == 0)
+                foreach (var managerKey in ParentContext.Managers.Keys)
                 {
-                    foreach (var managerKey in ParentContext.Managers.Keys)
-                    {
-                        Managers.Add(managerKey, ParentContext.Managers[managerKey]);
-                    }
+                    Managers.Add(managerKey, ParentContext.Managers[managerKey]);
                 }
             }
 
             foreach (var contextItem in TestContextItems)
             {
-                var typeName = contextItem.TypeName;
-                var type = ReflectionManager.GetMetaType(typeName);
+                var contextItemType = contextItem.GetType();
+                var metaType = ReflectionManager.GetMetaType(contextItemType);
 
-                var configXml = XElement.Parse(ResolveBind(contextItem.ItemConfig.ToString()));
+                var key = metaType.Key.GetValue(contextItem).ToString();
 
-                var obj = MetaType.Parse(type.XType, configXml, false, null, this);
+                if (key == null)
+                    throw new FrameworkException($"Context object with type: {contextItemType} doesn't contains Key");
 
-                if (!ContextValues.ContainsKey(typeName))
-                    ContextValues.Add(typeName, new Dictionary<string, object>());
+                if (!ContextValues.ContainsKey(metaType.Info.Name))
+                    ContextValues.Add(metaType.Info.Name, new Dictionary<string, object>());
 
-                var contextObject = obj as XmlBaseType;
-                if (contextObject == null)
-                    throw new FrameworkException($"Error occurs during creating context object: {obj.ToString()}. Couldn't be cast to ConfigElementBase");
+                if (ContextValues[metaType.Info.Name].ContainsKey(key))
+                    throw new FrameworkException($"Error occurs during creating context object: {contextItemType.ToString()}. Object with the same name: {key} already present");
 
-                if (ContextValues[typeName].ContainsKey(contextObject.UniqueName))
-                    throw new FrameworkException($"Error occurs during creating context object: {obj.ToString()}. Object with the same name: {contextObject.UniqueName} already present");
-
-                ContextValues[typeName].Add(contextObject.UniqueName, obj);
+                ContextValues[metaType.Info.Name].Add(key, contextItem);
             }
 
-            if (Managers.Count == 0)
+            foreach (var managerItem in CommandManagersItems)
             {
-                foreach (var managerItem in CommandManagersItems)
-                {
-                    var manager = ReflectionManager.GetCommandManagerByTypeName(managerItem.ManagerType);
+                var manager = ReflectionManager.GetCommandManagerByTypeName(managerItem.ManagerType);
+                var managerObj = manager.CreateInstance(managerItem.Config);
 
-                    object managerConfig = null;
-                    if (manager.ConfigType != null)
-                    {
-                        managerConfig = MetaType.Parse(manager.ConfigType, managerItem.Config.Elements().First(), true, null, this);
-                    }
+                if (!Managers.ContainsKey(managerItem.ManagerType))
+                    Managers.Add(managerItem.ManagerType, new Dictionary<string, object>());
 
-                    var managerObj = manager.CreateObject(managerConfig);
-
-                    if (!Managers.ContainsKey(managerItem.ManagerType))
-                        Managers.Add(managerItem.ManagerType, new Dictionary<string, object>());
-
-                    if (Managers[managerItem.ManagerType].ContainsKey(managerItem.Name ?? managerItem.ManagerType))
-                        Managers[managerItem.ManagerType][managerItem.Name ?? managerItem.ManagerType] = managerObj;
-                    else
-                        Managers[managerItem.ManagerType].Add(managerItem.Name ?? managerItem.ManagerType, managerObj);
-                }
+                if (Managers[managerItem.ManagerType].ContainsKey(managerItem.Name ?? managerItem.ManagerType))
+                    Managers[managerItem.ManagerType][managerItem.Name ?? managerItem.ManagerType] = managerObj;
+                else
+                    Managers[managerItem.ManagerType].Add(managerItem.Name ?? managerItem.ManagerType, managerObj);
             }
         }
 

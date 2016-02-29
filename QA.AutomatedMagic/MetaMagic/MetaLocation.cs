@@ -8,7 +8,7 @@
 
     public class MetaLocation
     {
-        public List<string> PossibleNames { get; set; } = new List<string>();
+        public List<string> PossibleNames { get; private set; } = new List<string>();
         public bool CouldBeValue { get; set; } = false;
 
         public MetaLocation(List<MetaLocationAttribute> locationAttributes)
@@ -37,7 +37,15 @@
 
         public void Add(string possibleName)
         {
-            PossibleNames.Add(possibleName);
+            if (!PossibleNames.Contains(possibleName))
+                PossibleNames.Add(possibleName);
+
+            var invariantName = char.IsLower(possibleName[0])
+                ? char.ToUpper(possibleName[0]) + possibleName.Substring(1)
+                : char.ToLower(possibleName[0]) + possibleName.Substring(1);
+            
+            if (!PossibleNames.Contains(invariantName))
+                PossibleNames.Add(invariantName);
         }
     }
 }
