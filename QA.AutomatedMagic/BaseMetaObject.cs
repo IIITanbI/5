@@ -10,6 +10,9 @@
     [MetaType("Base class for all MetaObjects")]
     public abstract class BaseMetaObject : IMetaObject
     {
+        public virtual void Init()
+        {
 
+        }
     }
 }

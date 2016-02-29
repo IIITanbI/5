@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic.CommandMagic
+﻿namespace QA.AutomatedMagic.CommandsMagic
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,8 @@
     using System.Threading.Tasks;
 
 
-    public class CommandAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class CommandAttribute : Attribute
     {
         public List<string> Names { get; private set; }
         public string Description { get; set; }

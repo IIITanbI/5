@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic.CommandMagic
+﻿namespace QA.AutomatedMagic.CommandsMagic
 {
     using System;
     using System.Collections.Generic;
