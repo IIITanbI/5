@@ -6,7 +6,6 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
-    using TestLogger;
     using System.Text.RegularExpressions;
 
     [MetaType("Test step config")]
@@ -111,6 +110,9 @@
             }
 
             var result = command.Method.Invoke(managerObj, parObjs.ToArray());
+
+            if (result != null)
+                context.Add($"Step.{Name}", result);
         }
 
         public static Regex KeyWordRegex = new Regex(@"((?:\$?\{.*?\})(?:[^{]*\})*)", RegexOptions.Compiled);

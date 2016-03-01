@@ -77,6 +77,7 @@
         public object Serialize(object parentObj, MetaTypeValueMember valueMember)
         {
             var value = valueMember.GetValue(parentObj);
+            if (value == null) return null;
             var el = new XElement(valueMember.Info.Name, new XCData(value.ToString()));
             return el;
         }

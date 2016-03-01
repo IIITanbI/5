@@ -44,6 +44,16 @@
             var metaType = ReflectionManager.GetMetaType(obj.GetType());
             return metaType.SourceResolver.GetObjectSourceResolver().Serialize(obj, metaType, metaType.Info.Name, false);
         }
+        public static object CopyObject(object obj)
+        {
+            var metaType = ReflectionManager.GetMetaType(obj.GetType());
+            return metaType.Copy(obj);
+        }
+        public static T CopyObjectWithCast<T>(T obj)
+        {
+            var metaType = ReflectionManager.GetMetaType(typeof(T));
+            return (T)metaType.Copy(obj);
+        }
         #endregion
 
         public Type TargetType { get; private set; }
@@ -238,6 +248,11 @@
             if (memberValue != null)
                 memberToParse.SetValue(createdObject, memberValue);
             parsedMembersDict[memberToParse] = true;
+        }
+
+        public object Copy(object obj)
+        {
+            return Parse(SourceResolver.GetObjectSourceResolver().Serialize(obj, this, Info.Name, false));
         }
 
         public override string ToString()

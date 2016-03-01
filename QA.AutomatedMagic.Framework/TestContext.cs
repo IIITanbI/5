@@ -27,6 +27,7 @@
 
         public Dictionary<string, Dictionary<string, object>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, object>>();
         public Dictionary<string, Dictionary<string, object>> Managers = new Dictionary<string, Dictionary<string, object>>();
+        public Dictionary<string, object> StepResults { get; set; } = new Dictionary<string, object>();
 
         public void Initialize()
         {
@@ -47,6 +48,11 @@
                 foreach (var managerKey in ParentContext.Managers.Keys)
                 {
                     Managers.Add(managerKey, ParentContext.Managers[managerKey]);
+                }
+
+                foreach (var stepResult in ParentContext.StepResults)
+                {
+                    StepResults.Add(stepResult.Key, stepResult.Value);
                 }
             }
 
@@ -86,7 +92,12 @@
 
         public void Add(string path, object value)
         {
-            throw new NotImplementedException();
+            var nameParts = path.Split('.');
+
+            if (nameParts[0] == "Step")
+            {
+                StepResults.Add(nameParts[1], value);
+            }
         }
 
         public void Add(Type type, string name, object value)
@@ -119,7 +130,28 @@
         }
         public object ResolveValue(string name)
         {
-            throw new NotImplementedException();
+            var nameParts = name.Split('.');
+
+            if (nameParts[0] == "Step")
+            {
+                return StepResults[nameParts[1]];
+            }
+            else if (nameParts[0] == "Manager")
+            {
+                var managerType = nameParts[1];
+                var managerName = managerType;
+                if (nameParts.Length == 3)
+                    managerName = nameParts[2];
+
+                return Managers[managerType][managerName];
+            }
+            else
+            {
+                var typeName = nameParts[0];
+                var itemName = nameParts[1];
+
+                return ContextValues[typeName][itemName];
+            }
         }
 
         public object ResolveValue(Type type, string name)

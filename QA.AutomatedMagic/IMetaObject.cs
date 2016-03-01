@@ -10,5 +10,7 @@
     [MetaType("Base interface for MetaObjects")]
     public interface IMetaObject
     {
+        //object Resolve(string path);
+        //List<string> GetPossiblePaths();
     }
 }

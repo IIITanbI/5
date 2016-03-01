@@ -35,12 +35,32 @@
             throw new NotImplementedException();
         }
 
-        public object FillEditControls(object container, object obj, string name)
+        public Func<object> FillEditControls(object container, object obj, string name)
         {
-            throw new NotImplementedException();
+            var containerStackPanel = container as StackPanel;
+            if (containerStackPanel == null)
+                throw new ManagingFillerException();
+
+            var objType = obj.GetType();
+
+            var rootGroupBox = new GroupBox();
+            containerStackPanel.Children.Add(rootGroupBox);
+            var headerWrapPanel = new WrapPanel();
+            rootGroupBox.Header = headerWrapPanel;
+            var nameLabel = new Label { Content = $"{name} : {objType.Name}" };
+            headerWrapPanel.Children.Add(nameLabel);
+
+            var rootStackPanel = new StackPanel();
+            rootGroupBox.Content = rootStackPanel;
+
+            var filler = _valueFillers.First(f => f.IsMatch(objType));
+            filler.FillEditControls(rootStackPanel, obj, objType);
+
+            var valueEditor = new ValueEditor(headerWrapPanel, filler, rootStackPanel, obj);
+            return filler.GetValue;
         }
 
-        public object FillEditControls(object container, object parentObj, MetaTypeValueMember valueMember)
+        public void FillEditControls(object container, object parentObj, MetaTypeValueMember valueMember)
         {
             var containerStackPanel = container as StackPanel;
             if (containerStackPanel == null)
@@ -52,21 +72,14 @@
             rootGroupBox.Header = headerWrapPanel;
             var nameLabel = new Label { Content = $"{valueMember.Info.Name} : {valueMember.MemberType.Name}" };
             headerWrapPanel.Children.Add(nameLabel);
-            var editBtn = new Button { Content = "Edit" };
-            headerWrapPanel.Children.Add(editBtn);
-            var saveBtn = new Button { Content = "Save" };
-            headerWrapPanel.Children.Add(saveBtn);
-            var cancelBtn = new Button { Content = "Cancel" };
-            headerWrapPanel.Children.Add(cancelBtn);
 
             var rootStackPanel = new StackPanel();
             rootGroupBox.Content = rootStackPanel;
 
             var filler = _valueFillers.First(f => f.IsMatch(valueMember.MemberType));
-            filler.FillInfoControls(rootStackPanel, valueMember.GetValue(parentObj), valueMember.MemberType);
+            filler.FillEditControls(rootStackPanel, valueMember.GetValue(parentObj), valueMember.MemberType);
 
-            var valueEditor = new ValueEditor(editBtn, saveBtn, cancelBtn, filler, rootStackPanel);
-            return null;
+            var valueEditor = new ValueEditor(headerWrapPanel, filler, rootStackPanel, valueMember, parentObj);
         }
 
         public void FillInfoControls(object container, object obj, string name)

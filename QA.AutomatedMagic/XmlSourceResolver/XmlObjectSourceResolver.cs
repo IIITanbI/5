@@ -31,6 +31,7 @@
         public object Serialize(object parentObj, MetaTypeObjectMember objectMember)
         {
             var memberValue = objectMember.GetValue(parentObj);
+            if (memberValue == null) return null;
             if (!objectMember.IsAssignableTypesAllowed)
                 return Serialize(memberValue, objectMember.MemberMetaType.Value, objectMember.Info.Name, false);
 

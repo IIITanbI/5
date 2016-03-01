@@ -11,7 +11,7 @@
     {
         object FillCreateControlls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
 
-        object FillEditControls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
+        void FillEditControls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
 
         void FillInfoControlls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
     }

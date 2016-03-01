@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using MetaMagic;
     using System.Windows.Controls;
+    using Editors;
 
     public class WpfManagingCollectionFiller : IManagingCollectionFiller
     {
@@ -15,9 +16,50 @@
             throw new NotImplementedException();
         }
 
-        public object FillEditControls(object container, object parentObj, MetaTypeCollectionMember collectionMember)
+        public void FillEditControls(object container, object parentObj, MetaTypeCollectionMember collectionMember)
         {
-            throw new NotImplementedException();
+            var containerStackPanel = container as StackPanel;
+            if (containerStackPanel == null)
+                throw new ManagingFillerException();
+
+            var collectionObj = collectionMember.GetValue(parentObj) ?? new List<object>();
+
+            var objs = collectionMember.CollectionWrapper.GetChildren(collectionObj);
+
+            var rootGroupBox = new GroupBox();
+            containerStackPanel.Children.Add(rootGroupBox);
+
+            var headerWrapPanel = new WrapPanel();
+            rootGroupBox.Header = headerWrapPanel;
+            headerWrapPanel.Children.Add(new Label { Content = $"{collectionMember.Info.Name} : {collectionMember.CollectionWrapper.GetCollectionType()} of {(collectionMember.ChildrenMetaType?.Value.TargetType ?? collectionMember.ChildrenType).Name}" });
+
+
+            var rootExpander = new Expander { Header = $"Count: {objs.Count}" };
+            rootGroupBox.Content = rootExpander;
+
+            var rootStackPanel = new StackPanel();
+            rootExpander.Content = rootStackPanel;
+
+            var counter = 1;
+            if (collectionMember.ChildrenMetaType == null)
+            {
+                var managingValueFiller = collectionMember.ParentType.ManagingFiller.GetManagingValueFiller();
+
+                foreach (var obj in objs)
+                {
+                    managingValueFiller.FillInfoControls(rootStackPanel, obj, $"Item: {counter++}");
+                }
+            }
+            else
+            {
+                var managingObjectFiller = collectionMember.ChildrenMetaType.Value.ManagingFiller.GetManagingObjectFiller();
+                foreach (var obj in objs)
+                {
+                    managingObjectFiller.FillInfoControls(rootStackPanel, obj, collectionMember.ChildrenMetaType.Value, $"Item: {counter++}", collectionMember.IsAssignableTypesAllowed);
+                }
+            }
+            
+            var collectionEditor = new CollectionEditor(headerWrapPanel, collectionMember, parentObj);
         }
 
         public void FillInfoControlls(object container, object parentObj, MetaTypeCollectionMember collectionMember)

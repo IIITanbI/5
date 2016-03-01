@@ -7,7 +7,6 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using MetaMagic;
-    using TestLogger;
 
     [MetaType("TestItem config")]
     public abstract class TestItem : Source
@@ -77,34 +76,44 @@
             }
         }
 
+        private TestLogger _realLog = null;
         public void Execute()
         {
+            if (_realLog == null)
+            {
+                Log.INFO($"Start executing {ItemType}: {Name}");
+                Log.INFO($"Description: {Description}");
+                ParentItem?.Log.INFO($"Start executing {ItemType}: {Name}");
+                ParentItem?.Log.INFO($"Description: {Description}");
+
+                try
+                {
+                    Log.DEBUG("Start initialization");
+                    ExecuteStageInitialization();
+                    Log.DEBUG("Initialization completed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Log.ERROR("Error occurred during initialization", ex);
+                    Log.ERROR($"Executing of {ItemType}: {Name}  completed with status: FAILED");
+                    ParentItem?.Log.ERROR("Error occurred during initialization", ex);
+                    ParentItem?.Log.ERROR($"Executing of {ItemType}: {Name}  completed with status: FAILED");
+                    MarkAsFailedOrSkipped();
+                    return;
+                }
+
+                _realLog = Log;
+            }
+
+            Log = new TestLogger(Name, ItemType.ToString());
+            if (RetryCount > 1)
+            {
+                Log.INFO($"Start try #{_tryNumber} of {RetryCount} ");
+            }
+
             Status = TestItemStatus.Unknown;
             StepsMeta.Clear();
-            var realLog = Log;
-            Log = new TestLogger(Name, ItemType.ToString());
 
-            Log.INFO($"Start executing {ItemType}: {Name}");
-            Log.INFO($"Description: {Description}");
-            Log.DEBUG("Start of initialization");
-            try
-            {
-                ExecuteStageInitialization();
-            }
-            catch (Exception ex)
-            {
-                Log.ERROR("Error has occurred during initialization", ex);
-                Log.SpamToLog(realLog);
-                Log = realLog;
-                MarkAsFailedOrSkipped();
-            }
-            Log.DEBUG("Initialization has been completed");
-
-
-            if (RetryCount != 1)
-            {
-                realLog.DEBUG($"Start try {_tryNumber} of {RetryCount}");
-            }
 
             try
             {
@@ -113,46 +122,29 @@
             }
             catch (Exception ex)
             {
-                if (RetryCount == 1)
+                if (_tryNumber < RetryCount)
                 {
-                    Log.ERROR("Error occurred during step execution", ex);
-                    Log.SpamToLog(realLog);
-                    Log = realLog;
-                    MarkAsFailedOrSkipped();
+                    Log.WARN($"Error occurred during execution {ItemType}: {Name}", ex);
                 }
                 else
                 {
-                    Log.WARN("Error occurred during step execution", ex);
+                    if (RetryCount == 1)
+                    {
+                        ParentItem?.Log.ERROR($"Error occurred during execution {ItemType}: {Name}", ex);
+                    }
+                    Log.ERROR($"Error occurred during execution {ItemType}: {Name}", ex);
                 }
+                Status = TestItemStatus.Failed;
             }
             finally
             {
                 try
                 {
                     ExecuteStagePost();
-
-                    if (Status != TestItemStatus.Failed)
-                    {
-                        Log.SpamToLog(realLog);
-                        Log = realLog;
-                    }
                 }
                 catch (Exception ex)
                 {
-                    if (RetryCount == 1)
-                    {
-                        if (Status != TestItemStatus.Failed)
-                        {
-                            Log.ERROR("Error occurred during step execution", ex);
-                            Log.SpamToLog(realLog);
-                            Log = realLog;
-                            MarkAsFailedOrSkipped();
-                        }
-                        else
-                        {
-                            Log.WARN("Error occurred during step execution", ex);
-                        }
-                    }
+                    Log.WARN("Error occurred during Post steps execution", ex);
                 }
                 finally
                 {
@@ -160,14 +152,38 @@
                     {
                         if (_tryNumber < RetryCount)
                         {
-                            realLog.WARN($"Try {_tryNumber} of {RetryCount} completed with error. Try again");
-
-                            FailedTries.Add(GetState());
-
-                            Log = realLog;
+                            Log.WARN($"Try #{_tryNumber} of {RetryCount}  completed with error");
                             _tryNumber++;
+
+                            var state = GetState();
+                            FailedTries.Add(state);
+
                             Execute();
                         }
+                        else
+                        {
+                            if (_tryNumber > 1)
+                            {
+                                Log.ERROR($"Try #{_tryNumber} of {RetryCount}  completed with error");
+                            }
+
+                            Log.SpamTo(_realLog);
+                            Log = _realLog;
+
+
+                            Log.ERROR($"Executing of {ItemType}: {Name}  completed with status: FAILED");
+                            ParentItem?.Log.ERROR($"Executing of {ItemType}: {Name}  completed with status: FAILED");
+                            MarkAsFailedOrSkipped();
+                        }
+                    }
+                    else
+                    {
+                        Status = TestItemStatus.Passed;
+                        Log.INFO($"Executing of {ItemType}: {Name}  completed with status: PASSED");
+                        ParentItem?.Log.INFO($"Executing of {ItemType}: {Name}  completed with status: PASSED");
+
+                        Log.SpamTo(_realLog);
+                        Log = _realLog;
                     }
                 }
             }
@@ -175,16 +191,8 @@
 
         public virtual TestItem GetState()
         {
-            TestItem testItem = (TestItem)Activator.CreateInstance(GetType());
-
-            testItem.Name = Name;
-            testItem.Description = Description;
-            testItem.Context.ContextValues = Context.ContextValues;
-            testItem.Context.CommandManagersItems = Context.CommandManagersItems;
-            testItem.ItemType = ItemType;
+            var testItem = MetaType.CopyObjectWithCast(this);
             testItem.Log = Log;
-            testItem.StepsMeta = StepsMeta;
-
             return testItem;
         }
 
@@ -252,7 +260,7 @@
             stepMeta.Step = testStep;
             stepMeta.TestItemStatus = TestItemStatus.Unknown;
             stepMeta.Log = new TestLogger(testStep.Name, "Step");
-            stepMeta.Log.AddParent(Log);
+            stepMeta.Log.SetParent(Log);
             StepsMeta.Add(stepMeta);
 
             for (int i = 1; i <= testStep.TryCount; i++)
@@ -277,6 +285,10 @@
                         else
                         {
                             stepMeta.TestItemStatus = TestItemStatus.Failed;
+                            stepMeta.Log.ERROR($"Error occurred during step execution", ex);
+                            stepMeta.Log.ERROR($"TestStep: {testStep.Name} completed with status: FAILED");
+                            Log.ERROR($"Error occurred during executing TestStep: {testStep.Name}", ex);
+                            Log.ERROR($"TestStep: {testStep.Name} completed with status: FAILED");
                             throw ex;
                         }
                     }
@@ -286,6 +298,11 @@
                         stepMeta.Log.WARN("Try again");
                     }
                 }
+            }
+            if (stepMeta.TestItemStatus == TestItemStatus.Unknown)
+            {
+                stepMeta.TestItemStatus = TestItemStatus.Passed;
+                Log.INFO($"TestStep: {testStep.Name} has been successfully completed with status: PASSED");
             }
         }
 
@@ -297,8 +314,6 @@
                 Status = TestItemStatus.Failed;
         }
 
-
-
         public virtual void SetParent(TestSuite parent)
         {
             if (parent != null)
@@ -306,7 +321,7 @@
                 ParentItem = parent;
                 Context.ParentContext = parent.Context;
                 MergeSteps(parent.Steps);
-                Log.AddParent(parent.Log);
+                Log.SetParent(parent.Log);
             }
         }
         public void MergeSteps(LinkedList<TestStep> parentSteps)
@@ -354,9 +369,9 @@
             reportItem.Status = Status;
             reportItem.Type = ItemType;
 
-            foreach (var logMessage in Log.Messages)
+            foreach (var logMessage in Log.LogMessages)
             {
-                reportItem.LogMessages.Add(new TestInfo.LogMessage { Level = logMessage.Level, DataStemp = logMessage.Time, Message = logMessage.Message, Exception = logMessage.Ex });
+                reportItem.LogMessages.Add(logMessage);
             }
 
             foreach (var stepMeta in StepsMeta)
@@ -366,9 +381,9 @@
                 reportStep.Description = stepMeta.Step.Description;
                 reportStep.Status = stepMeta.TestItemStatus;
 
-                foreach (var stepMessage in stepMeta.Log.Messages)
+                foreach (var stepMessage in stepMeta.Log.LogMessages)
                 {
-                    reportStep.Messages.Add(new TestInfo.LogMessage { Level = stepMessage.Level, DataStemp = stepMessage.Time, Message = stepMessage.Message, Exception = stepMessage.Ex });
+                    reportStep.Messages.Add(stepMessage);
                 }
 
                 reportItem.Steps.Add(reportStep);

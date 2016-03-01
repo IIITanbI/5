@@ -28,6 +28,7 @@
         public object Serialize(object obj, MetaTypeCollectionMember collectionMember)
         {
             var collectionObj = collectionMember.GetValue(obj);
+            if (collectionObj == null) return null;
             var collectionChildren = collectionMember.CollectionWrapper.GetChildren(collectionObj);
 
             var collectionEl = new XElement(collectionMember.Info.Name);

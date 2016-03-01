@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttachedItemType.cs" />
     <Compile Include="BaseCommandManager.cs" />
     <Compile Include="BaseMetaObject.cs" />
     <Compile Include="BaseMetaObjectWpfFiller.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="BaseMetaObjectXmlSourceResolver.cs" />
     <Compile Include="TestItemStatus.cs" />
     <Compile Include="TestItemType.cs" />
-    <Compile Include="TestsInfo\AttachedData.cs" />
     <Compile Include="TestsInfo\LogMessage.cs" />
     <Compile Include="TestsInfo\Step.cs" />
     <Compile Include="TestsInfo\TestEnvironmentInfo.cs" />
@@ -107,6 +107,7 @@
     <Compile Include="ValueParsers\ParsableTypesParser.cs" />
     <Compile Include="ValueParsers\XElementParser.cs" />
     <Compile Include="WpfManagingFillers\BaseWpfValueFiller.cs" />
+    <Compile Include="WpfManagingFillers\Editors\CollectionEditor.cs" />
     <Compile Include="WpfManagingFillers\Editors\ValueEditor.cs" />
     <Compile Include="WpfManagingFillers\IWpfValueFiller.cs" />
     <Compile Include="WpfManagingFillers\WpfManagingCollectionFiller.cs" />

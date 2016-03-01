@@ -20,7 +20,7 @@
             throw new NotImplementedException();
         }
 
-        public object FillEditControls(object container, object parentObj, MetaTypeObjectMember objectMember)
+        public void FillEditControls(object container, object parentObj, MetaTypeObjectMember objectMember)
         {
             var containerStackPanel = container as StackPanel;
             if (containerStackPanel == null)
@@ -41,7 +41,6 @@
                 headerWrapPanel.Children.Add(createButton);
 
                 rootGroupBox.Content = new Label { Content = "Value is not specified" };
-                return null;
             }
 
             var editButton = new Button { Content = "Edit" };
@@ -77,11 +76,9 @@
                     objectMember1.MemberMetaType.Value.ManagingFiller.GetManagingObjectFiller().FillEditControls(rootStackPanel, obj, objectMember1);
                 }
             }
-
-            return obj;
         }
 
-        public object FillEditControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed)
+        public void FillEditControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed)
         {
             var containerStackPanel = container as StackPanel;
             if (containerStackPanel == null)
@@ -103,7 +100,6 @@
             if (obj == null)
             {
                 rootStackPanel.Children.Add(new Label { Content = "Value is not specified" });
-                return null;
             }
 
 
@@ -128,8 +124,6 @@
                     objectMember.MemberMetaType.Value.ManagingFiller.GetManagingObjectFiller().FillEditControls(rootStackPanel, obj, objectMember);
                 }
             }
-
-            return null;
         }
 
         public void FillInfoControls(object container, object parentObj, MetaTypeObjectMember objectMember)
