@@ -15,5 +15,7 @@
 
         void Add(Type type, string name, object value);
         void Add(string path, object value);
+
+        string ResolveBind(string stringWithBind);
     }
 }

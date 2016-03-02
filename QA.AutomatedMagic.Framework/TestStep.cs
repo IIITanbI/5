@@ -25,7 +25,7 @@
         [MetaTypeValue("Is step skipped on fail", IsRequired = false)]
         [MetaLocation("skipOnFail")]
         public bool IsSkippedOnFail { get; set; } = false;
-        
+
         [MetaTypeValue("Is TestStep enabled?", IsRequired = false)]
         [MetaLocation("enabled")]
         public bool IsEnabled { get; set; } = true;
@@ -57,59 +57,9 @@
                 throw new FrameworkException($"Unexpected Manager: {Manager}");
 
             var manager = ReflectionManager.GetCommandManagerByTypeName(managerTypeName);
-            var command = manager.Commands.First(c => c.PossibleNames.Contains(CommandName));
-            var parameterInfos = command.Parameters;
-
             var managerObj = context.Managers[managerTypeName][managerName ?? managerTypeName];
-            var curParamStrIndex = 0;
-            var parObjs = new List<object>();
 
-            for (int i = 0; i < parameterInfos.Length; i++)
-            {
-                var pInfo = parameterInfos[i];
-
-                if (pInfo.ParameterType == typeof(ILogger))
-                {
-                    parObjs.Add(log);
-                    continue;
-                }
-                if (pInfo.ParameterType == typeof(IContext))
-                {
-                    parObjs.Add(context);
-                    continue;
-                }
-
-                var parStr = Parameters[curParamStrIndex];
-                curParamStrIndex++;
-
-                if (parStr.StartsWith("$"))
-                {
-                    var objStr = context.ResolveBind(parStr.Substring(2, parStr.Length - 3));
-                    var parObj = context.ResolveValue(objStr);
-                    if (pInfo.ParameterType.IsAssignableFrom(parObj.GetType()))
-                    {
-                        parObjs.Add(parObj);
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-                else
-                {
-                    if (pInfo.ParameterType == typeof(string))
-                    {
-                        parObjs.Add(context.ResolveBind(parStr));
-                    }
-                    else
-                    {
-                        log.TRACE("Parameter type is Not string.");
-                        throw new FrameworkException($"Couldn't put object with type: String to parameter with name: {pInfo.Name} and type: {pInfo.ParameterType.Name} to call method: {CommandName} from manager: {Manager}.");
-                    }
-                }
-            }
-
-            var result = command.Method.Invoke(managerObj, parObjs.ToArray());
+            var result = manager.ExecuteCommand(managerObj, CommandName, Parameters, context, log);
 
             if (result != null)
                 context.Add($"Step.{Name}", result);
