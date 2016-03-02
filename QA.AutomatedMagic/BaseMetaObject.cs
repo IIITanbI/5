@@ -14,5 +14,17 @@
         {
 
         }
+
+        public List<string> GetPaths()
+        {
+            var metaType = ReflectionManager.GetMetaType(GetType());
+            return metaType.GetPaths(this);
+        }
+
+        public object ResolvePath(string path)
+        {
+            var metaType = ReflectionManager.GetMetaType(GetType());
+            return metaType.ResolvePath(path, this);
+        }
     }
 }

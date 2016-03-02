@@ -44,7 +44,7 @@
             var rootStackPanel = new StackPanel();
             scrollViewer.Content = rootStackPanel;
 
-            var infoLabel = new Label { Content = $"{_collectionMember.Info.Name} : {_collectionMember.CollectionWrapper.GetCollectionType()} of {(_collectionMember.ChildrenMetaType?.Value.TargetType ?? _collectionMember.ChildrenType).Name}";
+            var infoLabel = new Label { Content = $"{_collectionMember.Info.Name} : {_collectionMember.CollectionWrapper.GetCollectionType()} of {(_collectionMember.ChildrenMetaType?.Value.TargetType ?? _collectionMember.ChildrenType).Name}" };
             rootStackPanel.Children.Add(infoLabel);
 
             var buttonsPanel = new WrapPanel();

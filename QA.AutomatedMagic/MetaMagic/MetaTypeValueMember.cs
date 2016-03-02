@@ -50,5 +50,15 @@
                 return null;
             return ValueParser.Parse(resolvedSource, MemberType);
         }
+
+        public override List<string> GetPaths(object parentObj)
+        {
+            return new List<string> { Info.Name };
+        }
+
+        public override object ResolveValue(string path, object parentObj)
+        {
+            return GetValue(parentObj);
+        }
     }
 }

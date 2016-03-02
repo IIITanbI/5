@@ -55,5 +55,42 @@
 
             throw new ParseException();
         }
+
+        public override List<string> GetPaths(object parentObj)
+        {
+            var value = GetValue(parentObj);
+            if (value == null) return null;
+
+            var root = Info.Name;
+
+            var childPaths = new List<string>();
+            childPaths.Add(root);
+
+            var cps = MemberMetaType.Value.GetPaths(value);
+
+            foreach (var cp in cps)
+            {
+                childPaths.Add($"{root}.{cp}");
+            }
+
+            return childPaths;
+        }
+
+        public override object ResolveValue(string path, object parentObj)
+        {
+            var obj = GetValue(parentObj);
+
+            var firstName = path;
+            if (path.Contains('.'))
+            {
+                firstName = path.Substring(0, path.IndexOf('.'));
+            }
+
+            if (firstName == path) return obj;
+            
+            path = path.Substring(path.IndexOf('.') + 1);
+
+            return MemberMetaType.Value.ResolvePath(path, obj);
+        }
     }
 }

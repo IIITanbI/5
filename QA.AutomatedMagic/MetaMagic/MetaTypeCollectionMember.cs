@@ -151,5 +151,64 @@
 
             return createdCollection;
         }
+
+        public override List<string> GetPaths(object parentObj)
+        {
+            var root = Info.Name;
+
+            var collectionObj = GetValue(parentObj);
+            if (collectionObj == null) return null;
+
+            var children = CollectionWrapper.GetChildren(collectionObj);
+
+            var childPaths = new List<string>();
+            childPaths.Add(root);
+
+            int counter = 1;
+            if (ChildrenMetaType == null)
+            {
+                foreach (var child in children)
+                {
+                    childPaths.Add($"{root}[{counter++}]");
+                }
+            }
+            else
+            {
+                foreach (var child in children)
+                {
+                    var cps = ChildrenMetaType.Value.GetPaths(child);
+                    var p = $"{root}[{counter++}]";
+                    foreach (var cp in cps)
+                    {
+                        childPaths.Add($"{p}.{cp}");
+                    }
+                }
+            }
+
+            return childPaths;
+        }
+
+        public override object ResolveValue(string path, object parentObj)
+        {
+            var collectionObj = GetValue(parentObj);
+
+            var firstName = path;
+            if (path.Contains('.'))
+            {
+                firstName = path.Substring(0, path.IndexOf('.'));
+            }
+
+            if (firstName == Info.Name) return collectionObj;
+
+            var indexVal = firstName.Substring(firstName.IndexOf('[') + 1, firstName.IndexOf(']') - firstName.IndexOf('[') - 1);
+            var index = int.Parse(indexVal);
+
+            var children = CollectionWrapper.GetChildren(collectionObj);
+
+            if (firstName == path)
+                return children[index - 1];
+
+            return ChildrenMetaType.Value.ResolvePath(path.Substring(path.IndexOf('.') + 1), children[index - 1]);
+        }
     }
 }

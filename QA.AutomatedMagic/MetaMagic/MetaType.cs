@@ -22,6 +22,7 @@
             new EnumParser(),
             new XElementParser()
         };
+
         public static List<ICollectionWrapper> CollectionWrappers { get; set; } = new List<ICollectionWrapper>
         {
             new ListWrapper(),
@@ -253,6 +254,42 @@
         public object Copy(object obj)
         {
             return Parse(SourceResolver.GetObjectSourceResolver().Serialize(obj, this, Info.Name, false));
+        }
+
+        public List<string> GetPaths(object obj)
+        {
+            var childPaths = new List<string>();
+
+            foreach (var member in Members)
+            {
+                var cps = member.GetPaths(obj);
+                if (cps != null)
+                {
+                    foreach (var cp in cps)
+                    {
+                        childPaths.Add(cp);
+                    }
+                }
+            }
+
+            return childPaths;
+        }
+
+        public object ResolvePath(string path, object parentObj)
+        {
+            var memberName = path;
+            if (path.Contains('.'))
+            {
+                memberName = path.Substring(0, path.IndexOf('.'));
+            }
+            if(memberName.Contains('['))
+            {
+                memberName = memberName.Substring(0, path.IndexOf('['));
+            }
+
+            var member = Members.First(m => m.Info.Name == memberName);
+
+            return member.ResolveValue(path, parentObj);
         }
 
         public override string ToString()
