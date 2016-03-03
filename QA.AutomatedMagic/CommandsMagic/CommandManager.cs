@@ -156,6 +156,64 @@
             return result;
         }
 
+        public object ExecuteCommand(object managerObject, string commandName, List<object> parObjs, ILogger log)
+        {
+            var propInfos = new List<PropertyInfo>();
+            var possibleCommands = FindCommand(commandName, propInfos);
+
+            if (possibleCommands == null || possibleCommands.Count == 0)
+                throw new NotImplementedException();
+            
+            Command acceptedCommand = null;
+            var parArray = new List<object>();
+            foreach (var command in possibleCommands)
+            {
+                var curIndex = 0;
+                var isBad = false;
+                for (int i = 0; i < command.Parameters.Length; i++)
+                {
+                    var paramInfo = command.Parameters[i];
+                    if (paramInfo.ParameterType == typeof(ILogger))
+                    {
+                        parArray.Add(log);
+                        continue;
+                    }
+                    if (paramInfo.ParameterType.IsAssignableFrom(parObjs[curIndex].GetType()))
+                    {
+                        parArray.Add(parObjs[curIndex]);
+                        curIndex++;
+                    }
+                    else
+                    {
+                        isBad = true;
+                        break;
+                    }
+                }
+
+                if (!isBad)
+                {
+                    acceptedCommand = command;
+                    break;
+                }
+                else
+                {
+                    parArray.Clear();
+                }
+            }
+
+            if (acceptedCommand == null)
+                throw new NotImplementedException();
+
+            foreach (var propInfo in propInfos)
+            {
+                managerObject = propInfo.GetValue(managerObject);
+            }
+
+            var result = acceptedCommand.Method.Invoke(managerObject, parArray.ToArray());
+
+            return result;
+        }
+
         public List<Command> FindCommand(string commandName, List<PropertyInfo> propInfos)
         {
             if (commandName.StartsWith(CommandManagerType.Name + "."))
