@@ -23,5 +23,10 @@
         }
 
         public abstract bool IsMatch(Type type);
+
+        public BaseWpfValueFiller GetInstance()
+        {
+            return (BaseWpfValueFiller)Activator.CreateInstance(GetType());
+        }
     }
 }

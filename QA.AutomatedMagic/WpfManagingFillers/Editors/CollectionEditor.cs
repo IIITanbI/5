@@ -76,11 +76,12 @@
 
                 foreach (var obj in _children)
                 {
-                    StackPanel childStackPanel = CreateChildStackPanel(counter, obj);
+                    StackPanel childStackPanel = CreateChildStackPanel(counter);
 
                     _childrenStackPanel.Children.Add(childStackPanel);
 
-                    managingValueFiller.FillEditControls(childStackPanel, obj, $"Item: {counter++}");
+                    var getf = managingValueFiller.FillEditControls(childStackPanel, obj, $"Item: {counter++}");
+                    childStackPanel.Tag = getf;
                 }
             }
             else
@@ -88,22 +89,25 @@
                 var managingObjectFiller = _collectionMember.ChildrenMetaType.Value.ManagingFiller.GetManagingObjectFiller();
                 foreach (var obj in _children)
                 {
-                    StackPanel childStackPanel = CreateChildStackPanel(counter, obj);
+                    StackPanel childStackPanel = CreateChildStackPanel(counter);
 
-                    managingObjectFiller.FillEditControls(childStackPanel, obj, _collectionMember.ChildrenMetaType.Value, $"Item: {counter++}", _collectionMember.IsAssignableTypesAllowed);
+                    _childrenStackPanel.Children.Add(childStackPanel);
+
+                    var getf = managingObjectFiller.FillEditControls(childStackPanel, obj, _collectionMember.ChildrenMetaType.Value, $"Item: {counter++}", _collectionMember.IsAssignableTypesAllowed);
+                    childStackPanel.Tag = getf;
                 }
             }
 
             _editWindow.ShowDialog();
         }
 
-        private StackPanel CreateChildStackPanel(int counter, object obj)
+        private StackPanel CreateChildStackPanel(int counter)
         {
             var childStackPanel = new StackPanel();
             var childButtonsWrapPanel = new WrapPanel();
             childStackPanel.Children.Add(childButtonsWrapPanel);
 
-            var removeBtn = new Button { Content = "Remove" + counter };
+            var removeBtn = new Button { Content = "Remove" };
             childButtonsWrapPanel.Children.Add(removeBtn);
             removeBtn.Click += RemoveBtn_Click;
             removeBtn.Tag = childStackPanel;
@@ -118,7 +122,7 @@
 
             if (counter < _children.Count)
             {
-                var downBtn = new Button { Content = "Down" + obj };
+                var downBtn = new Button { Content = "Down" };
                 childButtonsWrapPanel.Children.Add(downBtn);
                 downBtn.Click += DownBtn_Click;
                 downBtn.Tag = childStackPanel;
@@ -141,16 +145,80 @@
         {
             var btn = (Button)sender;
             var childPanel = (StackPanel)btn.Tag;
-            var counter = (int)childPanel.Tag;
 
             var index = _childrenStackPanel.Children.IndexOf(childPanel);
-            var tmp1 = _childrenStackPanel.Children[index - 1];
-            _childrenStackPanel.Children[index - 1] = _childrenStackPanel.Children[index];
-            _childrenStackPanel.Children[index] = tmp1;
+            var targetPanel = (StackPanel)_childrenStackPanel.Children[index + 1];
 
-            var tmp2 = _children[index - 1];
-            _children[index - 1] = _children[index];
-            _children[index] = tmp2;
+            _childrenStackPanel.Children.Remove(childPanel);
+            _childrenStackPanel.Children.Remove(targetPanel);
+            _childrenStackPanel.Children.Insert(index, targetPanel);
+            _childrenStackPanel.Children.Insert(index + 1, childPanel);
+
+            #region fck magic
+            foreach (var ci in childPanel.Children)
+            {
+                var wp = ci as WrapPanel;
+                if (wp != null)
+                {
+                    wp.Children.Clear();
+
+                    var removeBtn = new Button { Content = "Remove" };
+                    wp.Children.Add(removeBtn);
+                    removeBtn.Click += RemoveBtn_Click;
+                    removeBtn.Tag = childPanel;
+
+                    if (index + 1 > 0)
+                    {
+                        var upBtn = new Button { Content = "Up" };
+                        wp.Children.Add(upBtn);
+                        upBtn.Click += UpBtn_Click;
+                        upBtn.Tag = childPanel;
+                    }
+
+                    if (index + 1 < _children.Count - 1)
+                    {
+                        var downBtn = new Button { Content = "Down" };
+                        wp.Children.Add(downBtn);
+                        downBtn.Click += DownBtn_Click;
+                        downBtn.Tag = childPanel;
+                    }
+
+                    break;
+                }
+            }
+
+            foreach (var ci in targetPanel.Children)
+            {
+                var wp = ci as WrapPanel;
+                if (wp != null)
+                {
+                    wp.Children.Clear();
+
+                    var removeBtn = new Button { Content = "Remove" };
+                    wp.Children.Add(removeBtn);
+                    removeBtn.Click += RemoveBtn_Click;
+                    removeBtn.Tag = targetPanel;
+
+                    if (index > 0)
+                    {
+                        var upBtn = new Button { Content = "Up" };
+                        wp.Children.Add(upBtn);
+                        upBtn.Click += UpBtn_Click;
+                        upBtn.Tag = targetPanel;
+                    }
+
+                    if (index < _children.Count - 1)
+                    {
+                        var downBtn = new Button { Content = "Down" };
+                        wp.Children.Add(downBtn);
+                        downBtn.Click += DownBtn_Click;
+                        downBtn.Tag = targetPanel;
+                    }
+
+                    break;
+                }
+            }
+            #endregion
 
             e.Handled = true;
         }
@@ -158,16 +226,80 @@
         {
             var btn = (Button)sender;
             var childPanel = (StackPanel)btn.Tag;
-            var counter = (int)childPanel.Tag;
 
             var index = _childrenStackPanel.Children.IndexOf(childPanel);
-            var tmp1 = _childrenStackPanel.Children[index + 1];
-            _childrenStackPanel.Children[index + 1] = _childrenStackPanel.Children[index];
-            _childrenStackPanel.Children[index] = tmp1;
+            var targetPanel = (StackPanel)_childrenStackPanel.Children[index - 1];
 
-            var tmp2 = _children[index + 1];
-            _children[index + 1] = _children[index];
-            _children[index] = tmp2;
+            _childrenStackPanel.Children.Remove(childPanel);
+            _childrenStackPanel.Children.Remove(targetPanel);
+            _childrenStackPanel.Children.Insert(index - 1, childPanel);
+            _childrenStackPanel.Children.Insert(index, targetPanel);
+
+            #region fck magic
+            foreach (var ci in childPanel.Children)
+            {
+                var wp = ci as WrapPanel;
+                if (wp != null)
+                {
+                    wp.Children.Clear();
+
+                    var removeBtn = new Button { Content = "Remove" };
+                    wp.Children.Add(removeBtn);
+                    removeBtn.Click += RemoveBtn_Click;
+                    removeBtn.Tag = childPanel;
+
+                    if (index - 1 > 0)
+                    {
+                        var upBtn = new Button { Content = "Up" };
+                        wp.Children.Add(upBtn);
+                        upBtn.Click += UpBtn_Click;
+                        upBtn.Tag = childPanel;
+                    }
+
+                    if (index - 1 < _children.Count - 1)
+                    {
+                        var downBtn = new Button { Content = "Down" };
+                        wp.Children.Add(downBtn);
+                        downBtn.Click += DownBtn_Click;
+                        downBtn.Tag = childPanel;
+                    }
+
+                    break;
+                }
+            }
+
+            foreach (var ci in targetPanel.Children)
+            {
+                var wp = ci as WrapPanel;
+                if (wp != null)
+                {
+                    wp.Children.Clear();
+
+                    var removeBtn = new Button { Content = "Remove" };
+                    wp.Children.Add(removeBtn);
+                    removeBtn.Click += RemoveBtn_Click;
+                    removeBtn.Tag = targetPanel;
+
+                    if (index > 0)
+                    {
+                        var upBtn = new Button { Content = "Up" };
+                        wp.Children.Add(upBtn);
+                        upBtn.Click += UpBtn_Click;
+                        upBtn.Tag = targetPanel;
+                    }
+
+                    if (index < _children.Count - 1)
+                    {
+                        var downBtn = new Button { Content = "Down" };
+                        wp.Children.Add(downBtn);
+                        downBtn.Click += DownBtn_Click;
+                        downBtn.Tag = targetPanel;
+                    }
+
+                    break;
+                }
+            }
+            #endregion
 
             e.Handled = true;
         }
@@ -182,8 +314,13 @@
             _editWindow.Close();
 
             var collection = _collectionMember.CollectionWrapper.CreateNew(_collectionMember.ChildrenType, null);
-            foreach (var child in _children)
+            foreach (var childStackPanel in _childrenStackPanel.Children)
+            {
+                var sp = (StackPanel)childStackPanel;
+                var getter = (Func<object>)sp.Tag;
+                var child = getter();
                 _collectionMember.CollectionWrapper.Add(collection, child, _collectionMember.ChildrenType);
+            }
 
             _collectionMember.SetValue(_parentObj, collection);
         }

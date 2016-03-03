@@ -24,6 +24,7 @@
             panel.Children.Add(textBox);
 
             GetValue = () => XElement.Parse(textBox.Text);
+            SetValue = val => textBox.Text = val.ToString();
         }
 
         public override bool IsMatch(Type type)

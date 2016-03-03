@@ -24,6 +24,7 @@
             panel.Children.Add(byteDownUp);
 
             GetValue = () => byteDownUp.Value.GetValueOrDefault();
+            SetValue = val => byteDownUp.Value = (byte)val;
         }
 
         public override bool IsMatch(Type type)

@@ -25,6 +25,7 @@
             panel.Children.Add(timSpanUpDown);
 
             GetValue = () => timSpanUpDown.Value.GetValueOrDefault();
+            SetValue = val => timSpanUpDown.Value = (TimeSpan)val;
         }
 
         public override bool IsMatch(Type type)

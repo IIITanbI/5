@@ -25,6 +25,7 @@
             panel.Children.Add(doubleUpDown);
 
             GetValue = () => doubleUpDown.Value.GetValueOrDefault();
+            SetValue = val => doubleUpDown.Value = (double)val;
         }
 
         public override bool IsMatch(Type type)

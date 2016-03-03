@@ -23,6 +23,7 @@
             panel.Children.Add(checkBox);
 
             GetValue = () => checkBox.IsChecked.GetValueOrDefault();
+            SetValue = val => checkBox.IsChecked = (bool)val;
         }
 
         public override bool IsMatch(Type type)

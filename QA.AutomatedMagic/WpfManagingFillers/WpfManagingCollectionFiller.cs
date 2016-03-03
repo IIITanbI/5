@@ -8,6 +8,7 @@
     using MetaMagic;
     using System.Windows.Controls;
     using Editors;
+    using Creators;
 
     public class WpfManagingCollectionFiller : IManagingCollectionFiller
     {
@@ -24,15 +25,24 @@
 
             var collectionObj = collectionMember.GetValue(parentObj) ?? new List<object>();
 
-            var objs = collectionMember.CollectionWrapper.GetChildren(collectionObj);
-
             var rootGroupBox = new GroupBox();
             containerStackPanel.Children.Add(rootGroupBox);
+
 
             var headerWrapPanel = new WrapPanel();
             rootGroupBox.Header = headerWrapPanel;
             headerWrapPanel.Children.Add(new Label { Content = $"{collectionMember.Info.Name} : {collectionMember.CollectionWrapper.GetCollectionType()} of {(collectionMember.ChildrenMetaType?.Value.TargetType ?? collectionMember.ChildrenType).Name}" });
 
+            if (collectionObj == null)
+            {
+                rootGroupBox.Content = new Label { Content = "Value is not specified" };
+
+                var creator = new CollectionCreator(headerWrapPanel, collectionMember, parentObj);
+
+                return;
+            }
+
+            var objs = collectionMember.CollectionWrapper.GetChildren(collectionObj);
 
             var rootExpander = new Expander { Header = $"Count: {objs.Count}" };
             rootGroupBox.Content = rootExpander;
@@ -58,22 +68,28 @@
                     managingObjectFiller.FillInfoControls(rootStackPanel, obj, collectionMember.ChildrenMetaType.Value, $"Item: {counter++}", collectionMember.IsAssignableTypesAllowed);
                 }
             }
-            
+
             var collectionEditor = new CollectionEditor(headerWrapPanel, collectionMember, parentObj);
         }
 
-        public void FillInfoControlls(object container, object parentObj, MetaTypeCollectionMember collectionMember)
+        public void FillInfoControls(object container, object parentObj, MetaTypeCollectionMember collectionMember)
         {
             var containerStackPanel = container as StackPanel;
             if (containerStackPanel == null)
                 throw new ManagingFillerException();
 
-            var collectionObj = collectionMember.GetValue(parentObj) ?? new List<object>();
-
-            var objs = collectionMember.CollectionWrapper.GetChildren(collectionObj);
+            var collectionObj = collectionMember.GetValue(parentObj);
 
             var rootGroupBox = new GroupBox { Header = $"{collectionMember.Info.Name} : {collectionMember.CollectionWrapper.GetCollectionType()} of {(collectionMember.ChildrenMetaType?.Value.TargetType ?? collectionMember.ChildrenType).Name}" };
             containerStackPanel.Children.Add(rootGroupBox);
+
+            if (collectionObj == null)
+            {
+                rootGroupBox.Content = new Label { Content = "Value is not specified" };
+                return;
+            }
+
+            var objs = collectionMember.CollectionWrapper.GetChildren(collectionObj);
 
             var rootExpander = new Expander { Header = $"Count: {objs.Count}" };
             rootGroupBox.Content = rootExpander;

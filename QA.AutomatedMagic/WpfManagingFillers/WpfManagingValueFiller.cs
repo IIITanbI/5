@@ -53,11 +53,11 @@
             var rootStackPanel = new StackPanel();
             rootGroupBox.Content = rootStackPanel;
 
-            var filler = _valueFillers.First(f => f.IsMatch(objType));
+            var filler = _valueFillers.First(f => f.IsMatch(objType)).GetInstance();
             filler.FillEditControls(rootStackPanel, obj, objType);
 
             var valueEditor = new ValueEditor(headerWrapPanel, filler, rootStackPanel, obj);
-            return filler.GetValue;
+            return valueEditor.GetGet();
         }
 
         public void FillEditControls(object container, object parentObj, MetaTypeValueMember valueMember)
@@ -76,7 +76,7 @@
             var rootStackPanel = new StackPanel();
             rootGroupBox.Content = rootStackPanel;
 
-            var filler = _valueFillers.First(f => f.IsMatch(valueMember.MemberType));
+            var filler = _valueFillers.First(f => f.IsMatch(valueMember.MemberType)).GetInstance();
             filler.FillEditControls(rootStackPanel, valueMember.GetValue(parentObj), valueMember.MemberType);
 
             var valueEditor = new ValueEditor(headerWrapPanel, filler, rootStackPanel, valueMember, parentObj);
@@ -96,7 +96,7 @@
             var rootStackPanel = new StackPanel();
             rootGroupBox.Content = rootStackPanel;
 
-            var filler = _valueFillers.First(f => f.IsMatch(objType));
+            var filler = _valueFillers.First(f => f.IsMatch(objType)).GetInstance();
             filler.FillInfoControls(rootStackPanel, obj, objType);
         }
         public void FillInfoControls(object container, object parentObj, MetaTypeValueMember valueMember)
@@ -111,7 +111,7 @@
             var rootStackPanel = new StackPanel();
             rootGroupBox.Content = rootStackPanel;
 
-            var filler = _valueFillers.First(f => f.IsMatch(valueMember.MemberType));
+            var filler = _valueFillers.First(f => f.IsMatch(valueMember.MemberType)).GetInstance();
             filler.FillInfoControls(rootStackPanel, valueMember.GetValue(parentObj), valueMember.MemberType);
         }
     }

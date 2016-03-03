@@ -47,6 +47,7 @@
             comboBox.SelectionChanged += ComboBox_SelectionChanged;
 
             GetValue = () => Enum.Parse(type, comboBox.SelectedItem.ToString());
+            SetValue = val => comboBox.SelectedIndex = values.ToList().IndexOf(val.ToString()); ;
         }
     }
 }

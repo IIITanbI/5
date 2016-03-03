@@ -89,9 +89,14 @@
                 )
             );
 
+            var comboProstConfig3 = new XElement("ComboProst",
+                prostConfig1,
+                new XElement("ProstField", prostConfig2)
+            );
+
             var obj4 = MetaType.Parse<ComboProst>(comboProstConfig2);
             obj4.Ts = TimeSpan.FromMilliseconds(20110646);
-            comboMetaType.ManagingFiller.GetManagingObjectFiller().FillInfoControls(S1, obj4, comboMetaType, "Test", false);
+            comboMetaType.ManagingFiller.GetManagingObjectFiller().FillEditControls(S1, obj4, comboMetaType, "Test", false);
         }
 
         [MetaType("Test Prost class", "StringProp")]

@@ -24,6 +24,7 @@
             panel.Children.Add(dateTimeUpDown);
 
             GetValue = () => dateTimeUpDown.Value.GetValueOrDefault();
+            SetValue = val => dateTimeUpDown.Value = (DateTime)val;
         }
 
         public override bool IsMatch(Type type)

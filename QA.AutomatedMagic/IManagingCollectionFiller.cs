@@ -13,6 +13,6 @@
 
         void FillEditControls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
 
-        void FillInfoControlls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
+        void FillInfoControls(object container, object parentObj, MetaTypeCollectionMember collectionMember);
     }
 }

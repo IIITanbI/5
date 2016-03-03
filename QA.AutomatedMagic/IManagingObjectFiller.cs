@@ -10,7 +10,7 @@
     public interface IManagingObjectFiller
     {
         void FillInfoControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed);
-        void FillEditControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed);
+        Func<object> FillEditControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed);
         object FillCreateControls(object container, MetaType metaType, string name, bool isAssignableTypesAllowed);
         
         void FillInfoControls(object container, object parentObj, MetaTypeObjectMember objectMember);

@@ -28,6 +28,7 @@
             panel.Children.Add(textBlock);
 
             GetValue = () => textBlock.Text;
+            SetValue = val => textBlock.Text = val.ToString();
         }
     }
 }

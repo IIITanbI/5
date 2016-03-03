@@ -25,6 +25,7 @@
             panel.Children.Add(intUpDown);
 
             GetValue = () => intUpDown.Value.GetValueOrDefault();
+            SetValue = val => intUpDown.Value = (int)val;
         }
 
         public override bool IsMatch(Type type)

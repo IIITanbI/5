@@ -106,7 +106,10 @@
     <Compile Include="ValueParsers\StringParser.cs" />
     <Compile Include="ValueParsers\ParsableTypesParser.cs" />
     <Compile Include="ValueParsers\XElementParser.cs" />
+    <Compile Include="WpfManagingFillers\BaseEditor.cs" />
     <Compile Include="WpfManagingFillers\BaseWpfValueFiller.cs" />
+    <Compile Include="WpfManagingFillers\Creators\CollectionCreator.cs" />
+    <Compile Include="WpfManagingFillers\Creators\ObjectCreator.cs" />
     <Compile Include="WpfManagingFillers\Editors\CollectionEditor.cs" />
     <Compile Include="WpfManagingFillers\Editors\ObjectEditor.cs" />
     <Compile Include="WpfManagingFillers\Editors\ValueEditor.cs" />
