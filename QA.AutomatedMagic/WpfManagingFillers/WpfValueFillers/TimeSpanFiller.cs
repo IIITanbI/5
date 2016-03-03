@@ -13,7 +13,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var timSpanUpDown = new TimeSpanUpDown();
+            var timSpanUpDown = new TimeSpanUpDown { Value = TimeSpan.FromDays(0) };
             panel.Children.Add(timSpanUpDown);
 
             GetValue = () => timSpanUpDown.Value.GetValueOrDefault();

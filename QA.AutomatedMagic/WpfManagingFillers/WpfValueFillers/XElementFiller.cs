@@ -12,7 +12,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var textBox = new TextBox();
+            var textBox = new TextBox { Text = "<root></root>" };
             panel.Children.Add(textBox);
 
             GetValue = () => XElement.Parse(textBox.Text);

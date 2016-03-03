@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RunConfig>
+  
+  <PathToProjectConfig>D:\Git\QA.AutomatedMagic\Test\config.xml</PathToProjectConfig>
+  <!--<PathToProjectConfig>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Tests.Tutorial\bin\Debug\TutorialTests.xml</PathToProjectConfig>-->
+  
+  <LibrariesPaths>
+    <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.ApiManager\bin\Debug</path>
+    <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.FileManager\bin\Debug</path>
+    <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.GitManager\bin\Debug</path>
+    <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.WebDriverManager\bin\Debug</path>
+    
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.AemPageManager\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.AemUI\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.TutorialManager\bin\Debug</path>
+    <!--<path></path>-->
+  </LibrariesPaths>
+  
+</RunConfig>

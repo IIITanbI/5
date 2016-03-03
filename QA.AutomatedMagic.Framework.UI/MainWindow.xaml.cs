@@ -16,6 +16,7 @@
     using System.Windows.Navigation;
     using System.Windows.Shapes;
     using System.Xml.Linq;
+    using WpfManagingFillers;
 
     public partial class MainWindow : Window
     {
@@ -23,9 +24,16 @@
         {
             ReflectionManager.LoadAssemblies();
             InitializeComponent();
+
+            var creator = new Creator(B1, ReflectionManager.GetMetaType(typeof(ComboProst)), "Test", true);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void B1_Click(object sender, RoutedEventArgs e)
+        {
+            //Test();
+        }
+
+        public void Test()
         {
             var prostConfig1 = new XElement("ProstProperty",
                 new XElement("StringProp", "StringProp1"),

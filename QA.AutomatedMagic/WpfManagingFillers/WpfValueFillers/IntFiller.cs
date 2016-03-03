@@ -12,7 +12,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var intUpDown = new IntegerUpDown();
+            var intUpDown = new IntegerUpDown { Value = 0 };
             panel.Children.Add(intUpDown);
 
             GetValue = () => intUpDown.Value.GetValueOrDefault();

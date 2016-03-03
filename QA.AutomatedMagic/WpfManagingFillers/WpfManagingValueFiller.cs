@@ -25,14 +25,29 @@
             new XElementFiller()
         };
 
-        public object FillCreateControls(object container, MetaTypeValueMember valueMember)
+        public Func<object> FillCreateControls(object container, Type type, string name)
         {
-            throw new NotImplementedException();
-        }
+            var containerStackPanel = container as StackPanel;
+            if (containerStackPanel == null)
+                throw new ManagingFillerException();
 
-        public object FillCreateControls(object container, Type type, string name)
-        {
-            throw new NotImplementedException();
+            var objType = type;
+
+            var rootGroupBox = new GroupBox();
+            containerStackPanel.Children.Add(rootGroupBox);
+            var headerWrapPanel = new WrapPanel();
+            rootGroupBox.Header = headerWrapPanel;
+            var nameLabel = new Label { Content = $"{name} : {objType.Name}" };
+            headerWrapPanel.Children.Add(nameLabel);
+
+            var rootStackPanel = new StackPanel();
+            rootGroupBox.Content = rootStackPanel;
+
+            var filler = _valueFillers.First(f => f.IsMatch(objType)).GetInstance();
+            filler.FillCreateControls(rootStackPanel, objType);
+
+            var valueEditor = new ValueEditor(headerWrapPanel, filler, rootStackPanel, null);
+            return valueEditor.GetGet();
         }
 
         public Func<object> FillEditControls(object container, object obj, string name)

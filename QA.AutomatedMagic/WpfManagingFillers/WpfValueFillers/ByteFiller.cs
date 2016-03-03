@@ -12,7 +12,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var byteDownUp = new ByteUpDown();
+            var byteDownUp = new ByteUpDown { Value = 0 };
             panel.Children.Add(byteDownUp);
 
             GetValue = () => byteDownUp.Value.GetValueOrDefault();

@@ -13,28 +13,65 @@
     public static class ReflectionManager
     {
         private static List<string> _loadedAssemblies = new List<string>();
+        private static List<string> _loadedAssemblyNames = new List<string>();
         private static Dictionary<Type, MetaType> _type_metaType = new Dictionary<Type, MetaType>();
         private static Dictionary<Type, CommandManager> _type_commandManager = new Dictionary<Type, CommandManager>();
 
-        public static void LoadAssemblies(string pathToLibFolder = null)
+        public static void LoadAssemblies()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+
+            foreach (var assembly in assemblies)
+            {
+                LoadAssembly(assembly);
+            }
+
+            foreach (var metaType in _type_metaType.Values)
+            {
+                foreach (var possibleAssiganbleType in _type_metaType.Values)
+                {
+                    if (metaType.TargetType.IsAssignableFrom(possibleAssiganbleType.TargetType))
+                    {
+                        if (!possibleAssiganbleType.TargetType.IsAbstract && !metaType.AssignableTypes.Contains(possibleAssiganbleType))
+                            metaType.AssignableTypes.Add(possibleAssiganbleType);
+                    }
+                }
+            }
+        }
+
+        public static void LoadAssemblies(string pathToLibFolder, bool all = false)
         {
             var assemblies = new List<Assembly>();
 
-            assemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies().ToList());
-
-            if (pathToLibFolder == null)
-                pathToLibFolder = Directory.GetCurrentDirectory();
-
             if (Directory.Exists(pathToLibFolder))
             {
-                var assemblyFiles = Directory.GetFiles(pathToLibFolder, "*.dll").ToList();
-                try
-                {
-                    assemblyFiles.ForEach(af => assemblies.Add(Assembly.LoadFrom(af)));
-                }
-                catch
-                {
+                var assemblyFiles = all
+                    ? Directory.GetFiles(pathToLibFolder, "*.dll", SearchOption.AllDirectories).ToList()
+                    : Directory.GetFiles(pathToLibFolder, "*.dll").ToList();
 
+                foreach (var asF in assemblyFiles)
+                {
+                    var assemblyFileName = Path.GetFileName(asF);
+                    if (!assemblyFileName.Contains("QA.AutomatedMagic") && !assemblyFileName.Contains("SapAutomation"))
+                        continue;
+
+                    assemblyFileName = Path.GetFileNameWithoutExtension(assemblyFileName);
+                    if (_loadedAssemblyNames.Contains(assemblyFileName))
+                        continue;
+
+
+                    if (!_loadedAssemblies.Contains(asF))
+                    {
+                        try
+                        {
+                            assemblies.Add(Assembly.LoadFrom(asF));
+                            _loadedAssemblies.Add(asF);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
+                    }
                 }
             }
 
@@ -55,10 +92,11 @@
                 }
             }
         }
+
         public static void LoadAssembly(Assembly assembly)
         {
             var assemblyName = assembly.GetName().Name;
-            if (_loadedAssemblies.Contains(assemblyName))
+            if (_loadedAssemblyNames.Contains(assemblyName))
                 return;
 
             var types = assembly.DefinedTypes.ToList();
@@ -68,7 +106,7 @@
                 LoadType(type);
             }
 
-            _loadedAssemblies.Add(assemblyName);
+            _loadedAssemblyNames.Add(assemblyName);
         }
 
         public static CommandManager GetCommandManagerByTypeName(string managerTypeName)

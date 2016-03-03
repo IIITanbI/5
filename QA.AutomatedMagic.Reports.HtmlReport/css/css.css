@@ -1,0 +1,158 @@
+﻿.environment {
+    margin-top: 3%;
+}
+
+.table.overall {
+    margin: 0px;
+}
+
+
+
+.test-fltr-btns button {
+    width: 70px;
+}
+
+.test-fltr-btns button.activated {
+    border-width: 3px;
+    border-color: black;
+}
+
+.test-fltr-btn-all {
+    background-color: deepskyblue;
+}
+
+.test-fltr-btn-psd {
+    background-color: greenyellow;
+}
+
+.test-fltr-btn-fld{
+    background-color: orange;
+}
+
+.test-fltr-btn-skpd {
+    background-color: lightseagreen;
+}
+
+
+.logPanel {
+    display: none;
+}
+
+.logHeader {
+    height: 22px;
+    margin-bottom: 10px;
+}
+
+.logHeader > * {
+    float : left;
+}
+
+.log-fltr-btn-exp {
+    height:20px;
+    width:20px;
+    margin-top: 3px;
+    margin-left: 3px;
+}
+
+.log-fltr-btns {
+    display: none;
+}
+
+.log-fltr-btns button {
+    width: 70px;
+}
+
+.log-fltr-btns button.activated {
+    border-width: 3px;
+    border-color: black;
+}
+
+.log-fltr-btn-trc {
+    background-color: deepskyblue;
+}
+
+.log-fltr-btn-dbg {
+    background-color: greenyellow;
+}
+
+.log-fltr-btn-wrn{
+    background-color: orange;
+}
+
+.log-fltr-btn-inf {
+    background-color: lightseagreen;
+}
+
+.log-fltr-btn-err {
+    background-color: orangered;
+}
+
+.logs {
+    clear: left;
+}
+
+.log {
+     margin-bottom: 15px;
+ }
+
+.log-level {
+    display: inline-block;
+    width: 60px;
+}
+
+.log-datastemp {
+    display: inline-block;
+    width: 160px;
+}
+
+
+.step-fltr-btns {
+    margin-bottom: 20px;
+    display: flex;
+}
+
+
+.step-fltr-btns button {
+	font-size: 10px;
+    width: 90px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.step-fltr-btns button.activated {
+    border-width: 3px;
+    border-color: black;
+}
+
+.step-fltr-btn-all {
+    background-color: deepskyblue;
+}
+
+.step-fltr-btn-notexctd {
+    background-color: lightgray;
+}
+
+.step-fltr-btn-psd  {
+    background-color: springgreen;
+}
+
+.step-fltr-btn-fld {
+    background-color: red;
+}
+
+.step-fltr-btn-skpd {
+    background-color: orange;
+}
+
+.step-fltr-btn-unkwn {
+    background-color: lightgray;
+}
+
+.steps {
+    display: none;
+    margin-left: 6%;
+}
+.tests {
+    display: none;
+    margin-left: 3%;
+}

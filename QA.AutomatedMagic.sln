@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework", "QA.AutomatedMagic.Framework\QA.AutomatedMagic.Framework.csproj", "{AC1040CF-4E54-4EBA-BC66-F61BA193A2F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework.ConsoleRunner", "QA.AutomatedMagic.Framework.ConsoleRunner\QA.AutomatedMagic.Framework.ConsoleRunner.csproj", "{E22C32F0-701D-4FF5-A6D9-CC446570EFD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Reports.HtmlReport", "QA.AutomatedMagic.Reports.HtmlReport\QA.AutomatedMagic.Reports.HtmlReport.csproj", "{77FB2828-8499-4273-86D2-3EA8C66130DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{AC1040CF-4E54-4EBA-BC66-F61BA193A2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC1040CF-4E54-4EBA-BC66-F61BA193A2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC1040CF-4E54-4EBA-BC66-F61BA193A2F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E22C32F0-701D-4FF5-A6D9-CC446570EFD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E22C32F0-701D-4FF5-A6D9-CC446570EFD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E22C32F0-701D-4FF5-A6D9-CC446570EFD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E22C32F0-701D-4FF5-A6D9-CC446570EFD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

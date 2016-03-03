@@ -8,7 +8,6 @@
     using MetaMagic;
     using System.Windows.Controls;
     using Editors;
-    using Creators;
 
     public class WpfManagingCollectionFiller : IManagingCollectionFiller
     {
@@ -23,7 +22,7 @@
             if (containerStackPanel == null)
                 throw new ManagingFillerException();
 
-            var collectionObj = collectionMember.GetValue(parentObj) ?? new List<object>();
+            var collectionObj = collectionMember.GetValue(parentObj);
 
             var rootGroupBox = new GroupBox();
             containerStackPanel.Children.Add(rootGroupBox);
@@ -37,7 +36,7 @@
             {
                 rootGroupBox.Content = new Label { Content = "Value is not specified" };
 
-                var creator = new CollectionCreator(headerWrapPanel, collectionMember, parentObj);
+                var creator = new Creator(headerWrapPanel, collectionMember, parentObj);
 
                 return;
             }

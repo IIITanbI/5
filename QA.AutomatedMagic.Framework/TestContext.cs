@@ -16,7 +16,7 @@
     {
         [MetaTypeCollection("List of TestContextItems", IsAssignableTypesAllowed = true, IsRequired = false)]
         [MetaLocation("contextItems")]
-        public List<BaseMetaObject> TestContextItems { get; set; } = new List<BaseMetaObject>();
+        public List<BaseTestContextItem> TestContextItems { get; set; } = new List<BaseTestContextItem>();
 
         [MetaTypeCollection("List of Managers", IsRequired = false)]
         [MetaLocation("managerItems", "managers")]
@@ -58,21 +58,34 @@
 
             foreach (var contextItem in TestContextItems)
             {
-                var contextItemType = contextItem.GetType();
-                var metaType = ReflectionManager.GetMetaType(contextItemType);
+                contextItem.Build(this);
 
-                var key = metaType.Key.GetValue(contextItem).ToString();
+                var itemsToAdd = new List<IMetaObject>();
 
-                if (key == null)
-                    throw new FrameworkException($"Context object with type: {contextItemType} doesn't contains Key");
+                var item = contextItem.GetItem();
+                if (item != null)
+                {
+                    itemsToAdd.Add(item);
+                }
 
-                if (!ContextValues.ContainsKey(metaType.Info.Name))
-                    ContextValues.Add(metaType.Info.Name, new Dictionary<string, object>());
+                var items = contextItem.GetItems();
+                if (items != null)
+                {
+                    itemsToAdd.AddRange(items);
+                }
 
-                if (ContextValues[metaType.Info.Name].ContainsKey(key))
-                    throw new FrameworkException($"Error occurs during creating context object: {contextItemType.ToString()}. Object with the same name: {key} already present");
+                foreach (var itemToAdd in itemsToAdd)
+                {
+                    var itemToAddType = itemToAdd.GetType();
+                    var metaType = ReflectionManager.GetMetaType(itemToAddType);
 
-                ContextValues[metaType.Info.Name].Add(key, contextItem);
+                    var key = metaType.Key?.GetValue(itemToAdd).ToString();
+
+                    if (key == null)
+                        throw new FrameworkException($"Context object with type: {itemToAddType} doesn't contains Key");
+
+                    Add(itemToAddType, key, itemToAdd);
+                }
             }
 
             foreach (var managerItem in CommandManagersItems)
@@ -102,7 +115,13 @@
 
         public void Add(Type type, string name, object value)
         {
-            throw new NotImplementedException();
+            if (!ContextValues.ContainsKey(type.Name))
+                ContextValues.Add(type.Name, new Dictionary<string, object>());
+
+            if (ContextValues[type.Name].ContainsKey(name))
+                throw new FrameworkException($"Error occurs during creating context object with type: {type}. Object with the same name: {name} already present");
+
+            ContextValues[type.Name].Add(name, value);
         }
 
         public bool Contains(Type type, string name)
@@ -153,7 +172,6 @@
                 return ContextValues[typeName][itemName];
             }
         }
-
         public object ResolveValue(Type type, string name)
         {
             return ContextValues[type.Name][name];

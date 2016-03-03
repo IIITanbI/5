@@ -12,7 +12,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var dateTimeUpDown = new DateTimeUpDown();
+            var dateTimeUpDown = new DateTimeUpDown { Value = DateTime.Now };
             panel.Children.Add(dateTimeUpDown);
 
             GetValue = () => dateTimeUpDown.Value.GetValueOrDefault();

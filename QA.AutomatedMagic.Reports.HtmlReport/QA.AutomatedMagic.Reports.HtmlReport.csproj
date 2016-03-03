@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AC1040CF-4E54-4EBA-BC66-F61BA193A2F0}</ProjectGuid>
+    <ProjectGuid>{77FB2828-8499-4273-86D2-3EA8C66130DE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>QA.AutomatedMagic.Framework</RootNamespace>
-    <AssemblyName>QA.AutomatedMagic.Framework</AssemblyName>
+    <RootNamespace>QA.AutomatedMagic.Reports.HtmlReport</RootNamespace>
+    <AssemblyName>QA.AutomatedMagic.Reports.HtmlReport</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="QA.AutomatedMagic">
+      <HintPath>..\packages\QA.AutomatedMagic\QA.AutomatedMagic.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,30 +44,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseTestContextItem.cs" />
-    <Compile Include="CommandManagerItem.cs" />
-    <Compile Include="FrameworkException.cs" />
+    <Compile Include="HtmlReportGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source.cs" />
-    <Compile Include="TestCase.cs" />
-    <Compile Include="TestContext.cs" />
-    <Compile Include="TestContextItems\BuildedContextItem.cs" />
-    <Compile Include="TestContextItems\ObjectContextItem.cs" />
-    <Compile Include="TestItem.cs" />
-    <Compile Include="TestLogger.cs" />
-    <Compile Include="TestProject.cs" />
-    <Compile Include="TestStep.cs" />
-    <Compile Include="TestSuite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QA.AutomatedMagic.TestLogger\QA.AutomatedMagic.TestLogger.csproj">
-      <Project>{42a8ae56-c858-4eb6-a879-6be1f8df789a}</Project>
-      <Name>QA.AutomatedMagic.TestLogger</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\QA.AutomatedMagic\QA.AutomatedMagic.csproj">
-      <Project>{dd5e0bdd-2dba-4aa2-bdd3-9df87487257b}</Project>
-      <Name>QA.AutomatedMagic</Name>
-    </ProjectReference>
+    <Content Include="css\css.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js\filter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js\init.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js\logFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js\stepFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js\testFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

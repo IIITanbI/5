@@ -21,6 +21,7 @@
         private List<object> _children;
         private StackPanel _childrenStackPanel;
         private object _savedValue;
+        private Creator _creator;
 
 
         public CollectionEditor(Panel buttonsPanel, MetaTypeCollectionMember collectionMember, object parentObj)
@@ -35,7 +36,14 @@
 
         private void _editBtn_Click(object sender, RoutedEventArgs e)
         {
-            _savedValue = _collectionMember.GetValue(MetaType.CopyObject(_parentObj));
+            try
+            {
+                _savedValue = _collectionMember.GetValue(MetaType.CopyObject(_parentObj));
+            }
+            catch (Exception ex)
+            {
+                _savedValue = _collectionMember.CollectionWrapper.CreateNew(_collectionMember.ChildrenType, null);
+            }
 
             _editWindow = new Window();
 
@@ -60,13 +68,21 @@
 
             _createBtn = new Button { Content = "Create new" };
             buttonsPanel.Children.Add(_createBtn);
+
+            if (_collectionMember.ChildrenMetaType != null)
+            {
+                _creator = new Creator(_createBtn, _collectionMember.ChildrenMetaType.Value, "child", _collectionMember.IsAssignableTypesAllowed);
+            }
             _createBtn.Click += _createBtn_Click;
 
             _childrenStackPanel = new StackPanel();
             rootStackPanel.Children.Add(_childrenStackPanel);
 
             var collectionObj = _collectionMember.GetValue(_parentObj);
-            _children = _collectionMember.CollectionWrapper.GetChildren(collectionObj);
+
+            if (collectionObj != null)
+                _children = _collectionMember.CollectionWrapper.GetChildren(collectionObj);
+            //else _children = new object();
 
             var counter = 1;
 
@@ -99,6 +115,41 @@
             }
 
             _editWindow.ShowDialog();
+        }
+
+        private void _createBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_creator == null)
+            {
+                var managingValueFiller = _collectionMember.ParentType.ManagingFiller.GetManagingValueFiller();
+
+                StackPanel childStackPanel = CreateChildStackPanel(_children.Count + 1);
+
+                _childrenStackPanel.Children.Add(childStackPanel);
+
+                var getf = managingValueFiller.FillCreateControls(childStackPanel, _collectionMember.ChildrenType, $"Item: {_children.Count + 1}");
+                childStackPanel.Tag = getf;
+                
+                _children.Add(getf());
+            }
+            else
+            {
+                if (_creator.CreatedObject == null)
+                    return;
+
+                else
+                {
+                    var managingObjectFiller = _collectionMember.ChildrenMetaType.Value.ManagingFiller.GetManagingObjectFiller();
+
+                    StackPanel childStackPanel = CreateChildStackPanel(_children.Count + 1);
+
+                    _childrenStackPanel.Children.Add(childStackPanel);
+
+                    var getf = managingObjectFiller.FillEditControls(childStackPanel, _creator.CreatedObject, _collectionMember.ChildrenMetaType.Value, $"Item: {_children.Count + 1}", _collectionMember.IsAssignableTypesAllowed);
+                    childStackPanel.Tag = getf;
+                    _children.Add(_creator.CreatedObject);
+                }
+            }
         }
 
         private StackPanel CreateChildStackPanel(int counter)
@@ -323,11 +374,6 @@
             }
 
             _collectionMember.SetValue(_parentObj, collection);
-        }
-
-        private void _createBtn_Click(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

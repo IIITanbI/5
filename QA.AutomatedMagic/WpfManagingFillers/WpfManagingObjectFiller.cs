@@ -7,20 +7,10 @@
     using System.Threading.Tasks;
     using MetaMagic;
     using System.Windows.Controls;
-    using Creators;
     using Editors;
+
     public class WpfManagingObjectFiller : IManagingObjectFiller
     {
-        public object FillCreateControls(object container, MetaTypeObjectMember objectMember)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object FillCreateControls(object container, MetaType metaType, string name, bool isAssignableTypesAllowed)
-        {
-            throw new NotImplementedException();
-        }
-
         public void FillEditControls(object container, object parentObj, MetaTypeObjectMember objectMember)
         {
             var containerStackPanel = container as StackPanel;
@@ -38,7 +28,7 @@
             if (obj == null)
             {
                 rootGroupBox.Content = new Label { Content = "Value is not specified" };
-                var creator = new ObjectCreator(headerWrapPanel, objectMember, parentObj);
+                var creator = new Creator(headerWrapPanel, objectMember, parentObj);
                 return;
             }
 
@@ -75,7 +65,6 @@
 
             var editor = new ObjectEditor(headerWrapPanel, objectMember, parentObj);
         }
-
         public Func<object> FillEditControls(object container, object obj, MetaType metaType, string name, bool isAssignableTypesAllowed)
         {
             var containerStackPanel = container as StackPanel;

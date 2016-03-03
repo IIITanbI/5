@@ -16,7 +16,7 @@
 
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var textBlock = new TextBox();
+            var textBlock = new TextBox { Text = "" };
             panel.Children.Add(textBlock);
 
             GetValue = () => textBlock.Text;

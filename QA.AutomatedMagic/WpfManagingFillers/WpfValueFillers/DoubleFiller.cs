@@ -13,7 +13,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var doubleUpDown = new DoubleUpDown();
+            var doubleUpDown = new DoubleUpDown { Value = 0 };
             panel.Children.Add(doubleUpDown);
 
             GetValue = () => doubleUpDown.Value.GetValueOrDefault();

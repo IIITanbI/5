@@ -8,7 +8,7 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <StackPanel>
-            <Button Click="Button_Click">Click</Button>
+            <Button Name="B1"  Click="B1_Click">Click</Button>
             <StackPanel Name="S1"></StackPanel>
         </StackPanel>
     </Grid>

@@ -11,7 +11,7 @@
     {
         public override void FillCreateControls(StackPanel panel, Type type)
         {
-            var checkBox = new CheckBox();
+            var checkBox = new CheckBox { IsChecked = false };
             panel.Children.Add(checkBox);
 
             GetValue = () => checkBox.IsChecked.GetValueOrDefault();

@@ -151,9 +151,15 @@
                 managerObject = propInfo.GetValue(managerObject);
             }
 
-            var result = acceptedCommand.Method.Invoke(managerObject, parArray.ToArray());
-
-            return result;
+            try
+            {
+                var result = acceptedCommand.Method.Invoke(managerObject, parArray.ToArray());
+                return result;
+            }
+            catch(TargetInvocationException tie)
+            {
+                throw tie.InnerException;
+            }
         }
 
         public object ExecuteCommand(object managerObject, string commandName, List<object> parObjs, ILogger log)

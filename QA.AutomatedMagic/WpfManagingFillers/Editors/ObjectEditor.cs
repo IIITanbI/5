@@ -19,6 +19,7 @@
         private Window _editWindow;
         private object _obj;
         private MetaType _metaType;
+        private string _name = null;
 
         public ObjectEditor(Panel buttonsPanel, MetaTypeObjectMember objectMember, object parentObj)
         {
@@ -36,6 +37,7 @@
             _editBtn = new Button { Content = "Edit" };
             buttonsPanel.Children.Add(_editBtn);
 
+            _name = name;
             _editBtn.Click += _editBtn_Click;
             _savedValue = MetaType.CopyObject(obj);
             _obj = obj;
@@ -62,7 +64,7 @@
             var rootStackPanel = new StackPanel();
             scrollViewer.Content = rootStackPanel;
 
-            var infoLabel = new Label { };
+            var infoLabel = new Label { Content = $"Editing : {_name ?? _objectMember.Info.Name}" };
             rootStackPanel.Children.Add(infoLabel);
 
             var buttonsPanel = new WrapPanel();
