@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="QA.AutomatedMagic">
-      <HintPath>..\packages\QA.AutomatedMagic\QA.AutomatedMagic.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -66,6 +63,12 @@
     <Content Include="filter js\testFilter.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QA.AutomatedMagic\QA.AutomatedMagic.csproj">
+      <Project>{dd5e0bdd-2dba-4aa2-bdd3-9df87487257b}</Project>
+      <Name>QA.AutomatedMagic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

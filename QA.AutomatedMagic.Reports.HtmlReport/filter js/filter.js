@@ -7,33 +7,32 @@ var FILTER = {
 
 FILTER.prepare = function(button) {
     var $filterButtons = this.getFilterButtons(button);
-    var $totalButton = this.getDefaultButton(button);
+    var $defaultButton = this.getDefaultButton(button);
 
-    this.deactivateButtons($filterButtons, $totalButton);
-    this.activateButton($totalButton);
+	$defaultButton.click();
 };
 
 FILTER.filterButtonClick = function (button) {
     this.deactivateButton(button) || this.activateButton(button);
 
     var $filterButtons = this.getFilterButtons(button);
-    var $totalButton = this.getDefaultButton(button);
+    var $defaultButton = this.getDefaultButton(button);
 
     if (!this.multiSelect)  {
         if (!this.isActive(button)){
-            this.activateButton($totalButton);
-            this.deactivateButtons($filterButtons, $totalButton);
+            this.activateButton($defaultButton);
+            this.deactivateButtons($filterButtons, $defaultButton);
         }
         else {
             this.deactivateButtons($filterButtons, button);
         }
     }
     else {
-        if (!$(button).is($totalButton)){
-            this.deactivateButton($totalButton);
+        if (!$(button).is($defaultButton)){
+            this.deactivateButton($defaultButton);
         }
         else {
-            this.deactivateButtons($filterButtons, $totalButton);
+            this.deactivateButtons($filterButtons, $defaultButton);
         }
     }
 
@@ -105,7 +104,7 @@ FILTER.isActive = function(button){
 FILTER.doFilter = function (button) {
     var $filters = [];
     var $filterButtons = this.getFilterButtons(button);
-	var $totalButton = this.getDefaultButton(button);
+	var $defaultButton = this.getDefaultButton(button);
     var thisObj = this;
 
     $filterButtons.each(function (index, item) {
@@ -114,7 +113,7 @@ FILTER.doFilter = function (button) {
         }
     });
     if ($filters.length === 0) {
-        $totalButton.click();
+        $defaultButton.click();
         return;
     }
 
