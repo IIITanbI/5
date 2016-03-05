@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic
+﻿namespace QA.AutomatedMagic.CommandsMagic
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +6,11 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public interface ICommandManager
+    public abstract class BaseCommandManager
     {
+        public virtual void Init()
+        {
+
+        }
     }
 }

@@ -9,15 +9,23 @@
 
     public class TestLogger : ILogger
     {
-        public ILogger PARENT { get; private set; } = null;
         public string Name { get; private set; }
-        private Dictionary<ILogger, LogLevel> _loggers = new Dictionary<ILogger, LogLevel>();
-        public List<LogMessage> LogMessages { get; private set; } = new List<LogMessage>();
+        public ILogger Parent { get; private set; }
+        public List<LogItem> LogMessages { get; private set; } = new List<LogItem>();
 
-        public TestLogger(string name, string itemType)
+        private Dictionary<ILogger, LogLevel> _loggers = new Dictionary<ILogger, LogLevel>();
+
+        public TestLogger(string name, string itemType, ILogger parent = null)
         {
+            Parent = parent;
             Name = $"({itemType}) {name}";
         }
+
+        public void SetParent(ILogger logger)
+        {
+            Parent = logger;
+        }
+
         public void AddLogger(ILogger logger, LogLevel level)
         {
             _loggers.Add(logger, level);
@@ -27,54 +35,60 @@
         {
             LOG(LogLevel.TRACE, message, exception);
         }
-        public void TRACE(string message, AttachedItemType itemType, string itemPath)
+        public void TRACE(string message, LoggedFileType fileType, string filePath)
         {
-            LOG(LogLevel.TRACE, message, itemType, itemPath);
+            LOG(LogLevel.TRACE, message, fileType, filePath);
         }
+
         public void DEBUG(string message, Exception exception = null)
         {
             LOG(LogLevel.DEBUG, message, exception);
         }
-        public void DEBUG(string message, AttachedItemType itemType, string itemPath)
+        public void DEBUG(string message, LoggedFileType fileType, string filePath)
         {
-            LOG(LogLevel.DEBUG, message, itemType, itemPath);
+            LOG(LogLevel.DEBUG, message, fileType, filePath);
         }
+
         public void WARN(string message, Exception exception = null)
         {
             LOG(LogLevel.WARN, message, exception);
         }
-        public void WARN(string message, AttachedItemType itemType, string itemPath)
+        public void WARN(string message, LoggedFileType fileType, string filePath)
         {
-            LOG(LogLevel.WARN, message, itemType, itemPath);
+            LOG(LogLevel.WARN, message, fileType, filePath);
         }
+
         public void INFO(string message, Exception exception = null)
         {
             LOG(LogLevel.INFO, message, exception);
         }
-        public void INFO(string message, AttachedItemType itemType, string itemPath)
+        public void INFO(string message, LoggedFileType fileType, string filePath)
         {
-            LOG(LogLevel.INFO, message, itemType, itemPath);
+            LOG(LogLevel.INFO, message, fileType, filePath);
         }
+
         public void ERROR(string message, Exception exception = null)
         {
             LOG(LogLevel.ERROR, message, exception);
         }
-        public void ERROR(string message, AttachedItemType itemType, string itemPath)
+        public void ERROR(string message, LoggedFileType fileType, string filePath)
         {
-            LOG(LogLevel.ERROR, message, itemType, itemPath);
+            LOG(LogLevel.ERROR, message, fileType, filePath);
         }
 
         public string GetFullName()
         {
-            if (PARENT == null)
+            if (Parent == null)
                 return Name;
 
-            return $"{PARENT.GetFullName()} $ {Name}";
+            return $"{Parent.GetFullName()} $ {Name}";
         }
 
         public void LOG(LogLevel level, string message, Exception exception = null)
         {
-            var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Exception = exception };
+            Console.WriteLine($"{GetFullName()}\t{level}\t{message}");
+
+            var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
             LogMessages.Add(logMessage);
 
             foreach (var logger in _loggers)
@@ -102,9 +116,9 @@
                     }
             }
         }
-        public void LOG(LogLevel level, string message, AttachedItemType itemType, string itemPath)
+        public void LOG(LogLevel level, string message, LoggedFileType fileType, string filePath)
         {
-            var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, ItemType = itemType, ItemPath = itemPath };
+            var logMessage = new LogFile { DataStemp = DateTime.Now, Level = level, FileType = fileType, FilePath = filePath };
             LogMessages.Add(logMessage);
 
             foreach (var logger in _loggers)
@@ -113,19 +127,19 @@
                     switch (level)
                     {
                         case LogLevel.TRACE:
-                            logger.Key.TRACE(message, itemType, itemPath);
+                            logger.Key.TRACE(message, fileType, filePath);
                             break;
                         case LogLevel.DEBUG:
-                            logger.Key.DEBUG(message, itemType, itemPath);
+                            logger.Key.DEBUG(message, fileType, filePath);
                             break;
                         case LogLevel.WARN:
-                            logger.Key.WARN(message, itemType, itemPath);
+                            logger.Key.WARN(message, fileType, filePath);
                             break;
                         case LogLevel.INFO:
-                            logger.Key.INFO(message, itemType, itemPath);
+                            logger.Key.INFO(message, fileType, filePath);
                             break;
                         case LogLevel.ERROR:
-                            logger.Key.ERROR(message, itemType, itemPath);
+                            logger.Key.ERROR(message, fileType, filePath);
                             break;
                         default:
                             break;
@@ -133,56 +147,55 @@
             }
         }
 
-        public void SetParent(ILogger logger)
-        {
-            PARENT = logger;
-        }
-
         public void SpamTo(ILogger logger)
         {
             foreach (var logMessage in LogMessages)
             {
-                if (logMessage.ItemType != AttachedItemType.NONE)
+                var loggedFile = logMessage as LogFile;
+                if (loggedFile != null)
                 {
-                    switch (logMessage.Level)
+                    switch (loggedFile.Level)
                     {
                         case LogLevel.TRACE:
-                            logger.TRACE(logMessage.Message, logMessage.ItemType, logMessage.ItemPath);
+                            logger.TRACE(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
                             break;
                         case LogLevel.DEBUG:
-                            logger.DEBUG(logMessage.Message, logMessage.ItemType, logMessage.ItemPath);
+                            logger.DEBUG(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
                             break;
                         case LogLevel.WARN:
-                            logger.WARN(logMessage.Message, logMessage.ItemType, logMessage.ItemPath);
+                            logger.WARN(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
                             break;
                         case LogLevel.INFO:
-                            logger.INFO(logMessage.Message, logMessage.ItemType, logMessage.ItemPath);
+                            logger.INFO(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
                             break;
                         case LogLevel.ERROR:
-                            logger.ERROR(logMessage.Message, logMessage.ItemType, logMessage.ItemPath);
+                            logger.ERROR(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
                             break;
                         default:
                             break;
                     }
+                    continue;
                 }
-                else
+
+                var loggedMessage = logMessage as LogMessage;
+                if (loggedMessage != null)
                 {
-                    switch (logMessage.Level)
+                    switch (loggedMessage.Level)
                     {
                         case LogLevel.TRACE:
-                            logger.TRACE(logMessage.Message, logMessage.Exception);
+                            logger.TRACE(loggedMessage.Message, loggedMessage.Ex);
                             break;
                         case LogLevel.DEBUG:
-                            logger.DEBUG(logMessage.Message, logMessage.Exception);
+                            logger.DEBUG(loggedMessage.Message, loggedMessage.Ex);
                             break;
                         case LogLevel.WARN:
-                            logger.WARN(logMessage.Message, logMessage.Exception);
+                            logger.WARN(loggedMessage.Message, loggedMessage.Ex);
                             break;
                         case LogLevel.INFO:
-                            logger.INFO(logMessage.Message, logMessage.Exception);
+                            logger.INFO(loggedMessage.Message, loggedMessage.Ex);
                             break;
                         case LogLevel.ERROR:
-                            logger.ERROR(logMessage.Message, logMessage.Exception);
+                            logger.ERROR(loggedMessage.Message, loggedMessage.Ex);
                             break;
                         default:
                             break;

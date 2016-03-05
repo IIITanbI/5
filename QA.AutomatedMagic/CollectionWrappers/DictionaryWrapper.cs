@@ -15,7 +15,7 @@
 
         public void Add(object collection, object item, Type childType)
         {
-            var childMeta = ReflectionManager.GetMetaType(item.GetType());
+            var childMeta = AutomatedMagicManager.GetMetaType(item.GetType());
 
             MethodInfo add = null;
             if (!_addMethods.ContainsKey(childType))
@@ -32,7 +32,7 @@
 
         public object CreateNew(Type childType, object arg)
         {
-            var childMeta = ReflectionManager.GetMetaType(childType);
+            var childMeta = AutomatedMagicManager.GetMetaType(childType);
             var dictionaryType = typeof(Dictionary<,>);
             var constructedListType = dictionaryType.MakeGenericType(childMeta.Key.MemberType, childType);
 
@@ -57,7 +57,7 @@
 
         public void Remove(object collection, object item, Type childType)
         {
-            var childMeta = ReflectionManager.GetMetaType(item.GetType());
+            var childMeta = AutomatedMagicManager.GetMetaType(item.GetType());
 
             MethodInfo remove = null;
             if (!_removeMethods.ContainsKey(childType))

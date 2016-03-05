@@ -6,8 +6,10 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Reflection;
-
-
+    using System.Xml.Linq;
+    using MetaMagic;
+    using System.Xml.XPath;
+    using System.IO;
     public class CommandManager
     {
         public string Description { get; private set; }
@@ -17,12 +19,16 @@
         public List<Command> Commands { get; private set; } = new List<Command>();
         public Lazy<List<CommandManager>> ChildManagers { get; private set; } = null;
         private Dictionary<Type, PropertyInfo> _childManagersProperties = null;
+        private Dictionary<PropertyInfo, MetaSourceAttribute> _sourcableProperties = new Dictionary<PropertyInfo, MetaSourceAttribute>();
+
+        public string AssemblyDirectoryPath { get; private set; }
 
         public CommandManager(CommandManagerAttribute commandManagerAttribute, Type commandManagerType)
         {
             Description = commandManagerAttribute.Description;
             CommandManagerType = commandManagerType;
             CommandManagerConfigType = commandManagerAttribute.ConfigType;
+            AssemblyDirectoryPath = Path.GetDirectoryName(commandManagerType.Assembly.Location);
 
             Commands = new List<Command>();
             var methods = CommandManagerType.GetMethods();
@@ -38,7 +44,7 @@
             }
 
             var props = CommandManagerType.GetProperties();
-            var childManagerProperties = props.Where(p => typeof(ICommandManager).IsAssignableFrom(p.PropertyType)).ToList();
+            var childManagerProperties = props.Where(p => typeof(BaseCommandManager).IsAssignableFrom(p.PropertyType)).ToList();
 
             if (childManagerProperties.Count > 0)
             {
@@ -56,7 +62,7 @@
 
                         foreach (var childManagerProperty in childManagerProperties)
                         {
-                            var manager = ReflectionManager.GetCommandManagerByTypeName(childManagerProperty.PropertyType.Name);
+                            var manager = AutomatedMagicManager.GetCommandManagerByTypeName(childManagerProperty.PropertyType.Name);
                             list.Add(manager);
                         }
 
@@ -64,18 +70,62 @@
                     }
                 );
             }
+
+            foreach (var property in props)
+            {
+                var metaSourceAttribute = property.GetCustomAttribute<MetaSourceAttribute>();
+                if (metaSourceAttribute != null)
+                {
+                    _sourcableProperties.Add(property, metaSourceAttribute);
+                }
+            }
         }
 
-        public object CreateInstance(object config)
+        public BaseCommandManager CreateInstance(object config)
         {
-            if (CommandManagerConfigType == null)
+            BaseCommandManager managerObject = null;
+
+            try
             {
-                return Activator.CreateInstance(CommandManagerType);
+                if (CommandManagerConfigType == null)
+                {
+                    managerObject = (BaseCommandManager)Activator.CreateInstance(CommandManagerType);
+                }
+                else
+                {
+                    managerObject = (BaseCommandManager)Activator.CreateInstance(CommandManagerType, new object[] { config });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Activator.CreateInstance(CommandManagerType, new object[] { config });
+                throw new AutomatedMagicException($"Error occurred during creating manager object for Manager: {CommandManagerType.Name}", ex);
             }
+
+            foreach (var sourcableProperty in _sourcableProperties)
+            {
+                try
+                {
+                    var sourceXml = XDocument.Load(Path.Combine(AssemblyDirectoryPath, sourcableProperty.Value.Path));
+                    var configElement = sourceXml.XPathSelectElement(sourcableProperty.Value.RootElementXPath);
+                    var propertyObject = MetaType.Parse(sourcableProperty.Key.PropertyType, configElement, null, true);
+                    sourcableProperty.Key.SetValue(managerObject, propertyObject);
+                }
+                catch (Exception ex)
+                {
+                    throw new AutomatedMagicException($"Error occurred during initialization property {sourcableProperty.Key.Name} for Manager: {CommandManagerType.Name}", ex);
+                }
+            }
+
+            try
+            {
+                managerObject.Init();
+            }
+            catch (Exception ex)
+            {
+                throw new AutomatedMagicException($"Error occurred during initialization manager object for Manager: {CommandManagerType.Name}", ex);
+            }
+
+            return managerObject;
         }
 
         public object ExecuteCommand(object managerObject, string commandName, List<string> parameters, IContext context, ILogger log)
@@ -156,12 +206,11 @@
                 var result = acceptedCommand.Method.Invoke(managerObject, parArray.ToArray());
                 return result;
             }
-            catch(TargetInvocationException tie)
+            catch (TargetInvocationException tie)
             {
                 throw tie.InnerException;
             }
         }
-
         public object ExecuteCommand(object managerObject, string commandName, List<object> parObjs, ILogger log)
         {
             var propInfos = new List<PropertyInfo>();
@@ -169,7 +218,7 @@
 
             if (possibleCommands == null || possibleCommands.Count == 0)
                 throw new NotImplementedException();
-            
+
             Command acceptedCommand = null;
             var parArray = new List<object>();
             foreach (var command in possibleCommands)
@@ -219,7 +268,6 @@
 
             return result;
         }
-
         public List<Command> FindCommand(string commandName, List<PropertyInfo> propInfos)
         {
             if (commandName.StartsWith(CommandManagerType.Name + "."))
@@ -255,6 +303,11 @@
                 return commands;
             }
             return null;
+        }
+
+        public override string ToString()
+        {
+            return $"{CommandManagerType}";
         }
     }
 }

@@ -11,7 +11,7 @@
     public class Step : BaseMetaObject
     {
         [MetaTypeCollection("Step log", IsRequired = false)]
-        public List<LogMessage> Messages { get; set; } = new List<LogMessage>();
+        public List<LogItem> Messages { get; set; } = new List<LogItem>();
 
         [MetaTypeValue("Step status")]
         public TestItemStatus Status { get; set; }

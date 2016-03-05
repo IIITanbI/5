@@ -47,7 +47,7 @@
             if (isAssignableTypesAllowed)
             {
                 var type = obj.GetType();
-                metaType = ReflectionManager.GetMetaType(type);
+                metaType = AutomatedMagicManager.GetMetaType(type);
             }
 
             var rootEl = new XElement(name ?? metaType.Info.Name);

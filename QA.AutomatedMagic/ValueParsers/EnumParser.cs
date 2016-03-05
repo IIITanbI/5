@@ -20,12 +20,12 @@
             {
                 var enumVal = Enum.Parse(type, source.ToString());
                 if (!Enum.IsDefined(type, enumVal))
-                    throw new ParseException();
+                    throw new ParseException(source, type);
                 return enumVal;
             }
             catch
             {
-                throw new ParseException();
+                throw new ParseException(source, type);
             }
         }
     }

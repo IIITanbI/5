@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic
+﻿namespace QA.AutomatedMagic.MetaMagic
 {
     using System;
     using System.Collections.Generic;
@@ -10,20 +10,15 @@
     [MetaType("Base class for all MetaObjects")]
     public abstract class BaseMetaObject : IMetaObject
     {
-        public virtual void Init()
-        {
-
-        }
-
         public virtual List<string> GetPaths()
         {
-            var metaType = ReflectionManager.GetMetaType(GetType());
+            var metaType = AutomatedMagicManager.GetMetaType(GetType());
             return metaType.GetPaths(this);
         }
 
         public virtual object ResolvePath(string path)
         {
-            var metaType = ReflectionManager.GetMetaType(GetType());
+            var metaType = AutomatedMagicManager.GetMetaType(GetType());
             return metaType.ResolvePath(path, this);
         }
     }

@@ -65,6 +65,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="config.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="RunConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

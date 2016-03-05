@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic
+﻿namespace QA.AutomatedMagic.MetaMagic
 {
     using System;
     using System.Collections.Generic;

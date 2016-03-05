@@ -22,10 +22,10 @@
     {
         public MainWindow()
         {
-            ReflectionManager.LoadAssemblies();
+            AutomatedMagicManager.LoadAssemblies();
             InitializeComponent();
 
-            var creator = new Creator(B1, ReflectionManager.GetMetaType(typeof(ComboProst)), "Test", true);
+            var creator = new Creator(B1, AutomatedMagicManager.GetMetaType(typeof(ComboProst)), "Test", true);
         }
 
         private void B1_Click(object sender, RoutedEventArgs e)
@@ -61,7 +61,7 @@
                 )
             );
 
-            var metaType = ReflectionManager.GetMetaType(typeof(Prost));
+            var metaType = AutomatedMagicManager.GetMetaType(typeof(Prost));
             var obj1 = metaType.Parse(prostConfig1);
             var obj2 = metaType.Parse(prostConfig2);
 
@@ -70,7 +70,7 @@
                 new XElement("ProstField", prostConfig2)
             );
 
-            var comboMetaType = ReflectionManager.GetMetaType(typeof(ComboProst));
+            var comboMetaType = AutomatedMagicManager.GetMetaType(typeof(ComboProst));
             var obj3 = comboMetaType.Parse(comboProstConfig1);
 
 

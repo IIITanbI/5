@@ -21,7 +21,7 @@
         public TestItemType Type { get; set; }
 
         [MetaTypeCollection("Test item log")]
-        public List<LogMessage> LogMessages { get; set; } = new List<LogMessage>();
+        public List<LogItem> LogMessages { get; set; } = new List<LogItem>();
 
         [MetaTypeValue("Test item status")]
         public TestItemStatus Status { get; set; }

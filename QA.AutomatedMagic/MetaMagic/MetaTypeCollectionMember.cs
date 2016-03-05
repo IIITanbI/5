@@ -43,7 +43,7 @@
 
             if (typeof(BaseMetaObject).IsAssignableFrom(ChildrenType))
             {
-                ChildrenMetaType = new Lazy<MetaType>(() => ReflectionManager.GetMetaType(ChildrenType));
+                ChildrenMetaType = new Lazy<MetaType>(() => AutomatedMagicManager.GetMetaType(ChildrenType));
 
                 if (!IsAssignableTypesAllowed)
                 {
