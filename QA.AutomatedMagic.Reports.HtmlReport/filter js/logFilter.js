@@ -12,7 +12,7 @@ $(function () {
     };
 
     myFilter.getDefaultButton = function (button) {
-        return $(button).closest(".log-fltr-btns").children().first();
+        return $(button).closest(".log-fltr-btns").find('.log-fltr-btn-inf');
     };
 
     myFilter.getChildStatus = function (child) {
@@ -35,14 +35,13 @@ $(function () {
         });
     });
 
-    myFilter.prepare($(".log-fltr-btns button").first());
-
+	$(".log-fltr-btns button").click(function (e) {
+        myFilter.filterButtonClick(this);
+    });
     var $btnsPanel = $(".log-fltr-btns");
     for(var i = 0; i < $btnsPanel.length; i++){
         myFilter.prepare($($btnsPanel[i]).find("button").first());
     }
 
-    $(".log-fltr-btns button").click(function (e) {
-        myFilter.filterButtonClick(this);
-    });
+    
 });

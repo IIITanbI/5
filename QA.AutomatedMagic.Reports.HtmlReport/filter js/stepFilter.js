@@ -20,15 +20,13 @@ $(function () {
         return $status;
     };
 
-    //myFilter.prepare($(".step-fltr-btns button").first());
-    var $btnsPanel = $(".step-fltr-btns");
+	$(".step-fltr-btns button").click(function (e) {
+        myFilter.filterButtonClick(this);
+    });
+	    var $btnsPanel = $(".step-fltr-btns");
     for(var i = 0; i < $btnsPanel.length; i++){
         myFilter.prepare($($btnsPanel[i]).find("button").first());
     }
 
-
-
-    $(".step-fltr-btns button").click(function (e) {
-        myFilter.filterButtonClick(this);
-    });
+   
 });
