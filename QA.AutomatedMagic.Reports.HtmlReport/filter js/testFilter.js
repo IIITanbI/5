@@ -14,7 +14,7 @@ $(function () {
     myFilter.getChildStatus = function (child) {
         var $needClass = "status";
         var $panelHeading = $(child).find('.panel-heading')[0];
-        var $className = $($panelHeading).children('p[class*=' + $needClass + ']').attr('class');
+        var $className = $($panelHeading).find('*[class*=' + $needClass + ']').attr('class');
         var $status = $className.substring($className.indexOf($needClass) + $needClass.length).toLowerCase();
 
         return $status;

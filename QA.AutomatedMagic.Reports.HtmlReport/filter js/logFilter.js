@@ -4,7 +4,7 @@ $(function () {
     myFilter.multiSelect = false;
 
     myFilter.getChilds = function (button) {
-        return $(button).closest(".logPanel").children('.logs').children();
+        return $(button).closest(".logPanel").find('.logs').children();
     };
 
     myFilter.getFilterButtons = function (button) {
@@ -16,7 +16,7 @@ $(function () {
     };
 
     myFilter.getChildStatus = function (child) {
-        var $status = $($(child).children("span")[0]).text().toLowerCase();
+        var $status = $($(child).find("span")[0]).text().toLowerCase();
         return $status;
     };
 
