@@ -43,9 +43,17 @@
             var invariantName = char.IsLower(possibleName[0])
                 ? char.ToUpper(possibleName[0]) + possibleName.Substring(1)
                 : char.ToLower(possibleName[0]) + possibleName.Substring(1);
-            
+
             if (!PossibleNames.Contains(invariantName))
                 PossibleNames.Add(invariantName);
+        }
+
+        public override string ToString()
+        {
+            var possNames = "";
+            PossibleNames.ForEach(pn => possNames += $"\t- {pn}\n");
+
+            return $"Could be value? : {CouldBeValue}\nPossible Names:\n{possNames}";
         }
     }
 }

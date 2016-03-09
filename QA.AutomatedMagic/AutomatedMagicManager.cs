@@ -10,71 +10,60 @@
     using MetaMagic;
     using CommandsMagic;
 
-    public static class ReflectionManager
+    public static class AutomatedMagicManager
     {
-        private static List<string> _loadedAssemblies = new List<string>();
         private static List<string> _loadedAssemblyNames = new List<string>();
         private static Dictionary<Type, MetaType> _type_metaType = new Dictionary<Type, MetaType>();
         private static Dictionary<Type, CommandManager> _type_commandManager = new Dictionary<Type, CommandManager>();
 
+        public static List<MetaType> LoadedMetaTypes { get; private set; } = new List<MetaType>();
+        public static List<CommandManager> LoadedCommandManagers { get; private set; } = new List<CommandManager>();
+
         public static void LoadAssemblies()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetCustomAttribute<AutomatedMagicAssemblyAttribute>() != null).ToList();
 
-            foreach (var assembly in assemblies)
-            {
-                LoadAssembly(assembly);
-            }
+            assemblies.ForEach(a => _loadedAssemblyNames.Add(a.FullName));
 
-            foreach (var metaType in _type_metaType.Values)
-            {
-                foreach (var possibleAssiganbleType in _type_metaType.Values)
-                {
-                    if (metaType.TargetType.IsAssignableFrom(possibleAssiganbleType.TargetType))
-                    {
-                        if (!possibleAssiganbleType.TargetType.IsAbstract && !metaType.AssignableTypes.Contains(possibleAssiganbleType))
-                            metaType.AssignableTypes.Add(possibleAssiganbleType);
-                    }
-                }
-            }
+            LoadAssemblies(assemblies);
         }
-
-        public static void LoadAssemblies(string pathToLibFolder, bool all = false)
+        public static void LoadAssemblies(string pathToLibFolder, SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
             var assemblies = new List<Assembly>();
 
             if (Directory.Exists(pathToLibFolder))
             {
-                var assemblyFiles = all
-                    ? Directory.GetFiles(pathToLibFolder, "*.dll", SearchOption.AllDirectories).ToList()
-                    : Directory.GetFiles(pathToLibFolder, "*.dll").ToList();
+                var assemblyFiles = Directory.GetFiles(pathToLibFolder, "*.dll", searchOption).ToList();
+                assemblyFiles.AddRange(Directory.GetFiles(pathToLibFolder, "*.exe", searchOption));
 
-                foreach (var asF in assemblyFiles)
+                foreach (var assemblyFile in assemblyFiles)
                 {
-                    var assemblyFileName = Path.GetFileName(asF);
-                    if (!assemblyFileName.Contains("QA.AutomatedMagic") && !assemblyFileName.Contains("SapAutomation"))
-                        continue;
-
-                    assemblyFileName = Path.GetFileNameWithoutExtension(assemblyFileName);
-                    if (_loadedAssemblyNames.Contains(assemblyFileName))
-                        continue;
-
-
-                    if (!_loadedAssemblies.Contains(asF))
+                    try
                     {
-                        try
+                        var reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
+                        var customAttributes = reflectionOnlyAssembly.GetCustomAttributesData().ToList();
+
+                        if (customAttributes.Any(ca => ca.AttributeType.FullName == typeof(AutomatedMagicAssemblyAttribute).FullName))
                         {
-                            assemblies.Add(Assembly.LoadFrom(asF));
-                            _loadedAssemblies.Add(asF);
+                            if (!_loadedAssemblyNames.Contains(reflectionOnlyAssembly.FullName))
+                            {
+                                assemblies.Add(Assembly.LoadFrom(assemblyFile));
+                                _loadedAssemblyNames.Add(reflectionOnlyAssembly.FullName);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex);
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
                     }
                 }
             }
 
+            LoadAssemblies(assemblies);
+        }
+
+        private static void LoadAssemblies(List<Assembly> assemblies)
+        {
             foreach (var assembly in assemblies)
             {
                 LoadAssembly(assembly);
@@ -92,29 +81,16 @@
                 }
             }
         }
-
-        public static void LoadAssembly(Assembly assembly)
+        private static void LoadAssembly(Assembly assembly)
         {
-            var assemblyName = assembly.GetName().Name;
-            if (_loadedAssemblyNames.Contains(assemblyName))
-                return;
-
             var types = assembly.DefinedTypes.ToList();
 
             foreach (var type in types)
             {
                 LoadType(type);
             }
-
-            _loadedAssemblyNames.Add(assemblyName);
         }
-
-        public static CommandManager GetCommandManagerByTypeName(string managerTypeName)
-        {
-            return _type_commandManager.First(tcm => tcm.Key.Name == managerTypeName).Value;
-        }
-
-        public static void LoadType(Type type)
+        private static void LoadType(Type type)
         {
             if (typeof(IMetaObject).IsAssignableFrom(type))
             {
@@ -123,9 +99,10 @@
                     throw new Exception($"Found duped metaType for type: {type}");
 
                 _type_metaType.Add(type, metaType);
+                LoadedMetaTypes.Add(metaType);
             }
 
-            if (typeof(ICommandManager).IsAssignableFrom(type))
+            if (typeof(BaseCommandManager).IsAssignableFrom(type))
             {
                 var commandManagerAttribute = type.GetCustomAttribute<CommandManagerAttribute>();
 
@@ -135,10 +112,22 @@
                     if (_type_commandManager.ContainsKey(type))
                         throw new Exception($"Found duped commandManager for type: {type}");
                     _type_commandManager.Add(type, commandManager);
+                    LoadedCommandManagers.Add(commandManager);
                 }
             }
         }
 
+        public static CommandManager GetCommandManagerByTypeName(string managerTypeName)
+        {
+            return _type_commandManager.First(tcm => tcm.Key.Name == managerTypeName).Value;
+        }
+        public static T CreateCommandManager<T>(BaseMetaObject config = null)
+            where T : BaseCommandManager
+        {
+            var type = typeof(T);
+            var commandmanager = _type_commandManager.First(tcm => tcm.Key.Name == type.Name).Value;
+            return (T)commandmanager.CreateInstance(config);
+        }
 
         public static MetaType GetMetaType(Type type)
         {

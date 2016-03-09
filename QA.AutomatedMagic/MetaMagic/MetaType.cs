@@ -31,28 +31,30 @@
             new ArrayWrapper()
         };
 
-        public static object Parse(Type type, object source, IContext context = null)
+        public static object Parse(Type type, object source, IContext context = null, bool isAssignableTypesAllowed = false)
         {
-            var metaType = ReflectionManager.GetMetaType(type);
-            return metaType.Parse(source, context);
+            var metaType = AutomatedMagicManager.GetMetaType(type);
+            return metaType.Parse(source, context, isAssignableTypesAllowed);
         }
-        public static T Parse<T>(object source, IContext context = null)
+        public static T Parse<T>(object source, IContext context = null, bool isAssignableTypesAllowed = false)
         {
-            return (T)Parse(typeof(T), source, context);
+            return (T)Parse(typeof(T), source, context, isAssignableTypesAllowed);
         }
+
+
         public static object SerializeObject(object obj)
         {
-            var metaType = ReflectionManager.GetMetaType(obj.GetType());
+            var metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
             return metaType.SourceResolver.GetObjectSourceResolver().Serialize(obj, metaType, metaType.Info.Name, false);
         }
         public static object CopyObject(object obj)
         {
-            var metaType = ReflectionManager.GetMetaType(obj.GetType());
+            var metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
             return metaType.Copy(obj);
         }
         public static T CopyObjectWithCast<T>(T obj)
         {
-            var metaType = ReflectionManager.GetMetaType(typeof(T));
+            var metaType = AutomatedMagicManager.GetMetaType(typeof(T));
             return (T)metaType.Copy(obj);
         }
         #endregion
@@ -182,7 +184,7 @@
             Members.Add(member);
         }
 
-        public object Parse(object source, IContext context = null)
+        public object Parse(object source, IContext context = null, bool isAssignableTypesAllowed = false)
         {
             object key = null;
             if (context != null && Key != null)
@@ -195,6 +197,17 @@
                         return context.ResolveValue(TargetType, key.ToString());
                     }
                 }
+            }
+
+            if (isAssignableTypesAllowed)
+            {
+                var name = SourceResolver.GetSourceNodeName(source);
+                var assignableType = AssignableTypes.FirstOrDefault(at => at.Info.Name == name);
+
+                if (assignableType == null)
+                    throw new ParseException($"Couldn't find assignable type with name: {name} for MetaType {Info}", TargetType);
+
+                return assignableType.Parse(source, context, false);
             }
 
             var createdObject = Activator.CreateInstance(TargetType);
@@ -282,7 +295,7 @@
             {
                 memberName = path.Substring(0, path.IndexOf('.'));
             }
-            if(memberName.Contains('['))
+            if (memberName.Contains('['))
             {
                 memberName = memberName.Substring(0, path.IndexOf('['));
             }

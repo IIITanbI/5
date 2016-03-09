@@ -20,7 +20,7 @@
             var r = (bool)m.Invoke(null, args);
 
             if (!r)
-                throw new ParseException();
+                throw new ParseException(source, type);
 
             return args[1];
         }

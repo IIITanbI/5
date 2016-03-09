@@ -9,10 +9,15 @@
     <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.FileManager\bin\Debug</path>
     <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.GitManager\bin\Debug</path>
     <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.WebDriverManager\bin\Debug</path>
-    
-    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.AemPageManager\bin\Debug</path>
-    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.AemUI\bin\Debug</path>
-    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.TutorialManager\bin\Debug</path>
+
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Managers.AemPageManager\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Managers.GitHubTutorialManager\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Managers.JobManager\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Web.Components.Aem\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Web.Components.Sap\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Web.Pages.Aem\bin\Debug</path>
+    <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Web.Pages.Sap\bin\Debug</path>
     <!--<path></path>-->
   </LibrariesPaths>
   

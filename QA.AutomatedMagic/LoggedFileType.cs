@@ -1,10 +1,7 @@
 ﻿namespace QA.AutomatedMagic
 {
-
-
-    public enum AttachedItemType
+    public enum LoggedFileType
     {
-        NONE,
         JPG,
         PNG,
         BMP,

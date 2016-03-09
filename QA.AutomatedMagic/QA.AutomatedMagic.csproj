@@ -47,11 +47,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttachedItemType.cs" />
-    <Compile Include="BaseCommandManager.cs" />
-    <Compile Include="BaseMetaObject.cs" />
+    <Compile Include="AutomatedMagicAssemblyAttribute.cs" />
+    <Compile Include="AutomatedMagicException.cs" />
+    <Compile Include="CommandsMagic\BaseCommandManager.cs" />
+    <Compile Include="CommandsMagic\MetaSourceAttribute.cs" />
+    <Compile Include="LoggedFileType.cs" />
+    <Compile Include="MetaMagic\BaseMetaObject.cs" />
     <Compile Include="BaseMetaObjectWpfFiller.cs" />
-    <Compile Include="BaseNamedMetaObject.cs" />
+    <Compile Include="MetaMagic\BaseNamedMetaObject.cs" />
     <Compile Include="CollectionWrappers\ArrayWrapper.cs" />
     <Compile Include="CollectionWrappers\DictionaryWrapper.cs" />
     <Compile Include="CollectionWrappers\LinkedListWrapper.cs" />
@@ -94,14 +97,16 @@
     <Compile Include="MetaMagic\MetaTypeValueMember.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReflectionManager.cs" />
+    <Compile Include="AutomatedMagicManager.cs" />
     <Compile Include="BaseMetaObjectXmlSourceResolver.cs" />
+    <Compile Include="TestInfo\LogFile.cs" />
     <Compile Include="TestItemStatus.cs" />
     <Compile Include="TestItemType.cs" />
-    <Compile Include="TestsInfo\LogMessage.cs" />
-    <Compile Include="TestsInfo\Step.cs" />
-    <Compile Include="TestsInfo\TestEnvironmentInfo.cs" />
-    <Compile Include="TestsInfo\TestItem.cs" />
+    <Compile Include="TestInfo\LogItem.cs" />
+    <Compile Include="TestInfo\LogMessage.cs" />
+    <Compile Include="TestInfo\Step.cs" />
+    <Compile Include="TestInfo\TestEnvironmentInfo.cs" />
+    <Compile Include="TestInfo\TestItem.cs" />
     <Compile Include="ValueParsers\EnumParser.cs" />
     <Compile Include="ValueParsers\StringParser.cs" />
     <Compile Include="ValueParsers\ParsableTypesParser.cs" />

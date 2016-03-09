@@ -18,9 +18,12 @@
         static void Main(string[] args)
         {
             _libPath = Path.Combine(Directory.GetCurrentDirectory(), _libPath);
-            
-            ReflectionManager.LoadAssemblies();
-            ReflectionManager.LoadAssemblies(Directory.GetCurrentDirectory());
+
+            if (Directory.Exists(_libPath))
+                Directory.Delete(_libPath, true);
+
+            AutomatedMagicManager.LoadAssemblies();
+            AutomatedMagicManager.LoadAssemblies(Directory.GetCurrentDirectory());
 
             var runConfigXml = XDocument.Load("RunConfig.xml");
             var runConfig = MetaType.Parse<RunConfig>(runConfigXml.Elements().First());
@@ -30,14 +33,19 @@
                 CopyLibraries(path);
             }
 
-            ReflectionManager.LoadAssemblies(_libPath, true);
+            AutomatedMagicManager.LoadAssemblies(_libPath, SearchOption.AllDirectories);
+
+            var lTypes = AutomatedMagicManager.LoadedMetaTypes;
+            var lManagers = AutomatedMagicManager.LoadedCommandManagers;
 
             var projectConfig = XDocument.Load(runConfig.PathToProjectConfig);
             var project = MetaType.Parse<TestProject>(projectConfig.Elements().First());
             project = (TestProject)project.Build().First();
             project.Execute();
-            
+
             var result = project.GetReportItem();
+            var xel = MetaType.SerializeObject(result) as XElement;
+            xel.Save("result.xml");
 
             var rg = new HtmlReportGenerator("out.html");
             rg.CreateReport(result, new TestInfo.TestEnvironmentInfo(), null);
@@ -60,7 +68,7 @@
                 if (!Directory.Exists(locarDir))
                     Directory.CreateDirectory(locarDir);
 
-                if(!File.Exists(newPath))
+                if (!File.Exists(newPath))
                     file.CopyTo(newPath);
             }
         }

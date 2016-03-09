@@ -31,9 +31,6 @@
 
         public void Initialize()
         {
-            ContextValues.ToList().ForEach(cv => cv.Value.Clear());
-            ContextValues.Clear();
-
             if (ParentContext != null)
             {
                 foreach (var TestItemTypeKey in ParentContext.ContextValues.Keys)
@@ -77,7 +74,7 @@
                 foreach (var itemToAdd in itemsToAdd)
                 {
                     var itemToAddType = itemToAdd.GetType();
-                    var metaType = ReflectionManager.GetMetaType(itemToAddType);
+                    var metaType = AutomatedMagicManager.GetMetaType(itemToAddType);
 
                     var key = metaType.Key?.GetValue(itemToAdd).ToString();
 
@@ -90,7 +87,7 @@
 
             foreach (var managerItem in CommandManagersItems)
             {
-                var manager = ReflectionManager.GetCommandManagerByTypeName(managerItem.ManagerType);
+                var manager = AutomatedMagicManager.GetCommandManagerByTypeName(managerItem.ManagerType);
                 var managerObj = manager.CreateInstance(managerItem.Config);
 
                 if (!Managers.ContainsKey(managerItem.ManagerType))
@@ -150,10 +147,11 @@
         public object ResolveValue(string name)
         {
             var nameParts = name.Split('.');
+            object objToReturn = null;
 
             if (nameParts[0] == "Step")
             {
-                return StepResults[nameParts[1]];
+                objToReturn = StepResults[nameParts[1]];
             }
             else if (nameParts[0] == "Manager")
             {
@@ -169,8 +167,20 @@
                 var typeName = nameParts[0];
                 var itemName = nameParts[1];
 
-                return ContextValues[typeName][itemName];
+                objToReturn = ContextValues[typeName][itemName];
             }
+
+            if (nameParts.Length > 2)
+            {
+                var bmo = objToReturn as BaseMetaObject;
+                if (bmo != null)
+                {
+                    var path = name.Replace($"{nameParts[0]}.{nameParts[1]}.", "");
+                    objToReturn = bmo.ResolvePath(path);
+                }
+            }
+
+            return objToReturn;
         }
         public object ResolveValue(Type type, string name)
         {

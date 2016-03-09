@@ -34,7 +34,7 @@
 
             var metaType = objectMember.MemberMetaType.Value;
             if (objectMember.IsAssignableTypesAllowed)
-                metaType = ReflectionManager.GetMetaType(obj.GetType());
+                metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
 
             var rootExpander = new Expander { Header = metaType.Info.Name };
             rootGroupBox.Content = rootExpander;
@@ -79,7 +79,7 @@
             headerWrapPanel.Children.Add(new Label { Content = $"{name} : {metaType.Info.Name}" });
 
             if (isAssignableTypesAllowed)
-                metaType = ReflectionManager.GetMetaType(obj.GetType());
+                metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
 
             var rootExpander = new Expander { Header = metaType.Info.Name };
             rootGroupBox.Content = rootExpander;
@@ -130,7 +130,7 @@
 
             var metaType = objectMember.MemberMetaType.Value;
             if (objectMember.IsAssignableTypesAllowed)
-                metaType = ReflectionManager.GetMetaType(obj.GetType());
+                metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
 
             var rootExpander = new Expander { Header = metaType.Info.Name };
             rootGroupBox.Content = rootExpander;
@@ -175,7 +175,7 @@
             }
 
             if (isAssignableTypesAllowed)
-                metaType = ReflectionManager.GetMetaType(metaType.TargetType);
+                metaType = AutomatedMagicManager.GetMetaType(metaType.TargetType);
 
             var rootExpander = new Expander { Header = metaType.Info.Name };
             rootGroupBox.Content = rootExpander;

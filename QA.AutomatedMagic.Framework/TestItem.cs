@@ -259,8 +259,7 @@
             var stepMeta = new StepMeta();
             stepMeta.Step = testStep;
             stepMeta.TestItemStatus = TestItemStatus.Unknown;
-            stepMeta.Log = new TestLogger(testStep.Name, "Step");
-            stepMeta.Log.SetParent(Log);
+            stepMeta.Log = new TestLogger(testStep.Name, "Step", Log);
             StepsMeta.Add(stepMeta);
 
             for (int i = 1; i <= testStep.TryCount; i++)
@@ -269,6 +268,7 @@
                 {
                     testStep.Execute(Context, stepMeta.Log);
                     stepMeta.TestItemStatus = TestItemStatus.Passed;
+                    break;
                 }
                 catch (Exception ex)
                 {

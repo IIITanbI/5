@@ -19,14 +19,14 @@
             : base(parentType, propertyInfo, objectAttribute, locationAttributes)
         {
             IsAssignableTypesAllowed = MemberType.IsInterface || MemberType.IsAbstract || objectAttribute.IsAssignableTypesAllowed;
-            MemberMetaType = new Lazy<MetaType>(() => ReflectionManager.GetMetaType(MemberType));
+            MemberMetaType = new Lazy<MetaType>(() => AutomatedMagicManager.GetMetaType(MemberType));
         }
 
         public MetaTypeObjectMember(MetaType parentType, FieldInfo fieldInfo, MetaTypeObjectAttribute objectAttribute, List<MetaLocationAttribute> locationAttributes)
             : base(parentType, fieldInfo, objectAttribute, locationAttributes)
         {
             IsAssignableTypesAllowed = MemberType.IsInterface || MemberType.IsAbstract || objectAttribute.IsAssignableTypesAllowed;
-            MemberMetaType = new Lazy<MetaType>(() => ReflectionManager.GetMetaType(MemberType));
+            MemberMetaType = new Lazy<MetaType>(() => AutomatedMagicManager.GetMetaType(MemberType));
         }
 
         public override void InitSourceResolver(Type type)
@@ -43,6 +43,9 @@
             if (resolvedValue == null && !IsRequired)
                 return null;
 
+            if (resolvedValue == null)
+                throw new ParseException(source, this);
+
             if (!IsAssignableTypesAllowed)
                 return MemberMetaType.Value.Parse(resolvedValue, context);
 
@@ -53,7 +56,7 @@
                     return assignableType.Parse(resolvedValue2, context);
             }
 
-            throw new ParseException();
+            throw new ParseException($"Couldn't find assignable type" ,source, this);
         }
 
         public override List<string> GetPaths(object parentObj)

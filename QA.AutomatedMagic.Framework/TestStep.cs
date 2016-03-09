@@ -56,7 +56,7 @@
             else if (managerParts.Length > 2)
                 throw new FrameworkException($"Unexpected Manager: {Manager}");
 
-            var manager = ReflectionManager.GetCommandManagerByTypeName(managerTypeName);
+            var manager = AutomatedMagicManager.GetCommandManagerByTypeName(managerTypeName);
             var managerObj = context.Managers[managerTypeName][managerName ?? managerTypeName];
 
             var result = manager.ExecuteCommand(managerObj, CommandName, Parameters, context, log);
