@@ -126,6 +126,14 @@
     width: 160px;
 }
 
+.image {
+	display: none;
+}
+
+img {
+	max-width: 100%;
+	heigth: auto;
+}
 
 .step-fltr-btns {
     margin-bottom: 20px;

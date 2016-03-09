@@ -74,7 +74,7 @@
 
             head.Add(charset, httpEquiv, name, title, css, mcss);
             return head;
-       }
+        }
 
         public XElement GetBody(TestItem testItem, TestEnvironmentInfo testEnvironmentInfo)
         {
@@ -98,7 +98,7 @@
             var script = new XElement("script");
 
             string res;
-            res = File.ReadAllText(@"filter js/init.js") ; script.Add(res);
+            res = File.ReadAllText(@"filter js/init.js"); script.Add(res);
             res = File.ReadAllText(@"filter js/filter.js"); script.Add(res);
             res = File.ReadAllText(@"filter js/testFilter.js"); script.Add(res);
             res = File.ReadAllText(@"filter js/logFilter.js"); script.Add(res);
@@ -289,17 +289,14 @@
         public XElement GetException(LogMessage logMessage)
         {
             XElement log = null;
-            if (logMessage.Exception != null)
+            if (logMessage.Ex != null)
             {
-                log = new XElement("div", $"Exception: {logMessage.Exception}", new XAttribute("class", "log-exception"));
+                log = new XElement("div", $"Exception: {logMessage.Ex}", new XAttribute("class", "log-exception"));
             }
-            else
-            {
-                log = new XElement("div", "");
-            }
+            
             return log;
         }
-        public XElement GetMessage(LogMessage logMessage)
+        public XElement GetMessage(LogItem logMessage)
         {
             XElement msg = null;
             if (logMessage.Message != null)
@@ -352,7 +349,7 @@
                 return null;
 
             string name = (obj as TestItem)?.Name ?? (obj as Step)?.Name;
-            List<LogMessage> messages = (obj as TestItem)?.LogMessages ?? (obj as Step)?.Messages;
+            List<LogItem> messages = (obj as TestItem)?.LogMessages ?? (obj as Step)?.Messages;
 
             var main = new XElement("div", new XAttribute("class", "logPanel"));
             var elem = new XElement("div", new XAttribute("class", "logs"));
@@ -377,16 +374,53 @@
 
             if (messages.Count != 0)
             {
-                foreach (var msg in messages)
+                foreach (var logItem in messages)
                 {
-                    var tmp = new XElement("div",
-                        new XAttribute("class", "log"),
-                        new XElement("span", $"{msg.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(msg.Level)}")),
-                        new XElement("span", $" | {msg.DataStemp}", new XAttribute("class", "log-datastemp")),
-                        GetMessage(msg),
-                        GetException(msg)
-                    );
-                    elem.Add(tmp);
+                    var msg = logItem as LogMessage;
+                    if (msg != null)
+                    {
+                        var tmp = new XElement("div",
+                            new XAttribute("class", "log"),
+                            new XElement("span", $"{msg.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(msg.Level)}")),
+                            new XElement("span", $" | {msg.DataStemp}", new XAttribute("class", "log-datastemp")),
+                            GetMessage(msg),
+                            GetException(msg)
+                        );
+                        elem.Add(tmp);
+                    }
+
+                    var att = logItem as LogFile;
+                    if (att != null)
+                    {
+                        switch (att.FileType)
+                        {
+                            case LoggedFileType.JPG:
+                            case LoggedFileType.PNG:
+                            case LoggedFileType.BMP:
+
+                                var tmp = new XElement("div",
+                                    new XAttribute("class", "log"),
+                                    new XElement("span", $"{att.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(att.Level)}")),
+                                    new XElement("span", $" | {att.DataStemp}", new XAttribute("class", "log-datastemp")),
+                                    GetMessage(att),
+                                    new XElement("div", new XAttribute("class", "img-btn-exp"),
+                                       new XElement("span", "Screenshot"),
+                                       new XElement("span", new XAttribute("class", "glyphicon glyphicon-triangle-bottom"))
+                                    ),
+                                    new XElement("div", new XAttribute("class", "image"),
+                                        new XElement("img", new XAttribute("src", att.FilePath))
+                                    )
+                                );
+                                elem.Add(tmp);
+                                break;
+                            case LoggedFileType.ZIP:
+                                break;
+                            case LoggedFileType.TXT:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 }
             }
 

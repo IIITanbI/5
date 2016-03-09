@@ -35,6 +35,21 @@ $(function () {
         });
     });
 
+	$(".img-btn-exp").click(function (e) {
+        var $cur = $(e.currentTarget).children("span").last();
+        var $elem = $(this).closest(".log").find(".image");
+        $elem.toggle(300, function onCompleteToggle() {
+            if ($elem.is(":visible")) {
+                $cur.attr("class", "glyphicon glyphicon-triangle-top");
+                console.log("visible");
+            } else {
+                $cur.attr("class", "glyphicon glyphicon-triangle-bottom");
+                console.log("none");
+            }
+        });
+    });
+
+
 	$(".log-fltr-btns button").click(function (e) {
         myFilter.filterButtonClick(this);
     });
