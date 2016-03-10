@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <RunConfig>
-  
+
   <PathToProjectConfig>D:\Git\QA.AutomatedMagic\Test\config.xml</PathToProjectConfig>
   <!--<PathToProjectConfig>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Tests.Tutorial\bin\Debug\TutorialTests.xml</PathToProjectConfig>-->
-  
+
+  <NeedToCopyLibraries>True</NeedToCopyLibraries>
+
   <LibrariesPaths>
     <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.ApiManager\bin\Debug</path>
     <path>D:\Git\QA.AutomatedMagic.Managers\QA.AutomatedMagic.FileManager\bin\Debug</path>
@@ -20,5 +22,5 @@
     <path>C:\Users\Kiryl_Sakalouski\Desktop\QA\SapAutomation\SapAutomation.Web.Pages.Sap\bin\Debug</path>
     <!--<path></path>-->
   </LibrariesPaths>
-  
+
 </RunConfig>

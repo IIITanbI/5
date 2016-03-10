@@ -17,38 +17,49 @@
 
         static void Main(string[] args)
         {
-            _libPath = Path.Combine(Directory.GetCurrentDirectory(), _libPath);
-
-            if (Directory.Exists(_libPath))
-                Directory.Delete(_libPath, true);
-
-            AutomatedMagicManager.LoadAssemblies();
-            AutomatedMagicManager.LoadAssemblies(Directory.GetCurrentDirectory());
-
-            var runConfigXml = XDocument.Load("RunConfig.xml");
-            var runConfig = MetaType.Parse<RunConfig>(runConfigXml.Elements().First());
-
-            foreach (var path in runConfig.LibrariesPaths)
+            try
             {
-                CopyLibraries(path);
+                _libPath = Path.Combine(Directory.GetCurrentDirectory(), _libPath);
+
+                AutomatedMagicManager.LoadAssemblies();
+                AutomatedMagicManager.LoadAssemblies(Directory.GetCurrentDirectory());
+
+                var runConfigXml = XDocument.Load("RunConfig.xml");
+                var runConfig = MetaType.Parse<RunConfig>(runConfigXml.Elements().First());
+
+                if (runConfig.NeedToCopyLibraries)
+                {
+                    if (Directory.Exists(_libPath))
+                        Directory.Delete(_libPath, true);
+
+                    foreach (var path in runConfig.LibrariesPaths)
+                    {
+                        CopyLibraries(path);
+                    }
+                }
+
+                AutomatedMagicManager.LoadAssemblies(_libPath, SearchOption.AllDirectories);
+
+                var lTypes = AutomatedMagicManager.LoadedMetaTypes;
+                var lManagers = AutomatedMagicManager.LoadedCommandManagers;
+
+                var projectConfig = XDocument.Load(runConfig.PathToProjectConfig);
+                var project = MetaType.Parse<TestProject>(projectConfig.Elements().First());
+                project = (TestProject)project.Build().First();
+                project.Execute();
+
+                var result = project.GetReportItem();
+                var xel = MetaType.SerializeObject(result) as XElement;
+                xel.Save("result.xml");
+
+                var rg = new HtmlReportGenerator("out.html");
+                rg.CreateReport(result, new TestInfo.TestEnvironmentInfo(), null);
             }
-
-            AutomatedMagicManager.LoadAssemblies(_libPath, SearchOption.AllDirectories);
-
-            var lTypes = AutomatedMagicManager.LoadedMetaTypes;
-            var lManagers = AutomatedMagicManager.LoadedCommandManagers;
-
-            var projectConfig = XDocument.Load(runConfig.PathToProjectConfig);
-            var project = MetaType.Parse<TestProject>(projectConfig.Elements().First());
-            project = (TestProject)project.Build().First();
-            project.Execute();
-
-            var result = project.GetReportItem();
-            var xel = MetaType.SerializeObject(result) as XElement;
-            xel.Save("result.xml");
-
-            var rg = new HtmlReportGenerator("out.html");
-            rg.CreateReport(result, new TestInfo.TestEnvironmentInfo(), null);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            Console.ReadLine();
         }
 
         static void CopyLibraries(string pathToLibraryFolder)
