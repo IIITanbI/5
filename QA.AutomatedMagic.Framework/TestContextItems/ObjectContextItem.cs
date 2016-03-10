@@ -14,7 +14,7 @@
         [MetaLocation("object")]
         public BaseMetaObject ObjectItem { get; set; }
 
-        public override IMetaObject GetItem()
+        public override BaseMetaObject GetItem()
         {
             return ObjectItem;
         }

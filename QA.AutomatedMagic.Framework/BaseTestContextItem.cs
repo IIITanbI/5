@@ -15,12 +15,12 @@
 
         }
 
-        public virtual List<IMetaObject> GetItems()
+        public virtual List<BaseMetaObject> GetItems()
         {
             return null;
         }
 
-        public virtual IMetaObject GetItem()
+        public virtual BaseMetaObject GetItem()
         {
             return null;
         }

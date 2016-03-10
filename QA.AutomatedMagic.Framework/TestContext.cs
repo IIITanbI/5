@@ -57,7 +57,7 @@
             {
                 contextItem.Build(this);
 
-                var itemsToAdd = new List<IMetaObject>();
+                var itemsToAdd = new List<BaseMetaObject>();
 
                 var item = contextItem.GetItem();
                 if (item != null)
@@ -88,7 +88,7 @@
             foreach (var managerItem in CommandManagersItems)
             {
                 var manager = AutomatedMagicManager.GetCommandManagerByTypeName(managerItem.ManagerType);
-                var managerObj = manager.CreateInstance(managerItem.Config);
+                var managerObj = manager.CreateInstance(managerItem.Config, this);
 
                 if (!Managers.ContainsKey(managerItem.ManagerType))
                     Managers.Add(managerItem.ManagerType, new Dictionary<string, object>());

@@ -18,7 +18,6 @@
 
         public ICollectionWrapper CollectionWrapper { get; private set; }
         public IValueParser ChildValueParser { get; private set; } = null;
-        public IManagingCollectionFiller ManagingCollectionFiller { get; private set; }
 
         public MetaTypeCollectionMember(MetaType parentType, PropertyInfo propertyInfo, MetaTypeCollectionAttribute collectionAttribute, List<MetaLocationAttribute> locationAttributes)
             : base(parentType, propertyInfo, collectionAttribute, locationAttributes)
@@ -86,10 +85,6 @@
             CollectionWrapper = collectionAttribute.CollectionWrapperType != null
                 ? (ICollectionWrapper)Activator.CreateInstance(collectionAttribute.CollectionWrapperType)
                 : MetaType.CollectionWrappers.First(cw => cw.IsMatch(MemberType));
-
-            ManagingCollectionFiller = collectionAttribute.CollectionManagingFillerType != null
-                ? (IManagingCollectionFiller)Activator.CreateInstance(collectionAttribute.CollectionManagingFillerType)
-                : ParentType.ManagingFiller.GetManagingCollectionFiller();
         }
 
         public override void InitSourceResolver(Type type)

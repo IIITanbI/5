@@ -81,7 +81,7 @@
             }
         }
 
-        public BaseCommandManager CreateInstance(object config)
+        public BaseCommandManager CreateInstance(object config, IContext context = null)
         {
             BaseCommandManager managerObject = null;
 

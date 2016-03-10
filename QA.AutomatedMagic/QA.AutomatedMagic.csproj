@@ -30,8 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,11 +38,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="Xceed.Wpf.Toolkit, Version=2.9.15603.14400, Culture=neutral, PublicKeyToken=ba83ff368b7563c6, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xceed.Wpf.Toolkit.2.9.15603.14400\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutomatedMagicAssemblyAttribute.cs" />
@@ -53,7 +46,6 @@
     <Compile Include="CommandsMagic\MetaSourceAttribute.cs" />
     <Compile Include="LoggedFileType.cs" />
     <Compile Include="MetaMagic\BaseMetaObject.cs" />
-    <Compile Include="BaseMetaObjectWpfFiller.cs" />
     <Compile Include="MetaMagic\BaseNamedMetaObject.cs" />
     <Compile Include="CollectionWrappers\ArrayWrapper.cs" />
     <Compile Include="CollectionWrappers\DictionaryWrapper.cs" />
@@ -74,10 +66,6 @@
     <Compile Include="ISourceResolver.cs" />
     <Compile Include="IValueParser.cs" />
     <Compile Include="IValueSourceResolver.cs" />
-    <Compile Include="IManagingCollectionFiller.cs" />
-    <Compile Include="IManagingFiller.cs" />
-    <Compile Include="IManagingObjectFiller.cs" />
-    <Compile Include="IManagingValueFiller.cs" />
     <Compile Include="LogLevel.cs" />
     <Compile Include="ManagingFillerException.cs" />
     <Compile Include="MetaMagic\MetaConstraint.cs" />
@@ -111,32 +99,10 @@
     <Compile Include="ValueParsers\StringParser.cs" />
     <Compile Include="ValueParsers\ParsableTypesParser.cs" />
     <Compile Include="ValueParsers\XElementParser.cs" />
-    <Compile Include="WpfManagingFillers\BaseEditor.cs" />
-    <Compile Include="WpfManagingFillers\BaseWpfValueFiller.cs" />
-    <Compile Include="WpfManagingFillers\Creator.cs" />
-    <Compile Include="WpfManagingFillers\Editors\CollectionEditor.cs" />
-    <Compile Include="WpfManagingFillers\Editors\ObjectEditor.cs" />
-    <Compile Include="WpfManagingFillers\Editors\ValueEditor.cs" />
-    <Compile Include="WpfManagingFillers\IWpfValueFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfManagingCollectionFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfManagingObjectFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfManagingValueFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\BoolFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\ByteFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\DateTimeFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\DoubleFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\EnumFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\IntFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\StringFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\TimeSpanFiller.cs" />
-    <Compile Include="WpfManagingFillers\WpfValueFillers\XElementFiller.cs" />
     <Compile Include="XmlSourceResolver\XmlCollectionSourceResolver.cs" />
     <Compile Include="XmlSourceResolver\XmlHelper.cs" />
     <Compile Include="XmlSourceResolver\XmlObjectSourceResolver.cs" />
     <Compile Include="XmlSourceResolver\XmlValueSourceResolver.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

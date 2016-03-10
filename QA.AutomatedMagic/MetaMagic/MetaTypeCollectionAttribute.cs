@@ -12,7 +12,6 @@
         public List<string> PossibleChildrenNames { get; private set; }
         public Type CollectionWrapperType { get; set; } = null;
         public Type ChildValueParserType { get; set; } = null;
-        public Type CollectionManagingFillerType { get; set; } = null;
 
         public MetaTypeCollectionAttribute(string description, params string[] possibleChildrenNames)
             : base(description)

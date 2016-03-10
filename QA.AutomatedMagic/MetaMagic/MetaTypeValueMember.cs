@@ -11,7 +11,6 @@
     {
         public IValueSourceResolver ValueSourceResolver { get; private set; }
         public IValueParser ValueParser { get; private set; }
-        public IManagingValueFiller ManagingValueFiller { get; private set; }
 
         public MetaTypeValueMember(MetaType parentType, PropertyInfo propertyInfo, MetaTypeValueAttribute valueAttribute, List<MetaLocationAttribute> locationAttributes)
             : base(parentType, propertyInfo, valueAttribute, locationAttributes)
@@ -30,10 +29,6 @@
             ValueParser = valueAttribute.ValueParserType != null
                 ? (IValueParser)Activator.CreateInstance(valueAttribute.ValueParserType)
                 : MetaType.ValueParsers.First(vp => vp.IsMatch(MemberType));
-
-            ManagingValueFiller = valueAttribute.ValueManagingFillerType != null
-                ? (IManagingValueFiller)Activator.CreateInstance(valueAttribute.ValueManagingFillerType)
-                : ParentType.ManagingFiller.GetManagingValueFiller();
         }
 
         public override void InitSourceResolver(Type type)

@@ -14,7 +14,6 @@
     {
         #region Static
         public static Type DefaultSourceResolverType { get; set; } = typeof(BaseMetaObjectXmlSourceResolver);
-        public static Type DefaultManagingFillerType { get; set; } = typeof(BaseMetaObjectWpfFiller);
         public static List<IValueParser> ValueParsers { get; set; } = new List<IValueParser>
         {
             new StringParser(),
@@ -67,7 +66,6 @@
         public MetaTypeMember Key { get; private set; }
 
         public ISourceResolver SourceResolver { get; private set; }
-        public IManagingFiller ManagingFiller { get; private set; }
 
         private string _keyName = null;
         private Type _sourceResolverType = null;
@@ -93,14 +91,10 @@
                 if (_sourceResolverType == null && baseMetaTypeAttribute.SourceResolverType != null)
                     _sourceResolverType = baseMetaTypeAttribute.SourceResolverType;
 
-                if (_managingFillerType == null && baseMetaTypeAttribute.ManagingFillerType != null)
-                    _managingFillerType = baseMetaTypeAttribute.ManagingFillerType;
-
                 curBase = curBase.BaseType;
             }
 
             SourceResolver = (ISourceResolver)Activator.CreateInstance(_sourceResolverType ?? DefaultSourceResolverType);
-            ManagingFiller = (IManagingFiller)Activator.CreateInstance(_managingFillerType ?? DefaultManagingFillerType);
 
             var locationAttributes = type.GetCustomAttributes<MetaLocationAttribute>().ToList();
             locationAttributes.Add(new MetaLocationAttribute(TargetType.Name));

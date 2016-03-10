@@ -16,7 +16,6 @@
     using System.Windows.Navigation;
     using System.Windows.Shapes;
     using System.Xml.Linq;
-    using WpfManagingFillers;
 
     public partial class MainWindow : Window
     {
@@ -24,8 +23,6 @@
         {
             AutomatedMagicManager.LoadAssemblies();
             InitializeComponent();
-
-            var creator = new Creator(B1, AutomatedMagicManager.GetMetaType(typeof(ComboProst)), "Test", true);
         }
 
         private void B1_Click(object sender, RoutedEventArgs e)
@@ -104,7 +101,6 @@
 
             var obj4 = MetaType.Parse<ComboProst>(comboProstConfig2);
             obj4.Ts = TimeSpan.FromMilliseconds(20110646);
-            comboMetaType.ManagingFiller.GetManagingObjectFiller().FillEditControls(S1, obj4, comboMetaType, "Test", false);
         }
 
         [MetaType("Test Prost class", "StringProp")]
