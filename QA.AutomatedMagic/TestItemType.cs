@@ -2,6 +2,6 @@
 {
     public enum TestItemType
     {
-        Project, Suite, Test
+        Project, Suite, Test, Step
     }
 }

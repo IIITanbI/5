@@ -6,9 +6,8 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
-    
-    [MetaType("TestProject config")]
-    [MetaLocation("project")]
+
+    [MetaType("Test project")]
     public class TestProject : TestSuite
     {
         public TestProject()
@@ -16,12 +15,9 @@
             ItemType = TestItemType.Project;
         }
 
-        public override List<TestItem> Build()
+        public override void Build()
         {
-            var projects = base.Build();
-            var project = projects.First();
-            project.SetParent(null);
-            return projects;
+            base.Build();
         }
     }
 }

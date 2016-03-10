@@ -1,4 +1,4 @@
-﻿namespace QA.AutomatedMagic
+﻿namespace QA.AutomatedMagic.MetaMagic
 {
     using MetaMagic;
     using System;
@@ -10,7 +10,7 @@
     [MetaType("Base interface for MetaObjects")]
     public interface IMetaObject
     {
-        //object Resolve(string path);
-        //List<string> GetPossiblePaths();
+        List<string> GetPaths();
+        object ResolvePath(string path);
     }
 }

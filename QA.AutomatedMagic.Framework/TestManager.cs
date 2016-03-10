@@ -1,13 +1,13 @@
-﻿namespace QA.AutomatedMagic
+﻿namespace QA.AutomatedMagic.Framework
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-
-
-    public class ManagingFillerException : Exception
+    
+    public static class TestManager
     {
+        public static TestLogger Log { get; set; }
     }
 }

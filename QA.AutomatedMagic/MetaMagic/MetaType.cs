@@ -69,7 +69,6 @@
 
         private string _keyName = null;
         private Type _sourceResolverType = null;
-        private Type _managingFillerType = null;
 
         public MetaType(Type type)
         {

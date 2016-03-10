@@ -5,113 +5,40 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using System.Xml.Linq;
     using MetaMagic;
 
-    [MetaType("Test suite config")]
-    [MetaLocation("Suite")]
-    public class TestSuite : TestItem
+    [MetaType("Test suite")]
+    public class TestSuite : TestCase
     {
-        [MetaTypeCollection("Child test items", IsAssignableTypesAllowed = true)]
-        [MetaLocation("suites", "tests", "testSuites", "cases", "testCases")]
-        public List<TestItem> TestItems { get; set; } = new List<TestItem>();
-
-        [MetaTypeValue("Is parallel execution allowed for children", IsRequired = false)]
-        [MetaLocation("parallel", "isParallel", "parallelAllowed")]
-        public bool IsParallelExecutionAllowed { get; set; } = false;
-
-        [MetaTypeValue("Level of parallelism", IsRequired = false)]
-        [MetaLocation("levelOfparallelism")]
-        public int ParallelismLevel { get; set; } = -1;
+        [MetaTypeCollection("List of child TestCases and TestSuites", "test", "testCase", "suite", "testSuite", IsAssignableTypesAllowed = true)]
+        [MetaLocation("Tests", "Suites", "TestCases", "TestSuites")]
+        public List<TestCase> Children { get; set; }
 
         public TestSuite()
         {
             ItemType = TestItemType.Suite;
         }
 
-        public override List<TestItem> Build()
+        public override void Build()
         {
-            var builtSuites = base.Build();
+            base.Build();
 
-            foreach (var builtSuite in builtSuites)
+            Log.INFO($"Start building children for item: {this}");
+            Log.INFO($"Children count: {Children.Count}");
+
+            foreach (var child in Children)
             {
-                var builtChildren = new List<TestItem>();
-
-                foreach (var testItem in ((TestSuite)builtSuite).TestItems)
-                {
-                    builtChildren.AddRange(testItem.Build());
-                }
-
-                ((TestSuite)builtSuite).TestItems.Clear();
-                ((TestSuite)builtSuite).TestItems = builtChildren;
+                child.Parent = this;
+                child.Build();
             }
 
-            return builtSuites;
+            Log.INFO($"Children were successfully built for item: {this}");
+            Log.INFO($"Build was successfully completed for item: {this}");
         }
 
-        public override void SetParent(TestSuite parent)
+        public override void Execute()
         {
-            base.SetParent(parent);
-
-            foreach (var testItem in TestItems)
-            {
-                testItem.SetParent(this);
-            }
-        }
-
-        public override TestItem GetState()
-        {
-            var testSuite = (TestSuite)base.GetState();
-            foreach (var child in TestItems)
-            {
-                testSuite.TestItems.Add(child.GetState());
-            }
-            return testSuite;
-        }
-
-        public override void ExecuteStageCase()
-        {
-            base.ExecuteStageCase();
-
-            if (!IsParallelExecutionAllowed)
-            {
-                foreach (var testItem in TestItems)
-                {
-                    testItem.Execute();
-                }
-            }
-            else
-            {
-                if (ParallelismLevel != -1 && ParallelismLevel > 1)
-                    Parallel.ForEach(TestItems, new ParallelOptions { MaxDegreeOfParallelism = ParallelismLevel }, ti => ti.Execute());
-                else
-                    Parallel.ForEach(TestItems, ti => ti.Execute());
-            }
-
-            if (TestItems.Any(ti => ti.Status == TestItemStatus.Failed))
-                Status = TestItemStatus.Failed;
-        }
-
-        public override void MarkAsFailedOrSkipped(TestItemStatus status = TestItemStatus.Failed)
-        {
-            base.MarkAsFailedOrSkipped(status);
-
-            foreach (var testItem in TestItems)
-            {
-                testItem.MarkAsFailedOrSkipped(TestItemStatus.Skipped);
-            }
-        }
-
-        public override TestInfo.TestItem GetReportItem()
-        {
-            var reportItem = base.GetReportItem();
-
-            foreach (var testItem in TestItems)
-            {
-                reportItem.Childs.Add(testItem.GetReportItem());
-            }
-
-            return reportItem;
+            base.Execute();
         }
     }
 }

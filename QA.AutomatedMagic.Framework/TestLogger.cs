@@ -7,30 +7,23 @@
     using System.Threading.Tasks;
     using TestInfo;
 
-    public class TestLogger : ILogger
+    public class TestLogger
     {
-        public string Name { get; private set; }
-        public ILogger Parent { get; private set; }
+        public string Name { get; }
         public List<LogItem> LogMessages { get; private set; } = new List<LogItem>();
 
         private Dictionary<ILogger, LogLevel> _loggers = new Dictionary<ILogger, LogLevel>();
 
-        public TestLogger(string name, string itemType, ILogger parent = null)
+        public TestLogger(string name)
         {
-            Parent = parent;
-            Name = $"({itemType}) {name}";
+            Name = name;
         }
-
-        public void SetParent(ILogger logger)
-        {
-            Parent = logger;
-        }
-
         public void AddLogger(ILogger logger, LogLevel level)
         {
             _loggers.Add(logger, level);
         }
 
+        #region Simple actions
         public void TRACE(string message, Exception exception = null)
         {
             LOG(LogLevel.TRACE, message, exception);
@@ -75,18 +68,12 @@
         {
             LOG(LogLevel.ERROR, message, fileType, filePath);
         }
+        #endregion
 
-        public string GetFullName()
-        {
-            if (Parent == null)
-                return Name;
-
-            return $"{Parent.GetFullName()} $ {Name}";
-        }
 
         public void LOG(LogLevel level, string message, Exception exception = null)
         {
-            Console.WriteLine($"{GetFullName()}\t{level}\t{message}");
+            Console.WriteLine($"{Name}\t{level}\t{message}");
 
             var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
             LogMessages.Add(logMessage);
@@ -144,63 +131,6 @@
                         default:
                             break;
                     }
-            }
-        }
-
-        public void SpamTo(ILogger logger)
-        {
-            foreach (var logMessage in LogMessages)
-            {
-                var loggedFile = logMessage as LogFile;
-                if (loggedFile != null)
-                {
-                    switch (loggedFile.Level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.TRACE(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.DEBUG(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.WARN:
-                            logger.WARN(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.INFO:
-                            logger.INFO(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.ERROR(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        default:
-                            break;
-                    }
-                    continue;
-                }
-
-                var loggedMessage = logMessage as LogMessage;
-                if (loggedMessage != null)
-                {
-                    switch (loggedMessage.Level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.TRACE(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.DEBUG(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.WARN:
-                            logger.WARN(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.INFO:
-                            logger.INFO(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.ERROR(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        default:
-                            break;
-                    }
-                }
             }
         }
     }

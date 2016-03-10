@@ -119,7 +119,7 @@
 
         public static CommandManager GetCommandManagerByTypeName(string managerTypeName)
         {
-            return _type_commandManager.First(tcm => tcm.Key.Name == managerTypeName).Value;
+            return _type_commandManager.FirstOrDefault(tcm => tcm.Key.Name == managerTypeName).Value;
         }
         public static T CreateCommandManager<T>(BaseMetaObject config = null)
             where T : BaseCommandManager
