@@ -33,14 +33,35 @@
     background-color: lightseagreen;
 }
 
+.panel-body {
+	padding-bottom: 0px;
+	padding-top: 0px;
+}
+.panel-heading > p {
+	margin: 0 0 2 0px;
+}
+.itemInfo {
+	color : inherit;
+	font-size: inherit;
+}
+.itemInfo td {
+	padding: 0 10 5 0px;
+}
+.itemInfo tr:first-child {
+	font-weight: bold;
+	font-size: 20px;
+}
+
 
 .logPanel {
+	padding: 0px 15px;
     display: none;
 }
 
 .logHeader {
     height: 22px;
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .logHeader > * {
@@ -105,6 +126,14 @@
     width: 160px;
 }
 
+.image {
+	display: none;
+}
+
+img {
+	max-width: 100%;
+	heigth: auto;
+}
 
 .step-fltr-btns {
     margin-bottom: 20px;

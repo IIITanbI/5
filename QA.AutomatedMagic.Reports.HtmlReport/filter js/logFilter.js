@@ -4,7 +4,7 @@ $(function () {
     myFilter.multiSelect = false;
 
     myFilter.getChilds = function (button) {
-        return $(button).closest(".logPanel").children('.logs').children();
+        return $(button).closest(".logPanel").find('.logs').children();
     };
 
     myFilter.getFilterButtons = function (button) {
@@ -16,7 +16,7 @@ $(function () {
     };
 
     myFilter.getChildStatus = function (child) {
-        var $status = $($(child).children("span")[0]).text().toLowerCase();
+        var $status = $($(child).find("span")[0]).text().toLowerCase();
         return $status;
     };
 
@@ -34,6 +34,21 @@ $(function () {
             }
         });
     });
+
+	$(".img-btn-exp").click(function (e) {
+        var $cur = $(e.currentTarget).children("span").last();
+        var $elem = $(this).closest(".log").find(".image");
+        $elem.toggle(300, function onCompleteToggle() {
+            if ($elem.is(":visible")) {
+                $cur.attr("class", "glyphicon glyphicon-triangle-top");
+                console.log("visible");
+            } else {
+                $cur.attr("class", "glyphicon glyphicon-triangle-bottom");
+                console.log("none");
+            }
+        });
+    });
+
 
 	$(".log-fltr-btns button").click(function (e) {
         myFilter.filterButtonClick(this);
