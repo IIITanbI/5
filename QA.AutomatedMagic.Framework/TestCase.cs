@@ -233,5 +233,23 @@
                 Log.DEBUG($"Executing {order} steps was completed");
             }
         }
+
+        public virtual TestInfo.TestItem GetTestInfo()
+        {
+            var ti = new TestInfo.TestItem();
+
+            ti.Name = Info.Name;
+            ti.Description = Info.Description;
+            ti.Status = ItemStatus;
+            ti.LogMessages.AddRange(Log.LogMessages);
+            ti.Type = ItemType;
+
+            foreach (var step in TestSteps)
+            {
+                ti.Steps.Add(step.GetTestInfo());
+            }
+
+            return ti;
+        }
     }
 }

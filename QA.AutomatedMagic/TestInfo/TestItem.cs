@@ -35,9 +35,6 @@
         [MetaTypeCollection("List of test item childes", IsRequired = false)]
         public List<TestItem> Childs { get; set; } = new List<TestItem>();
 
-        [MetaTypeCollection("Test item failed tries", IsRequired = false)]
-        public List<TestItem> FailedTries { get; set; } = new List<TestItem>();
-
         [MetaTypeCollection("Test item tags", "tag", IsRequired = false)]
         public List<string> Tags { get; set; }
 

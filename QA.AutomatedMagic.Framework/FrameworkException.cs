@@ -28,9 +28,6 @@
             _sb.AppendLine(innerException.ToString());
         }
 
-        public FrameworkException(string message, Exception innerException, params string[] infos)
-        { }
-
         public override string ToString()
         {
             return _sb.ToString();

@@ -16,9 +16,5 @@
         public FrameworkContextBuildingException(TestItem item, string message, Exception innerException, params string[] infos)
             : base(item, message, innerException, infos)
         { }
-
-        public FrameworkContextBuildingException(string message, Exception innerException, params string[] infos)
-            : base(message, innerException, infos)
-        { }
     }
 }

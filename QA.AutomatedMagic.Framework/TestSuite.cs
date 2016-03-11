@@ -6,6 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
+    using TestInfo;
 
     [MetaType("Test suite")]
     public class TestSuite : TestCase
@@ -37,6 +38,10 @@
                 child.Parent = this;
                 child.Build();
             }
+
+            var stepsToRemove = TestSteps.Where(s => s.Order != TestStepOrder.Pre || s.Order != TestStepOrder.Post).ToList();
+            stepsToRemove.ForEach(s => TestSteps.Remove(s));
+            stepsToRemove.Clear();
 
             TestManager.Log.INFO($"Children were successfully built for item: {this}");
             TestManager.Log.INFO($"Build was successfully completed for item: {this}");
@@ -165,6 +170,18 @@
             Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");
             Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
             Parent?.Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
+        }
+
+        public override TestInfo.TestItem GetTestInfo()
+        {
+            var ti = base.GetTestInfo();
+
+            foreach (var child in Children)
+            {
+                ti.Childs.Add(child.GetTestInfo());
+            }
+
+            return ti;
         }
     }
 }

@@ -26,11 +26,6 @@
         private CommandManager _commandManager;
         private BaseCommandManager _manager;
 
-        public virtual string GetName()
-        {
-            return Info.Name;
-        }
-
         public override void Execute()
         {
             ItemStatus = TestItemStatus.Unknown;
@@ -213,7 +208,7 @@
             #endregion
 
             if (result != null)
-                AddStepResult(GetName(), result);
+                AddStepResult(Info.Name, result);
 
             ItemStatus = TestItemStatus.Passed;
             Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");

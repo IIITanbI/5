@@ -6,11 +6,13 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
+    using TestInfo;
 
     [MetaType("Group of Test steps")]
     public class TestStepGroup : TestStepBase
     {
         [MetaTypeCollection("List of test steps", IsAssignableTypesAllowed = true)]
+        [MetaLocation("steps")]
         public List<TestStep> TestSteps { get; set; }
 
         public override void Execute()
@@ -115,6 +117,19 @@
             }
             TestManager.Log.INFO($"Child TestSteps were successfully built for item: {this}");
             TestManager.Log.INFO($"Build was successfully completed for item: {this}");
+        }
+
+        public override Step GetTestInfo()
+        {
+            var si = base.GetTestInfo();
+
+            si.Steps = new List<Step>();
+            foreach (var step in TestSteps)
+            {
+                si.Steps.Add(step.GetTestInfo());
+            }
+
+            return si;
         }
     }
 }

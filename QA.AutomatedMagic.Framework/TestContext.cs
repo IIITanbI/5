@@ -88,7 +88,7 @@
                         }
                         catch (FrameworkContextBuildingException fcbEx)
                         {
-                            throw new FrameworkContextBuildingException("Error occurred during adding context value", fcbEx, $"Context item name: {contextItem.Name}");
+                            throw new FrameworkContextBuildingException(Item, "Error occurred during adding context value", fcbEx, $"Context item name: {contextItem.Name}");
                         }
                     }
                 }

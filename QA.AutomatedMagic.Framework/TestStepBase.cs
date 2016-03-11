@@ -30,5 +30,17 @@
 
             curItem.Context.AddStepResult(stepName, result);
         }
+
+        public virtual TestInfo.Step GetTestInfo()
+        {
+            var si = new TestInfo.Step();
+
+            si.Name = Info.Name;
+            si.Description = Info.Description;
+            si.Status = ItemStatus;
+            si.Messages.AddRange(Log.LogMessages);
+
+            return si;
+        }
     }
 }
