@@ -392,13 +392,13 @@
                     var att = logItem as LogFile;
                     if (att != null)
                     {
+                        XElement tmp = null;
                         switch (att.FileType)
                         {
                             case LoggedFileType.JPG:
                             case LoggedFileType.PNG:
                             case LoggedFileType.BMP:
-
-                                var tmp = new XElement("div",
+                                tmp = new XElement("div",
                                     new XAttribute("class", "log"),
                                     new XElement("span", $"{att.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(att.Level)}")),
                                     new XElement("span", $" | {att.DataStemp}", new XAttribute("class", "log-datastemp")),
@@ -414,8 +414,38 @@
                                 elem.Add(tmp);
                                 break;
                             case LoggedFileType.ZIP:
+                                tmp = new XElement("div",
+                                    new XAttribute("class", "log"),
+                                    new XElement("span", $"{att.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(att.Level)}")),
+                                    new XElement("span", $" | {att.DataStemp}", new XAttribute("class", "log-datastemp")),
+                                    GetMessage(att),
+                                    new XElement("div", new XAttribute("class", "Link"),
+                                       new XElement("span", "ZIP"),
+                                       new XElement("a",
+                                            new XAttribute("href", att.FilePath),
+                                            new XAttribute("target", "_blank"),
+                                            "Link"
+                                        )
+                                    )
+                                );
+                                elem.Add(tmp);
                                 break;
                             case LoggedFileType.TXT:
+                                tmp = new XElement("div",
+                                    new XAttribute("class", "log"),
+                                    new XElement("span", $"{att.Level}", new XAttribute("class", $"log-level bg-{GetLogColor(att.Level)}")),
+                                    new XElement("span", $" | {att.DataStemp}", new XAttribute("class", "log-datastemp")),
+                                    GetMessage(att),
+                                    new XElement("div", new XAttribute("class", "Link"),
+                                       new XElement("span", "TXT"),
+                                       new XElement("a",
+                                            new XAttribute("href", att.FilePath),
+                                            new XAttribute("target", "_blank"),
+                                            "Link"
+                                        )
+                                    )
+                                );
+                                elem.Add(tmp);
                                 break;
                             default:
                                 break;

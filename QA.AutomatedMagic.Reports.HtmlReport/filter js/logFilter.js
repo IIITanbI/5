@@ -35,7 +35,7 @@ $(function () {
         });
     });
 
-	$(".img-btn-exp").click(function (e) {
+	$(".img-btn-exp .glyphicon").click(function (e) {
         var $cur = $(e.currentTarget).children("span").last();
         var $elem = $(this).closest(".log").find(".image");
         $elem.toggle(300, function onCompleteToggle() {
