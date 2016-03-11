@@ -130,27 +130,9 @@
                 Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
 
                 ExecuteSteps(TestStepOrder.Pre);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ExecuteSteps(TestStepOrder.Case);
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-                    Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
-                    continue;
-                }
-
                 ExecuteSteps(TestStepOrder.Case);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-                    Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
-                    continue;
-                }
-
                 ExecuteSteps(TestStepOrder.Post);
+
                 if (ItemStatus == TestItemStatus.Failed)
                 {
                     Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
@@ -169,32 +151,7 @@
                 Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
 
                 ExecuteSteps(TestStepOrder.Pre);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ExecuteSteps(TestStepOrder.Case);
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-
-                    Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
-                    Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    Parent?.Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    return;
-                }
-
                 ExecuteSteps(TestStepOrder.Case);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-
-                    Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
-                    Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    Parent?.Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    return;
-                }
-
                 ExecuteSteps(TestStepOrder.Post);
 
                 if (ItemStatus == TestItemStatus.Failed)
@@ -219,16 +176,35 @@
                 Log.DEBUG($"Number of {order} steps: {stepsToExecute.Count}");
                 Log.DEBUG($"Start executing {order} steps");
 
-                foreach (var step in stepsToExecute)
+                if (order == TestStepOrder.Post)
                 {
-                    if (ItemStatus == TestItemStatus.Failed)
+                    var isFailed = ItemStatus == TestItemStatus.Failed;
+
+                    foreach (var step in stepsToExecute)
                     {
-                        step.ItemStatus = TestItemStatus.Skipped;
-                        continue;
+                        step.Execute();
+                        if (step.ItemStatus == TestItemStatus.Failed)
+                            isFailed = true;
                     }
 
-                    step.Execute();
-                    ItemStatus = step.ItemStatus;
+                    if (isFailed)
+                        ItemStatus = TestItemStatus.Failed;
+                    else
+                        ItemStatus = TestItemStatus.Passed;
+                }
+                else
+                {
+                    foreach (var step in stepsToExecute)
+                    {
+                        if (ItemStatus == TestItemStatus.Failed)
+                        {
+                            step.ItemStatus = TestItemStatus.Skipped;
+                            continue;
+                        }
+
+                        step.Execute();
+                        ItemStatus = step.ItemStatus;
+                    }
                 }
                 Log.DEBUG($"Executing {order} steps was completed");
             }

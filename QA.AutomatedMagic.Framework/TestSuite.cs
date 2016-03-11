@@ -60,45 +60,39 @@
                 Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
 
                 ExecuteSteps(TestStepOrder.Pre);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-                    Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
-                    continue;
-                }
 
-                Log.DEBUG("Start executing children");
-                Log.DEBUG($"Children count: {Children.Count}");
-
-                if (!IsParallelismEnabled)
+                if (ItemStatus == TestItemStatus.Passed)
                 {
-                    Log.DEBUG($"Execute children in sequence mode");
-                    foreach (var child in Children)
+                    Log.DEBUG("Start executing children");
+                    Log.DEBUG($"Children count: {Children.Count}");
+
+                    if (!IsParallelismEnabled)
                     {
-                        child.Execute();
+                        Log.DEBUG($"Execute children in sequence mode");
+                        foreach (var child in Children)
+                        {
+                            child.Execute();
+                        }
                     }
+                    else
+                    {
+                        Log.DEBUG($"Execute children in parallel mode");
+                        Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
+
+                        var parallelOptions = new ParallelOptions();
+                        if (ThreadNumber != 0)
+                            parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
+
+                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                    }
+                    Log.DEBUG("Children execution was completed");
+
+                    if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
+                        ItemStatus = TestItemStatus.Failed;
                 }
-                else
-                {
-                    Log.DEBUG($"Execute children in parallel mode");
-                    Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
 
-                    var parallelOptions = new ParallelOptions();
-                    if (ThreadNumber != 0)
-                        parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
-
-                    Parallel.ForEach(Children, parallelOptions, child => child.Execute());
-                }
-                Log.DEBUG("Children execution was completed");
-
-                if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
-                    ItemStatus = TestItemStatus.Failed;
-
-                ItemStatus = TestItemStatus.Unknown;
                 ExecuteSteps(TestStepOrder.Post);
-                ItemStatus = TestItemStatus.Failed;
+
                 if (ItemStatus == TestItemStatus.Failed)
                 {
                     Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
@@ -117,47 +111,43 @@
                 Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
 
                 ExecuteSteps(TestStepOrder.Pre);
-                if (ItemStatus == TestItemStatus.Failed)
-                {
-                    ItemStatus = TestItemStatus.Unknown;
-                    ExecuteSteps(TestStepOrder.Post);
-                    ItemStatus = TestItemStatus.Failed;
-                    Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
-                    Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    Parent?.Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
-                    return;
-                }
 
-                Log.DEBUG("Start executing children");
-                Log.DEBUG($"Children count: {Children.Count}");
-
-                if (!IsParallelismEnabled)
+                if (ItemStatus == TestItemStatus.Passed)
                 {
-                    Log.DEBUG($"Execute children in sequence mode");
-                    foreach (var child in Children)
+                    Log.DEBUG("Start executing children");
+                    Log.DEBUG($"Children count: {Children.Count}");
+
+                    if (!IsParallelismEnabled)
                     {
-                        child.Execute();
+                        Log.DEBUG($"Execute children in sequence mode");
+                        foreach (var child in Children)
+                        {
+                            child.Execute();
+                        }
                     }
+                    else
+                    {
+                        Log.DEBUG($"Execute children in parallel mode");
+                        Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
+
+                        var parallelOptions = new ParallelOptions();
+                        if (ThreadNumber != 0)
+                            parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
+
+                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                    }
+                    Log.DEBUG("Children execution was completed");
+
+                    if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
+                        ItemStatus = TestItemStatus.Failed;
                 }
                 else
                 {
-                    Log.DEBUG($"Execute children in parallel mode");
-                    Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
-
-                    var parallelOptions = new ParallelOptions();
-                    if (ThreadNumber != 0)
-                        parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
-
-                    Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                    Children.ForEach(c => c.ItemStatus = TestItemStatus.Skipped);
                 }
-                Log.DEBUG("Children execution was completed");
 
-                if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
-                    ItemStatus = TestItemStatus.Failed;
-
-                ItemStatus = TestItemStatus.Unknown;
                 ExecuteSteps(TestStepOrder.Post);
-                ItemStatus = TestItemStatus.Failed;
+
                 if (ItemStatus == TestItemStatus.Failed)
                 {
                     Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
