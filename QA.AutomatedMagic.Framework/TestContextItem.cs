@@ -8,7 +8,7 @@
     using MetaMagic;
 
     [MetaType("Base class for Test context item")]
-    public abstract class TestContextItem
+    public abstract class TestContextItem : BaseMetaObject
     {
         [MetaTypeValue("Name of context item")]
         public string Name { get; set; }

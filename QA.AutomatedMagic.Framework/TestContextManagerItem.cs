@@ -8,7 +8,7 @@
     using MetaMagic;
 
     [MetaType("Test context manager item")]
-    public class TestContextManagerItem
+    public class TestContextManagerItem : BaseMetaObject
     {
         [MetaTypeValue("Manager type")]
         public string ManagerType { get; set; }

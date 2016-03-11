@@ -8,6 +8,6 @@
     
     public static class TestManager
     {
-        public static TestLogger Log { get; set; }
+        public static TestLogger Log { get; set; } = new TestLogger("TestManager");
     }
 }

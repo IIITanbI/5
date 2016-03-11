@@ -11,9 +11,9 @@
     public abstract class TestItem : BaseMetaObject
     {
         [MetaTypeObject("Test item info")]
-        public TestItemInfo ItemInfo { get; set; }
+        public TestItemInfo Info { get; set; }
 
-        [MetaTypeValue("Number of tries to execute")]
+        [MetaTypeValue("Number of tries to execute", IsRequired = false)]
         public int TryCount { get; set; } = 1;
 
         [MetaTypeObject("Test item Context", IsRequired = false)]
@@ -27,10 +27,14 @@
 
         public abstract TestItemType ItemType { get; protected set; }
         public TestItemStatus ItemStatus { get; set; } = TestItemStatus.NotExecuted;
+        protected int _tryNumber = 1;
 
         public virtual void Build()
         {
+            Log = new TestLogger(GetFullName());
+
             TestManager.Log.INFO($"Start building context for item: {this}");
+            Context.Item = this;
             Context.Build();
             TestManager.Log.INFO($"Context was successfully built for item: {this}");
         }
@@ -38,7 +42,20 @@
 
         public override string ToString()
         {
-            return $"{GetType().Name} : {ItemInfo}";
+            return $"{GetType().Name} : {Info}";
+        }
+
+        public virtual string GetName()
+        {
+            return $"({GetType().Name}) {Info.Name}";
+        }
+
+        public virtual string GetFullName()
+        {
+            if (Parent == null)
+                return GetName();
+
+            return $"{Parent.GetFullName()} $ {GetName()}";
         }
     }
 }

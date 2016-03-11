@@ -101,7 +101,7 @@
                 var managerInfo = AutomatedMagicManager.GetCommandManagerByTypeName(contextManagerItem.ManagerType);
 
                 if (managerInfo == null)
-                    throw new FrameworkContextBuildingException(Item, $"Couldn't find manager with type name: {contextManagerItem.ManagerType}");
+                    throw new FrameworkContextBuildingException(Item, $"Couldn't find manager descriptor with type name: {contextManagerItem.ManagerType}");
 
                 var managerName = contextManagerItem.Name ?? managerInfo.CommandManagerType.Name;
 
@@ -153,11 +153,108 @@
 
             ContextValues[metaType.Info.Name].Add(key, contextValue);
         }
+        public void AddStepResult(string stepName, object result)
+        {
+            if (!StepResults.ContainsKey(stepName))
+                StepResults.Add(stepName, result);
+            else
+                StepResults[stepName] = result;
+        }
+
+        public BaseCommandManager GetManager(string typeName, string name)
+        {
+            if (ContextManagers.ContainsKey(typeName) && ContextManagers[typeName].ContainsKey(name))
+                return ContextManagers[typeName][name];
+
+            return Item.Parent?.Context.GetManager(typeName, name);
+        }
 
         public object ResolveValue(string path)
         {
-            throw new NotImplementedException();
+            path = path.Trim();
+
+            if (path == "")
+                throw new FrameworkContextResolvingException(Item, "Context Path is empty");
+
+            var parts = path.Split('.');
+
+            if (parts.Length < 2)
+                throw new FrameworkContextResolvingException(Item, "Context Path contains less then two parts separated by dot '.'",
+                    $"Path: {path}");
+
+            var typeName = parts[0].Trim();
+            var objectKey = parts[1].Trim();
+
+            if (ContextValues.ContainsKey(typeName) && ContextValues[typeName].ContainsKey(objectKey))
+            {
+                var obj = ContextValues[typeName][objectKey];
+
+                if (parts.Length == 2)
+                    return obj;
+
+                if (parts.Length > 2)
+                {
+                    var innerPath = path.Substring(path.IndexOf('.') + 1);
+                    innerPath = innerPath.Substring(path.IndexOf('.') + 1);
+
+                    try
+                    {
+                        return obj.ResolvePath(innerPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FrameworkContextResolvingException(Item, "Context Object couldn't resolve inner path", ex,
+                            $"Full path: {path}",
+                            $"Type name: {typeName}",
+                            $"Object key: {objectKey}");
+                    }
+                }
+            }
+
+            try
+            {
+                return Item.Parent?.Context.ResolvePath(path);
+            }
+            catch (FrameworkContextResolvingException ex)
+            {
+                throw new FrameworkContextResolvingException(Item, "Error occurred during Parent Context path resolving", ex);
+            }
         }
+
+        public object ResolveManager(string path)
+        {
+            path = path.Trim();
+
+            if (path == "")
+                throw new FrameworkContextResolvingException(Item, "Manager Path is empty");
+
+            var parts = path.Split('.');
+
+            if (parts.Length > 2)
+                throw new FrameworkContextResolvingException(Item, "Manager Path contains more then two parts separated by dot '.'",
+                    $"Path: {path}");
+
+            var typeName = parts[0].Trim();
+            var managerName = parts.Length == 2
+                ? parts[1].Trim()
+                : typeName;
+
+            if (ContextManagers.ContainsKey(typeName) && ContextManagers[typeName].ContainsKey(managerName))
+                return ContextManagers[typeName][managerName];
+
+            return Item.Parent?.Context.GetManager(typeName, managerName);
+        }
+
+        public object ResolveStepResult(string stepName)
+        {
+            stepName = stepName.Trim();
+
+            if (StepResults.ContainsKey(stepName))
+                return StepResults[stepName];
+
+            return Item.Parent?.Context.ResolveStepResult(stepName);
+        }
+
 
         public object ResolveValue(Type type, string name)
         {

@@ -7,10 +7,11 @@
     using System.Threading.Tasks;
     using TestInfo;
 
-    public class TestLogger
+    public class TestLogger : ILogger
     {
         public string Name { get; }
         public List<LogItem> LogMessages { get; private set; } = new List<LogItem>();
+        private object _lock = new object();
 
         private Dictionary<ILogger, LogLevel> _loggers = new Dictionary<ILogger, LogLevel>();
 
@@ -70,67 +71,72 @@
         }
         #endregion
 
-
         public void LOG(LogLevel level, string message, Exception exception = null)
         {
-            Console.WriteLine($"{Name}\t{level}\t{message}");
-
-            var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
-            LogMessages.Add(logMessage);
-
-            foreach (var logger in _loggers)
+            lock (_lock)
             {
-                if (logger.Value <= level)
-                    switch (level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.Key.TRACE(message, exception);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.Key.DEBUG(message, exception);
-                            break;
-                        case LogLevel.WARN:
-                            logger.Key.WARN(message, exception);
-                            break;
-                        case LogLevel.INFO:
-                            logger.Key.INFO(message, exception);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.Key.ERROR(message, exception);
-                            break;
-                        default:
-                            break;
-                    }
+                Console.WriteLine($"{Name}\t{level}\t{message}");
+
+                var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
+                LogMessages.Add(logMessage);
+
+                foreach (var logger in _loggers)
+                {
+                    if (logger.Value <= level)
+                        switch (level)
+                        {
+                            case LogLevel.TRACE:
+                                logger.Key.TRACE(message, exception);
+                                break;
+                            case LogLevel.DEBUG:
+                                logger.Key.DEBUG(message, exception);
+                                break;
+                            case LogLevel.WARN:
+                                logger.Key.WARN(message, exception);
+                                break;
+                            case LogLevel.INFO:
+                                logger.Key.INFO(message, exception);
+                                break;
+                            case LogLevel.ERROR:
+                                logger.Key.ERROR(message, exception);
+                                break;
+                            default:
+                                break;
+                        }
+                }
             }
         }
         public void LOG(LogLevel level, string message, LoggedFileType fileType, string filePath)
         {
-            var logMessage = new LogFile { DataStemp = DateTime.Now, Level = level, FileType = fileType, FilePath = filePath };
-            LogMessages.Add(logMessage);
-
-            foreach (var logger in _loggers)
+            lock (_lock)
             {
-                if (logger.Value <= level)
-                    switch (level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.Key.TRACE(message, fileType, filePath);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.Key.DEBUG(message, fileType, filePath);
-                            break;
-                        case LogLevel.WARN:
-                            logger.Key.WARN(message, fileType, filePath);
-                            break;
-                        case LogLevel.INFO:
-                            logger.Key.INFO(message, fileType, filePath);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.Key.ERROR(message, fileType, filePath);
-                            break;
-                        default:
-                            break;
-                    }
+                var logMessage = new LogFile { DataStemp = DateTime.Now, Level = level, FileType = fileType, FilePath = filePath };
+                LogMessages.Add(logMessage);
+
+                foreach (var logger in _loggers)
+                {
+                    if (logger.Value <= level)
+                        switch (level)
+                        {
+                            case LogLevel.TRACE:
+                                logger.Key.TRACE(message, fileType, filePath);
+                                break;
+                            case LogLevel.DEBUG:
+                                logger.Key.DEBUG(message, fileType, filePath);
+                                break;
+                            case LogLevel.WARN:
+                                logger.Key.WARN(message, fileType, filePath);
+                                break;
+                            case LogLevel.INFO:
+                                logger.Key.INFO(message, fileType, filePath);
+                                break;
+                            case LogLevel.ERROR:
+                                logger.Key.ERROR(message, fileType, filePath);
+                                break;
+                            default:
+                                break;
+                        }
+                }
             }
         }
     }

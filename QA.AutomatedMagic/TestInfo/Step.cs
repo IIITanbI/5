@@ -10,6 +10,9 @@
     [MetaType("Step config")]
     public class Step : BaseMetaObject
     {
+        [MetaTypeCollection("List of child steps", IsRequired = false)]
+        public List<Step> Steps { get; set; } = null;
+
         [MetaTypeCollection("Step log", IsRequired = false)]
         public List<LogItem> Messages { get; set; } = new List<LogItem>();
 

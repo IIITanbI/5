@@ -40,8 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrameworkBuildingException.cs" />
     <Compile Include="FrameworkContextBuildingException.cs" />
+    <Compile Include="FrameworkContextResolvingException.cs" />
     <Compile Include="FrameworkException.cs" />
+    <Compile Include="FrameworkTestExecutionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestContext.cs" />
@@ -54,6 +57,7 @@
     <Compile Include="TestManager.cs" />
     <Compile Include="TestProject.cs" />
     <Compile Include="TestStep.cs" />
+    <Compile Include="TestStepBase.cs" />
     <Compile Include="TestStepGroup.cs" />
     <Compile Include="TestStepOrder.cs" />
     <Compile Include="TestStepArgument.cs" />

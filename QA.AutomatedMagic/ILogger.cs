@@ -9,9 +9,6 @@
 
     public interface ILogger
     {
-        string Name { get; }
-        string GetFullName();
-
         void TRACE(string message, Exception exception = null);
         void TRACE(string message, LoggedFileType fileType, string filePath);
 

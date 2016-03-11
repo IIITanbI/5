@@ -8,12 +8,13 @@
     using MetaMagic;
 
     [MetaType("Test step argument")]
-    public class TestStepArgument
+    public class TestStepArgument : BaseMetaObject
     {
         [MetaTypeValue("Test step argument type", IsRequired = false)]
         public TestStepArgumentType Type { get; set; } = TestStepArgumentType.Context;
 
         [MetaTypeValue("Test step argument value")]
+        [MetaLocation(true)]
         public string Value { get; set; }
     }
 }
