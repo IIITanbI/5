@@ -30,14 +30,14 @@
             new ArrayWrapper()
         };
 
-        public static object Parse(Type type, object source, IContext context = null, bool isAssignableTypesAllowed = false)
+        public static object Parse(Type type, object source, bool isAssignableTypesAllowed = false)
         {
             var metaType = AutomatedMagicManager.GetMetaType(type);
-            return metaType.Parse(source, context, isAssignableTypesAllowed);
+            return metaType.Parse(source, isAssignableTypesAllowed);
         }
-        public static T Parse<T>(object source, IContext context = null, bool isAssignableTypesAllowed = false)
+        public static T Parse<T>(object source, bool isAssignableTypesAllowed = false)
         {
-            return (T)Parse(typeof(T), source, context, isAssignableTypesAllowed);
+            return (T)Parse(typeof(T), source, isAssignableTypesAllowed);
         }
 
 
@@ -177,21 +177,8 @@
             Members.Add(member);
         }
 
-        public object Parse(object source, IContext context = null, bool isAssignableTypesAllowed = false)
+        public object Parse(object source, bool isAssignableTypesAllowed = false)
         {
-            object key = null;
-            if (context != null && Key != null)
-            {
-                key = Key.Parse(source);
-                if (key != null)
-                {
-                    if (context.Contains(TargetType, key.ToString()))
-                    {
-                        return context.ResolveValue(TargetType, key.ToString());
-                    }
-                }
-            }
-
             if (isAssignableTypesAllowed)
             {
                 var name = SourceResolver.GetSourceNodeName(source);
@@ -200,7 +187,7 @@
                 if (assignableType == null)
                     throw new ParseException($"Couldn't find assignable type with name: {name} for MetaType {Info}", TargetType);
 
-                return assignableType.Parse(source, context, false);
+                return assignableType.Parse(source, false);
             }
 
             var createdObject = Activator.CreateInstance(TargetType);
@@ -211,20 +198,13 @@
             while (parsedMembersDict.Any(m => !m.Value))
             {
                 var memberToParse = parsedMembersDict.First(m => !m.Value).Key;
-                if (memberToParse == Key && key != null)
-                {
-                    memberToParse.SetValue(createdObject, key);
-                    parsedMembersDict[memberToParse] = true;
-                    continue;
-                }
-
-                ParseMember(source, context, createdObject, parsedMembersDict, memberToParse);
+                ParseMember(source, createdObject, parsedMembersDict, memberToParse);
             }
 
             return createdObject;
         }
 
-        private void ParseMember(object source, IContext context, object createdObject, Dictionary<MetaTypeMember, bool> parsedMembersDict, MetaTypeMember memberToParse)
+        private void ParseMember(object source, object createdObject, Dictionary<MetaTypeMember, bool> parsedMembersDict, MetaTypeMember memberToParse)
         {
             if (memberToParse.Constraint != null)
             {
@@ -233,7 +213,7 @@
                     foreach (var memberConstr in constrEntry)
                     {
                         if (!parsedMembersDict[memberConstr.Member.Value])
-                            ParseMember(source, context, createdObject, parsedMembersDict, memberConstr.Member.Value);
+                            ParseMember(source, createdObject, parsedMembersDict, memberConstr.Member.Value);
                     }
 
                     if (!constrEntry.All(ce =>
@@ -251,7 +231,7 @@
                 }
             }
 
-            var memberValue = memberToParse.Parse(source, context);
+            var memberValue = memberToParse.Parse(source);
             if (memberValue != null)
                 memberToParse.SetValue(createdObject, memberValue);
             parsedMembersDict[memberToParse] = true;

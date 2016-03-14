@@ -64,7 +64,7 @@
             Setter(obj, value);
         }
 
-        public abstract object Parse(object source, IContext context = null);
+        public abstract object Parse(object source);
         public abstract void InitSourceResolver(Type type);
         public abstract List<string> GetPaths(object parentObj);
         public abstract object ResolveValue(string path, object parentObj);

@@ -131,7 +131,16 @@
 
         public static MetaType GetMetaType(Type type)
         {
+            if (!_type_metaType.ContainsKey(type))
+                return null;
             return _type_metaType[type];
+        }
+
+        public static MetaType GetMetaType(string typeName)
+        {
+            var key = _type_metaType.Keys.FirstOrDefault(k => k.Name == typeName);
+            if (key == null) return null;
+            return _type_metaType[key];
         }
     }
 }

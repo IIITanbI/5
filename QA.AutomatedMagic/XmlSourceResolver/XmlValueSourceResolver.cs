@@ -23,7 +23,7 @@
                 if (fn != null && fn.NodeType == System.Xml.XmlNodeType.CDATA)
                     return (el.FirstNode as XCData).Value;
                 else
-                    return el.Value;
+                    return el;
             }
 
             var att = XmlHelper.GetAttributeByNames(xmlConfig, possibleNames);

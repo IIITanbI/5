@@ -38,7 +38,7 @@
                 : ParentType.SourceResolver.GetValueSourceResolver();
         }
 
-        public override object Parse(object source, IContext context = null)
+        public override object Parse(object source)
         {
             var resolvedSource = ValueSourceResolver.ResolveValue(source, this);
             if (resolvedSource == null && !IsRequired)

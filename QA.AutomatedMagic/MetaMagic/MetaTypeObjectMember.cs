@@ -36,7 +36,7 @@
                 : ParentType.SourceResolver.GetObjectSourceResolver();
         }
 
-        public override object Parse(object source, IContext context = null)
+        public override object Parse(object source)
         {
             var resolvedValue = ObjectSourceResolver.ResolveObject(source, this);
 
@@ -47,13 +47,13 @@
                 throw new ParseException(source, this);
 
             if (!IsAssignableTypesAllowed)
-                return MemberMetaType.Value.Parse(resolvedValue, context);
+                return MemberMetaType.Value.Parse(resolvedValue);
 
             foreach (var assignableType in MemberMetaType.Value.AssignableTypes)
             {
                 var resolvedValue2 = ObjectSourceResolver.ResolveObject(resolvedValue, assignableType.Location);
                 if (resolvedValue2 != null)
-                    return assignableType.Parse(resolvedValue2, context);
+                    return assignableType.Parse(resolvedValue2);
             }
 
             throw new ParseException($"Couldn't find assignable type" ,source, this);

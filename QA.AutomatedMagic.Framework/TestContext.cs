@@ -20,7 +20,7 @@
         public List<TestContextManagerItem> ContextManagerItems { get; set; } = new List<TestContextManagerItem>();
 
         public TestItem Item { get; set; } = null;
-        public Dictionary<string, Dictionary<string, IMetaObject>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, IMetaObject>>();
+        public Dictionary<string, Dictionary<string, Lazy<IMetaObject>>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, Lazy<IMetaObject>>>();
         public Dictionary<string, Dictionary<string, BaseCommandManager>> ContextManagers { get; set; } = new Dictionary<string, Dictionary<string, BaseCommandManager>>();
         public Dictionary<string, object> StepResults { get; set; } = new Dictionary<string, object>();
 
@@ -70,7 +70,7 @@
             #region Building context values
             foreach (var contextItem in ContextItems)
             {
-                List<IMetaObject> contextValues = null;
+                Dictionary<string, Lazy<IMetaObject>> contextValues = null;
                 try
                 {
                     contextValues = contextItem.Build(this);
@@ -117,7 +117,7 @@
                 BaseCommandManager managerObj = null;
                 try
                 {
-                    managerObj = managerInfo.CreateInstance(contextManagerItem.ManagerConfig, this);
+                    managerObj = managerInfo.CreateInstance(contextManagerItem.ManagerConfig);
                 }
                 catch (Exception ex)
                 {
@@ -131,29 +131,22 @@
             #endregion
         }
 
-        public void AddContextValue(IMetaObject contextValue)
+        public void AddContextValue(KeyValuePair<string, Lazy<IMetaObject>> contextValue)
         {
-            var metaType = AutomatedMagicManager.GetMetaType(contextValue.GetType());
+            var metaType = AutomatedMagicManager.GetMetaType(contextValue.Value..GetType());
 
-            if (metaType.Key == null)
-                throw new FrameworkContextBuildingException(Item, "Context value object MetaType doesn't contain Key property",
-                    $"Context value object MetaType: {metaType}");
-
-            var key = metaType.Key.GetValue(contextValue)?.ToString() ?? "";
-
-            if (key == "")
-                throw new FrameworkContextBuildingException(Item, "Context value object Key is null or empty",
-                    $"Context value object MetaType: {metaType}");
+            if(metaType == null)
+                throw new FrameworkContextBuildingException(Item, $"Couldn't find MetaType for type: {contextValue.Value.GetType()}");
 
             if (!ContextValues.ContainsKey(metaType.Info.Name))
-                ContextValues.Add(metaType.Info.Name, new Dictionary<string, IMetaObject>());
+                ContextValues.Add(metaType.Info.Name, new Dictionary<string, Lazy<IMetaObject>>());
 
-            if (ContextValues[metaType.Info.Name].ContainsKey(key))
+            if (ContextValues[metaType.Info.Name].ContainsKey(contextValue.Key))
                 throw new FrameworkContextBuildingException(Item, "Context values have already contained object with the same Key",
-                    $"Key: {key}",
+                    $"Key: {contextValue.Key}",
                     $"Context value object MetaType: {metaType}");
 
-            ContextValues[metaType.Info.Name].Add(key, contextValue);
+            ContextValues[metaType.Info.Name].Add(contextValue.Key, contextValue.Value);
         }
         public void AddStepResult(string stepName, object result)
         {
@@ -201,7 +194,7 @@
 
                     try
                     {
-                        return obj.ResolvePath(innerPath);
+                        return obj.Value.ResolvePath(innerPath);
                     }
                     catch (Exception ex)
                     {

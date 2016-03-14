@@ -81,7 +81,7 @@
             }
         }
 
-        public BaseCommandManager CreateInstance(object config, IContext context = null)
+        public BaseCommandManager CreateInstance(object config)
         {
             BaseCommandManager managerObject = null;
 
@@ -107,7 +107,7 @@
                 {
                     var sourceXml = XDocument.Load(Path.Combine(AssemblyDirectoryPath, sourcableProperty.Value.Path));
                     var configElement = sourceXml.XPathSelectElement(sourcableProperty.Value.RootElementXPath);
-                    var propertyObject = MetaType.Parse(sourcableProperty.Key.PropertyType, configElement, null, true);
+                    var propertyObject = MetaType.Parse(sourcableProperty.Key.PropertyType, configElement, true);
                     sourcableProperty.Key.SetValue(managerObject, propertyObject);
                 }
                 catch (Exception ex)

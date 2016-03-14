@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-
+    using System.Xml.Linq;
     public class StringParser : IValueParser
     {
         public bool IsMatch(Type type)
@@ -15,6 +15,7 @@
 
         public object Parse(object source, Type type)
         {
+            source = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source;
             return source;
         }
     }

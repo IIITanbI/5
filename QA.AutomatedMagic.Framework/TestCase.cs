@@ -69,12 +69,13 @@
                             break;
                         }
                     case TestStepOrder.PrePost:
+                    case TestStepOrder.CasePre:
                     case TestStepOrder.CasePost:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
                             if (step.Order == TestStepOrder.PrePost)
                                 step.Order = TestStepOrder.Pre;
-                            if (step.Order == TestStepOrder.CasePost && ItemType == TestItemType.Test)
+                            if ((step.Order == TestStepOrder.CasePost || step.Order == TestStepOrder.CasePre) && ItemType == TestItemType.Test)
                                 step.Order = TestStepOrder.Case;
 
                             var first = TestSteps.FirstOrDefault(s => s.Order > parentStep.Order);
@@ -86,7 +87,6 @@
 
                             break;
                         }
-                    case TestStepOrder.CasePre:
                     case TestStepOrder.PostPre:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
