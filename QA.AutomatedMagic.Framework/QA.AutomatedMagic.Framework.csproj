@@ -52,6 +52,7 @@
     <Compile Include="TestContextItems\DynamicContextObjectItem.cs" />
     <Compile Include="TestContextItems\ContextObjectItem.cs" />
     <Compile Include="TestContextManagerItem.cs" />
+    <Compile Include="TestContextValueInfo.cs" />
     <Compile Include="TestItem.cs" />
     <Compile Include="TestItemInfo.cs" />
     <Compile Include="TestLogger.cs" />

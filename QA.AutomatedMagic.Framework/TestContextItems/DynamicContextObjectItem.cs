@@ -15,10 +15,10 @@
         [MetaTypeValue("Config for element with binds")]
         public XElement DynamicObjects { get; set; }
 
-        public override Dictionary<string, Lazy<IMetaObject>> Build(TestContext context)
+        public override List<TestContextValueInfo> Build(TestContext context)
         {
             var children = DynamicObjects.Elements().ToList();
-            var dict = new Dictionary<string, Lazy<IMetaObject>>();
+            var valueInfos = new List<TestContextValueInfo>();
 
             for (int i = 0; i < children.Count; i++)
             {
@@ -47,28 +47,34 @@
                     throw new FrameworkContextBuildingException(context.Item, "Context value object Key is null or empty",
                         $"Context value object MetaType: {metaType}");
 
-                if (dict.ContainsKey(key))
+                if (valueInfos.Any(vi => vi.ValueKey == key))
                     throw new FrameworkContextBuildingException(context.Item, $"Item with key: {key} has already present",
                         $"Context value object MetaType: {metaType}");
 
-                dict.Add(key, new Lazy<IMetaObject>(() =>
-                    {
-                        ResolveNode(key, child, context);
-                        try
+                valueInfos.Add(new TestContextValueInfo
+                {
+                    ValueKey = key,
+                    ValueMetaType = metaType,
+                    ValueValue = new Lazy<IMetaObject>(
+                        () =>
                         {
-                            var obj = (IMetaObject)metaType.Parse(child);
-                            return obj;
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new FrameworkContextBuildingException(context.Item, $"Error occurred during parsing object", ex,
+                            ResolveNode(key, child, context);
+                            try
+                            {
+                                var obj = (IMetaObject)metaType.Parse(child);
+                                return obj;
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new FrameworkContextBuildingException(context.Item, $"Error occurred during parsing object", ex,
                                 $"Object key: {key}",
                                 $"Context value object MetaType: {metaType}");
-                        }
-                    }));
+                            }
+                        })
+                });
             }
 
-            return dict;
+            return valueInfos;
         }
 
         private void ResolveNode(string key, XElement element, TestContext context)

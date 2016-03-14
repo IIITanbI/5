@@ -26,51 +26,10 @@
 
         public void Build()
         {
-            #region Copy parent values
-            //if (Item?.Parent?.Context != null)
-            //{
-            //    foreach (var parentContextValues in Item.Parent.Context.ContextValues)
-            //    {
-            //        if (!ContextValues.ContainsKey(parentContextValues.Key))
-            //            ContextValues.Add(parentContextValues.Key, new Dictionary<string, IMetaObject>());
-
-            //        foreach (var value in parentContextValues.Value)
-            //        {
-            //            if (ContextValues[parentContextValues.Key].ContainsKey(value.Key))
-            //                throw new FrameworkContextBuildingException(Item, "Context value with the same key already present", $"Item Type: {parentContextValues.Key}", $"Key: {value.Key}");
-
-            //            ContextValues[parentContextValues.Key].Add(value.Key, value.Value);
-            //        }
-            //    }
-
-            //    foreach (var parentContextManagers in Item.Parent.Context.ContextManagers)
-            //    {
-            //        if (!ContextManagers.ContainsKey(parentContextManagers.Key))
-            //            ContextManagers.Add(parentContextManagers.Key, new Dictionary<string, BaseCommandManager>());
-
-            //        foreach (var value in parentContextManagers.Value)
-            //        {
-            //            if (ContextManagers[parentContextManagers.Key].ContainsKey(value.Key))
-            //                throw new FrameworkContextBuildingException(Item, "Context manager with the same key already present", $"Manager Type: {parentContextManagers.Key}", $"Key: {value.Key}");
-
-            //            ContextManagers[parentContextManagers.Key].Add(value.Key, value.Value);
-            //        }
-            //    }
-
-            //    foreach (var parentStepResults in Item.Parent.Context.StepResults)
-            //    {
-            //        if (StepResults.ContainsKey(parentStepResults.Key))
-            //            throw new FrameworkContextBuildingException(Item, "Step result with the same name already present", $"Step name: {parentStepResults.Key}");
-
-            //        StepResults.Add(parentStepResults.Key, parentStepResults.Value);
-            //    }
-            //}
-            #endregion
-
             #region Building context values
             foreach (var contextItem in ContextItems)
             {
-                Dictionary<string, Lazy<IMetaObject>> contextValues = null;
+                List<TestContextValueInfo> contextValues = null;
                 try
                 {
                     contextValues = contextItem.Build(this);
@@ -131,23 +90,21 @@
             #endregion
         }
 
-        public void AddContextValue(KeyValuePair<string, Lazy<IMetaObject>> contextValue)
+        public void AddContextValue(TestContextValueInfo contextValue)
         {
-            var metaType = AutomatedMagicManager.GetMetaType(contextValue.Value..GetType());
-
-            if(metaType == null)
-                throw new FrameworkContextBuildingException(Item, $"Couldn't find MetaType for type: {contextValue.Value.GetType()}");
+            var metaType = contextValue.ValueMetaType;
 
             if (!ContextValues.ContainsKey(metaType.Info.Name))
                 ContextValues.Add(metaType.Info.Name, new Dictionary<string, Lazy<IMetaObject>>());
 
-            if (ContextValues[metaType.Info.Name].ContainsKey(contextValue.Key))
+            if (ContextValues[metaType.Info.Name].ContainsKey(contextValue.ValueKey))
                 throw new FrameworkContextBuildingException(Item, "Context values have already contained object with the same Key",
-                    $"Key: {contextValue.Key}",
+                    $"Key: {contextValue.ValueKey}",
                     $"Context value object MetaType: {metaType}");
 
-            ContextValues[metaType.Info.Name].Add(contextValue.Key, contextValue.Value);
+            ContextValues[metaType.Info.Name].Add(contextValue.ValueKey, contextValue.ValueValue);
         }
+
         public void AddStepResult(string stepName, object result)
         {
             if (!StepResults.ContainsKey(stepName))

@@ -13,6 +13,6 @@
         [MetaTypeValue("Name of context item")]
         public string Name { get; set; }
 
-        public abstract Dictionary<string, Lazy<IMetaObject>> Build(TestContext context);
+        public abstract List<TestContextValueInfo> Build(TestContext context);
     }
 }

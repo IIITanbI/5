@@ -13,9 +13,9 @@
         [MetaTypeCollection("List of context objects. Each must have Key", "object", IsAssignableTypesAllowed = true)]
         public List<IMetaObject> Objects { get; set; }
 
-        public override Dictionary<string, Lazy<IMetaObject>> Build(TestContext context)
+        public override List<TestContextValueInfo> Build(TestContext context)
         {
-            var dict = new Dictionary<string, Lazy<IMetaObject>>();
+            var valueInfos = new List<TestContextValueInfo>();
             foreach (var obj in Objects)
             {
                 var metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
@@ -30,13 +30,13 @@
                     throw new FrameworkContextBuildingException(context.Item, "Context value object Key is null or empty",
                         $"Context value object MetaType: {metaType}");
 
-                if (dict.ContainsKey(key))
+                if (valueInfos.Any(vi => vi.ValueKey == key))
                     throw new FrameworkContextBuildingException(context.Item, $"Item with key: {key} has already present",
                         $"Context value object MetaType: {metaType}");
 
-                dict.Add(key, new Lazy<IMetaObject>(() => obj));
+                valueInfos.Add(new TestContextValueInfo { ValueKey = key, ValueValue = new Lazy<IMetaObject>(() => obj), ValueMetaType = metaType });
             }
-            return dict;
+            return valueInfos;
         }
     }
 }
