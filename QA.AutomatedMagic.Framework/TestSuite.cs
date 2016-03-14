@@ -5,113 +5,173 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using System.Xml.Linq;
     using MetaMagic;
+    using TestInfo;
 
-    [MetaType("Test suite config")]
-    [MetaLocation("Suite")]
-    public class TestSuite : TestItem
+    [MetaType("Test suite")]
+    public class TestSuite : TestCase
     {
-        [MetaTypeCollection("Child test items", IsAssignableTypesAllowed = true)]
-        [MetaLocation("suites", "tests", "testSuites", "cases", "testCases")]
-        public List<TestItem> TestItems { get; set; } = new List<TestItem>();
+        [MetaTypeCollection("List of child TestCases and TestSuites", IsAssignableTypesAllowed = true)]
+        [MetaLocation("Tests", "Suites", "TestCases", "TestSuites")]
+        public List<TestCase> Children { get; set; }
 
-        [MetaTypeValue("Is parallel execution allowed for children", IsRequired = false)]
-        [MetaLocation("parallel", "isParallel", "parallelAllowed")]
-        public bool IsParallelExecutionAllowed { get; set; } = false;
+        [MetaTypeValue("Is parallelism enabled?", IsRequired = false)]
+        public bool IsParallelismEnabled { get; set; } = false;
 
-        [MetaTypeValue("Level of parallelism", IsRequired = false)]
-        [MetaLocation("levelOfparallelism")]
-        public int ParallelismLevel { get; set; } = -1;
+        [MetaTypeValue("Number of threads for parallel execution. 0 - Auto", IsRequired = false)]
+        public int ThreadNumber { get; set; } = 0;
 
         public TestSuite()
         {
             ItemType = TestItemType.Suite;
         }
 
-        public override List<TestItem> Build()
+        public override void Build()
         {
-            var builtSuites = base.Build();
+            base.Build();
 
-            foreach (var builtSuite in builtSuites)
+            TestManager.Log.INFO($"Start building children for item: {this}");
+            TestManager.Log.INFO($"Children count: {Children.Count}");
+
+            foreach (var child in Children)
             {
-                var builtChildren = new List<TestItem>();
+                child.Parent = this;
+                child.Build();
+            }
 
-                foreach (var testItem in ((TestSuite)builtSuite).TestItems)
+            var stepsToRemove = TestSteps.Where(s => s.Order != TestStepOrder.Pre || s.Order != TestStepOrder.Post).ToList();
+            stepsToRemove.ForEach(s => TestSteps.Remove(s));
+            stepsToRemove.Clear();
+
+            TestManager.Log.INFO($"Children were successfully built for item: {this}");
+            TestManager.Log.INFO($"Build was successfully completed for item: {this}");
+        }
+
+        public override void Execute()
+        {
+            Log.INFO($"Start executing {this}");
+            Parent?.Log.INFO($"Start executing {this}");
+            ItemStatus = TestItemStatus.Unknown;
+
+            for (; _tryNumber < TryCount; _tryNumber++)
+            {
+                ItemStatus = TestItemStatus.Unknown;
+
+                Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
+
+                ExecuteSteps(TestStepOrder.Pre);
+
+                if (ItemStatus == TestItemStatus.Passed)
                 {
-                    builtChildren.AddRange(testItem.Build());
+                    Log.DEBUG("Start executing children");
+                    Log.DEBUG($"Children count: {Children.Count}");
+
+                    if (!IsParallelismEnabled)
+                    {
+                        Log.DEBUG($"Execute children in sequence mode");
+                        foreach (var child in Children)
+                        {
+                            child.Execute();
+                        }
+                    }
+                    else
+                    {
+                        Log.DEBUG($"Execute children in parallel mode");
+                        Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
+
+                        var parallelOptions = new ParallelOptions();
+                        if (ThreadNumber != 0)
+                            parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
+
+                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                    }
+                    Log.DEBUG("Children execution was completed");
+
+                    if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
+                        ItemStatus = TestItemStatus.Failed;
                 }
 
-                ((TestSuite)builtSuite).TestItems.Clear();
-                ((TestSuite)builtSuite).TestItems = builtChildren;
-            }
+                ExecuteSteps(TestStepOrder.Post);
 
-            return builtSuites;
-        }
-
-        public override void SetParent(TestSuite parent)
-        {
-            base.SetParent(parent);
-
-            foreach (var testItem in TestItems)
-            {
-                testItem.SetParent(this);
-            }
-        }
-
-        public override TestItem GetState()
-        {
-            var testSuite = (TestSuite)base.GetState();
-            foreach (var child in TestItems)
-            {
-                testSuite.TestItems.Add(child.GetState());
-            }
-            return testSuite;
-        }
-
-        public override void ExecuteStageCase()
-        {
-            base.ExecuteStageCase();
-
-            if (!IsParallelExecutionAllowed)
-            {
-                foreach (var testItem in TestItems)
+                if (ItemStatus == TestItemStatus.Failed)
                 {
-                    testItem.Execute();
+                    Log.WARN($"Try #{_tryNumber} of {TryCount} completed with error. Try again");
+                    continue;
                 }
+
+                if (ItemStatus == TestItemStatus.Passed)
+                    break;
             }
-            else
+
+
+            if (ItemStatus != TestItemStatus.Passed)
             {
-                if (ParallelismLevel != -1 && ParallelismLevel > 1)
-                    Parallel.ForEach(TestItems, new ParallelOptions { MaxDegreeOfParallelism = ParallelismLevel }, ti => ti.Execute());
+                ItemStatus = TestItemStatus.Unknown;
+
+                Log.DEBUG($"Start try #{_tryNumber} of {TryCount}");
+
+                ExecuteSteps(TestStepOrder.Pre);
+
+                if (ItemStatus == TestItemStatus.Passed)
+                {
+                    Log.DEBUG("Start executing children");
+                    Log.DEBUG($"Children count: {Children.Count}");
+
+                    if (!IsParallelismEnabled)
+                    {
+                        Log.DEBUG($"Execute children in sequence mode");
+                        foreach (var child in Children)
+                        {
+                            child.Execute();
+                        }
+                    }
+                    else
+                    {
+                        Log.DEBUG($"Execute children in parallel mode");
+                        Log.DEBUG("Thread number: " + (ThreadNumber == 0 ? "Auto" : ThreadNumber.ToString()));
+
+                        var parallelOptions = new ParallelOptions();
+                        if (ThreadNumber != 0)
+                            parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
+
+                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                    }
+                    Log.DEBUG("Children execution was completed");
+
+                    if (Children.Any(c => c.ItemStatus == TestItemStatus.Failed))
+                        ItemStatus = TestItemStatus.Failed;
+                }
                 else
-                    Parallel.ForEach(TestItems, ti => ti.Execute());
+                {
+                    Children.ForEach(c => c.ItemStatus = TestItemStatus.Skipped);
+                }
+
+                ExecuteSteps(TestStepOrder.Post);
+
+                if (ItemStatus == TestItemStatus.Failed)
+                {
+                    Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
+                    Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
+                    Parent?.Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
+                    return;
+                }
             }
 
-            if (TestItems.Any(ti => ti.Status == TestItemStatus.Failed))
-                Status = TestItemStatus.Failed;
+            Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");
+            Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
+            Parent?.Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
         }
 
-        public override void MarkAsFailedOrSkipped(TestItemStatus status = TestItemStatus.Failed)
+        public override TestInfo.TestItem GetTestInfo()
         {
-            base.MarkAsFailedOrSkipped(status);
+            var ti = base.GetTestInfo();
 
-            foreach (var testItem in TestItems)
+            foreach (var child in Children)
             {
-                testItem.MarkAsFailedOrSkipped(TestItemStatus.Skipped);
-            }
-        }
-
-        public override TestInfo.TestItem GetReportItem()
-        {
-            var reportItem = base.GetReportItem();
-
-            foreach (var testItem in TestItems)
-            {
-                reportItem.Childs.Add(testItem.GetReportItem());
+                ti.Childs.Add(child.GetTestInfo());
             }
 
-            return reportItem;
+            return ti;
         }
     }
 }

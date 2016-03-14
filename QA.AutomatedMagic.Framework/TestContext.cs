@@ -4,187 +4,283 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using System.Xml.Linq;
     using MetaMagic;
-    using System.Reflection;
+    using CommandsMagic;
 
-    [MetaType("TestingContext config")]
-    [MetaLocation("context", "testingContext")]
+    [MetaType("Test context")]
     public class TestContext : BaseMetaObject, IContext
     {
-        [MetaTypeCollection("List of TestContextItems", IsAssignableTypesAllowed = true, IsRequired = false)]
-        [MetaLocation("contextItems")]
-        public List<BaseTestContextItem> TestContextItems { get; set; } = new List<BaseTestContextItem>();
+        [MetaTypeCollection("List of context items", IsRequired = false, IsAssignableTypesAllowed = true)]
+        [MetaLocation("items")]
+        public List<TestContextItem> ContextItems { get; set; } = new List<TestContextItem>();
 
-        [MetaTypeCollection("List of Managers", IsRequired = false)]
-        [MetaLocation("managerItems", "managers")]
-        public List<CommandManagerItem> CommandManagersItems { get; set; } = new List<CommandManagerItem>();
+        [MetaTypeCollection("List of context manager items", "manager", IsRequired = false)]
+        [MetaLocation("managers")]
+        public List<TestContextManagerItem> ContextManagerItems { get; set; } = new List<TestContextManagerItem>();
 
-        public TestContext ParentContext { get; set; }
-        public static Regex BindRegex = new Regex(@"\$\{([\w\s.]+)\}", RegexOptions.Compiled);
-
-        public Dictionary<string, Dictionary<string, object>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, object>>();
-        public Dictionary<string, Dictionary<string, object>> Managers = new Dictionary<string, Dictionary<string, object>>();
+        public TestItem Item { get; set; } = null;
+        public Dictionary<string, Dictionary<string, IMetaObject>> ContextValues { get; set; } = new Dictionary<string, Dictionary<string, IMetaObject>>();
+        public Dictionary<string, Dictionary<string, BaseCommandManager>> ContextManagers { get; set; } = new Dictionary<string, Dictionary<string, BaseCommandManager>>();
         public Dictionary<string, object> StepResults { get; set; } = new Dictionary<string, object>();
 
-        public void Initialize()
+        public void Build()
         {
-            if (ParentContext != null)
+            #region Copy parent values
+            //if (Item?.Parent?.Context != null)
+            //{
+            //    foreach (var parentContextValues in Item.Parent.Context.ContextValues)
+            //    {
+            //        if (!ContextValues.ContainsKey(parentContextValues.Key))
+            //            ContextValues.Add(parentContextValues.Key, new Dictionary<string, IMetaObject>());
+
+            //        foreach (var value in parentContextValues.Value)
+            //        {
+            //            if (ContextValues[parentContextValues.Key].ContainsKey(value.Key))
+            //                throw new FrameworkContextBuildingException(Item, "Context value with the same key already present", $"Item Type: {parentContextValues.Key}", $"Key: {value.Key}");
+
+            //            ContextValues[parentContextValues.Key].Add(value.Key, value.Value);
+            //        }
+            //    }
+
+            //    foreach (var parentContextManagers in Item.Parent.Context.ContextManagers)
+            //    {
+            //        if (!ContextManagers.ContainsKey(parentContextManagers.Key))
+            //            ContextManagers.Add(parentContextManagers.Key, new Dictionary<string, BaseCommandManager>());
+
+            //        foreach (var value in parentContextManagers.Value)
+            //        {
+            //            if (ContextManagers[parentContextManagers.Key].ContainsKey(value.Key))
+            //                throw new FrameworkContextBuildingException(Item, "Context manager with the same key already present", $"Manager Type: {parentContextManagers.Key}", $"Key: {value.Key}");
+
+            //            ContextManagers[parentContextManagers.Key].Add(value.Key, value.Value);
+            //        }
+            //    }
+
+            //    foreach (var parentStepResults in Item.Parent.Context.StepResults)
+            //    {
+            //        if (StepResults.ContainsKey(parentStepResults.Key))
+            //            throw new FrameworkContextBuildingException(Item, "Step result with the same name already present", $"Step name: {parentStepResults.Key}");
+
+            //        StepResults.Add(parentStepResults.Key, parentStepResults.Value);
+            //    }
+            //}
+            #endregion
+
+            #region Building context values
+            foreach (var contextItem in ContextItems)
             {
-                foreach (var TestItemTypeKey in ParentContext.ContextValues.Keys)
+                List<IMetaObject> contextValues = null;
+                try
                 {
-                    ContextValues.Add(TestItemTypeKey, new Dictionary<string, object>());
-                    foreach (var itemNameKey in ParentContext.ContextValues[TestItemTypeKey].Keys)
+                    contextValues = contextItem.Build(this);
+                }
+                catch (Exception ex)
+                {
+                    throw new FrameworkContextBuildingException(Item, $"Error occurred during building context item with name: {contextItem.Name}", ex);
+                }
+
+                if (contextValues != null)
+                {
+                    foreach (var contextValue in contextValues)
                     {
-                        ContextValues[TestItemTypeKey].Add(itemNameKey, ParentContext.ContextValues[TestItemTypeKey][itemNameKey]);
+                        try
+                        {
+                            AddContextValue(contextValue);
+                        }
+                        catch (FrameworkContextBuildingException fcbEx)
+                        {
+                            throw new FrameworkContextBuildingException(Item, "Error occurred during adding context value", fcbEx, $"Context item name: {contextItem.Name}");
+                        }
                     }
                 }
+            }
+            #endregion
 
-                foreach (var managerKey in ParentContext.Managers.Keys)
+            #region Build context managers
+            foreach (var contextManagerItem in ContextManagerItems)
+            {
+                var managerInfo = AutomatedMagicManager.GetCommandManagerByTypeName(contextManagerItem.ManagerType);
+
+                if (managerInfo == null)
+                    throw new FrameworkContextBuildingException(Item, $"Couldn't find manager descriptor with type name: {contextManagerItem.ManagerType}");
+
+                var managerName = contextManagerItem.Name ?? managerInfo.CommandManagerType.Name;
+
+                if (!ContextManagers.ContainsKey(managerInfo.CommandManagerType.Name))
+                    ContextManagers.Add(managerInfo.CommandManagerType.Name, new Dictionary<string, BaseCommandManager>());
+
+                if (ContextManagers[managerInfo.CommandManagerType.Name].ContainsKey(managerName))
+                    throw new FrameworkContextBuildingException(Item, $"Context managers have already contained manager with name: {managerName}",
+                        $"Manager type: {managerInfo.CommandManagerType.Name}");
+
+                BaseCommandManager managerObj = null;
+                try
                 {
-                    Managers.Add(managerKey, ParentContext.Managers[managerKey]);
+                    managerObj = managerInfo.CreateInstance(contextManagerItem.ManagerConfig, this);
+                }
+                catch (Exception ex)
+                {
+                    throw new FrameworkContextBuildingException(Item, $"Error occurred during creating manager", ex,
+                        $"Manager type: {managerInfo.CommandManagerType.Name}",
+                        $"Manager name: {managerName}");
                 }
 
-                foreach (var stepResult in ParentContext.StepResults)
+                ContextManagers[managerInfo.CommandManagerType.Name].Add(managerName, managerObj);
+            }
+            #endregion
+        }
+
+        public void AddContextValue(IMetaObject contextValue)
+        {
+            var metaType = AutomatedMagicManager.GetMetaType(contextValue.GetType());
+
+            if (metaType.Key == null)
+                throw new FrameworkContextBuildingException(Item, "Context value object MetaType doesn't contain Key property",
+                    $"Context value object MetaType: {metaType}");
+
+            var key = metaType.Key.GetValue(contextValue)?.ToString() ?? "";
+
+            if (key == "")
+                throw new FrameworkContextBuildingException(Item, "Context value object Key is null or empty",
+                    $"Context value object MetaType: {metaType}");
+
+            if (!ContextValues.ContainsKey(metaType.Info.Name))
+                ContextValues.Add(metaType.Info.Name, new Dictionary<string, IMetaObject>());
+
+            if (ContextValues[metaType.Info.Name].ContainsKey(key))
+                throw new FrameworkContextBuildingException(Item, "Context values have already contained object with the same Key",
+                    $"Key: {key}",
+                    $"Context value object MetaType: {metaType}");
+
+            ContextValues[metaType.Info.Name].Add(key, contextValue);
+        }
+        public void AddStepResult(string stepName, object result)
+        {
+            if (!StepResults.ContainsKey(stepName))
+                StepResults.Add(stepName, result);
+            else
+                StepResults[stepName] = result;
+        }
+
+        public BaseCommandManager GetManager(string typeName, string name)
+        {
+            if (ContextManagers.ContainsKey(typeName) && ContextManagers[typeName].ContainsKey(name))
+                return ContextManagers[typeName][name];
+
+            return Item.Parent?.Context.GetManager(typeName, name);
+        }
+
+        public object ResolveValue(string path)
+        {
+            path = path.Trim();
+
+            if (path == "")
+                throw new FrameworkContextResolvingException(Item, "Context Path is empty");
+
+            var parts = path.Split('.');
+
+            if (parts.Length < 2)
+                throw new FrameworkContextResolvingException(Item, "Context Path contains less then two parts separated by dot '.'",
+                    $"Path: {path}");
+
+            var typeName = parts[0].Trim();
+            var objectKey = parts[1].Trim();
+
+            if (ContextValues.ContainsKey(typeName) && ContextValues[typeName].ContainsKey(objectKey))
+            {
+                var obj = ContextValues[typeName][objectKey];
+
+                if (parts.Length == 2)
+                    return obj;
+
+                if (parts.Length > 2)
                 {
-                    StepResults.Add(stepResult.Key, stepResult.Value);
+                    var innerPath = path.Substring(path.IndexOf('.') + 1);
+                    innerPath = innerPath.Substring(path.IndexOf('.') + 1);
+
+                    try
+                    {
+                        return obj.ResolvePath(innerPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new FrameworkContextResolvingException(Item, "Context Object couldn't resolve inner path", ex,
+                            $"Full path: {path}",
+                            $"Type name: {typeName}",
+                            $"Object key: {objectKey}");
+                    }
                 }
             }
 
-            foreach (var contextItem in TestContextItems)
+            try
             {
-                contextItem.Build(this);
-
-                var itemsToAdd = new List<BaseMetaObject>();
-
-                var item = contextItem.GetItem();
-                if (item != null)
-                {
-                    itemsToAdd.Add(item);
-                }
-
-                var items = contextItem.GetItems();
-                if (items != null)
-                {
-                    itemsToAdd.AddRange(items);
-                }
-
-                foreach (var itemToAdd in itemsToAdd)
-                {
-                    var itemToAddType = itemToAdd.GetType();
-                    var metaType = AutomatedMagicManager.GetMetaType(itemToAddType);
-
-                    var key = metaType.Key?.GetValue(itemToAdd).ToString();
-
-                    if (key == null)
-                        throw new FrameworkException($"Context object with type: {itemToAddType} doesn't contains Key");
-
-                    Add(itemToAddType, key, itemToAdd);
-                }
+                return Item.Parent?.Context.ResolveValue(path);
             }
-
-            foreach (var managerItem in CommandManagersItems)
+            catch (FrameworkContextResolvingException ex)
             {
-                var manager = AutomatedMagicManager.GetCommandManagerByTypeName(managerItem.ManagerType);
-                var managerObj = manager.CreateInstance(managerItem.Config, this);
-
-                if (!Managers.ContainsKey(managerItem.ManagerType))
-                    Managers.Add(managerItem.ManagerType, new Dictionary<string, object>());
-
-                if (Managers[managerItem.ManagerType].ContainsKey(managerItem.Name ?? managerItem.ManagerType))
-                    Managers[managerItem.ManagerType][managerItem.Name ?? managerItem.ManagerType] = managerObj;
-                else
-                    Managers[managerItem.ManagerType].Add(managerItem.Name ?? managerItem.ManagerType, managerObj);
+                throw new FrameworkContextResolvingException(Item, "Error occurred during Parent Context path resolving", ex);
             }
         }
 
-        public void Add(string path, object value)
+        public object ResolveManager(string path)
         {
-            var nameParts = path.Split('.');
+            path = path.Trim();
 
-            if (nameParts[0] == "Step")
-            {
-                StepResults.Add(nameParts[1], value);
-            }
+            if (path == "")
+                throw new FrameworkContextResolvingException(Item, "Manager Path is empty");
+
+            var parts = path.Split('.');
+
+            if (parts.Length > 2)
+                throw new FrameworkContextResolvingException(Item, "Manager Path contains more then two parts separated by dot '.'",
+                    $"Path: {path}");
+
+            var typeName = parts[0].Trim();
+            var managerName = parts.Length == 2
+                ? parts[1].Trim()
+                : typeName;
+
+            if (ContextManagers.ContainsKey(typeName) && ContextManagers[typeName].ContainsKey(managerName))
+                return ContextManagers[typeName][managerName];
+
+            return Item.Parent?.Context.GetManager(typeName, managerName);
         }
 
-        public void Add(Type type, string name, object value)
+        public object ResolveStepResult(string stepName)
         {
-            if (!ContextValues.ContainsKey(type.Name))
-                ContextValues.Add(type.Name, new Dictionary<string, object>());
+            stepName = stepName.Trim();
 
-            if (ContextValues[type.Name].ContainsKey(name))
-                throw new FrameworkException($"Error occurs during creating context object with type: {type}. Object with the same name: {name} already present");
+            if (StepResults.ContainsKey(stepName))
+                return StepResults[stepName];
 
-            ContextValues[type.Name].Add(name, value);
+            return Item.Parent?.Context.ResolveStepResult(stepName);
+        }
+
+
+        public object ResolveValue(Type type, string name)
+        {
+            throw new NotImplementedException();
         }
 
         public bool Contains(Type type, string name)
         {
-            if (!ContextValues.ContainsKey(type.Name))
-                return false;
-            if (!ContextValues[type.Name].ContainsKey(name))
-                return false;
-            return true;
+            throw new NotImplementedException();
+        }
+
+        public void Add(Type type, string name, object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Add(string path, object value)
+        {
+            throw new NotImplementedException();
         }
 
         public string ResolveBind(string stringWithBind)
         {
-            var match = BindRegex.Match(stringWithBind);
-
-            if (!match.Success)
-                return stringWithBind;
-
-            var sb = new StringBuilder(stringWithBind);
-            var val = System.Security.SecurityElement.Escape(ResolveValue(match.Groups[1].Value).ToString());
-
-            sb.Replace(match.Value, val, match.Index, match.Length);
-
-            return ResolveBind(sb.ToString());
-        }
-        public object ResolveValue(string name)
-        {
-            var nameParts = name.Split('.');
-            object objToReturn = null;
-
-            if (nameParts[0] == "Step")
-            {
-                objToReturn = StepResults[nameParts[1]];
-            }
-            else if (nameParts[0] == "Manager")
-            {
-                var managerType = nameParts[1];
-                var managerName = managerType;
-                if (nameParts.Length == 3)
-                    managerName = nameParts[2];
-
-                return Managers[managerType][managerName];
-            }
-            else
-            {
-                var typeName = nameParts[0];
-                var itemName = nameParts[1];
-
-                objToReturn = ContextValues[typeName][itemName];
-            }
-
-            if (nameParts.Length > 2)
-            {
-                var bmo = objToReturn as BaseMetaObject;
-                if (bmo != null)
-                {
-                    var path = name.Replace($"{nameParts[0]}.{nameParts[1]}.", "");
-                    objToReturn = bmo.ResolvePath(path);
-                }
-            }
-
-            return objToReturn;
-        }
-        public object ResolveValue(Type type, string name)
-        {
-            return ContextValues[type.Name][name];
+            throw new NotImplementedException();
         }
     }
 }

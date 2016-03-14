@@ -40,7 +40,7 @@
             IsAssignableTypesAllowed = ChildrenType.IsInterface || ChildrenType.IsAbstract || collectionAttribute.IsAssignableTypesAllowed;
 
 
-            if (typeof(BaseMetaObject).IsAssignableFrom(ChildrenType))
+            if (typeof(IMetaObject).IsAssignableFrom(ChildrenType))
             {
                 ChildrenMetaType = new Lazy<MetaType>(() => AutomatedMagicManager.GetMetaType(ChildrenType));
 

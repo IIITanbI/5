@@ -9,28 +9,22 @@
 
     public class TestLogger : ILogger
     {
-        public string Name { get; private set; }
-        public ILogger Parent { get; private set; }
+        public string Name { get; }
         public List<LogItem> LogMessages { get; private set; } = new List<LogItem>();
+        private object _lock = new object();
 
         private Dictionary<ILogger, LogLevel> _loggers = new Dictionary<ILogger, LogLevel>();
 
-        public TestLogger(string name, string itemType, ILogger parent = null)
+        public TestLogger(string name)
         {
-            Parent = parent;
-            Name = $"({itemType}) {name}";
+            Name = name;
         }
-
-        public void SetParent(ILogger logger)
-        {
-            Parent = logger;
-        }
-
         public void AddLogger(ILogger logger, LogLevel level)
         {
             _loggers.Add(logger, level);
         }
 
+        #region Simple actions
         public void TRACE(string message, Exception exception = null)
         {
             LOG(LogLevel.TRACE, message, exception);
@@ -75,131 +69,73 @@
         {
             LOG(LogLevel.ERROR, message, fileType, filePath);
         }
-
-        public string GetFullName()
-        {
-            if (Parent == null)
-                return Name;
-
-            return $"{Parent.GetFullName()} $ {Name}";
-        }
+        #endregion
 
         public void LOG(LogLevel level, string message, Exception exception = null)
         {
-            Console.WriteLine($"{GetFullName()}\t{level}\t{message}");
-
-            var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
-            LogMessages.Add(logMessage);
-
-            foreach (var logger in _loggers)
+            lock (_lock)
             {
-                if (logger.Value <= level)
-                    switch (level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.Key.TRACE(message, exception);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.Key.DEBUG(message, exception);
-                            break;
-                        case LogLevel.WARN:
-                            logger.Key.WARN(message, exception);
-                            break;
-                        case LogLevel.INFO:
-                            logger.Key.INFO(message, exception);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.Key.ERROR(message, exception);
-                            break;
-                        default:
-                            break;
-                    }
+                Console.WriteLine($"{Name}\t{level}\t{message}");
+
+                var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
+                LogMessages.Add(logMessage);
+
+                foreach (var logger in _loggers)
+                {
+                    if (logger.Value <= level)
+                        switch (level)
+                        {
+                            case LogLevel.TRACE:
+                                logger.Key.TRACE(message, exception);
+                                break;
+                            case LogLevel.DEBUG:
+                                logger.Key.DEBUG(message, exception);
+                                break;
+                            case LogLevel.WARN:
+                                logger.Key.WARN(message, exception);
+                                break;
+                            case LogLevel.INFO:
+                                logger.Key.INFO(message, exception);
+                                break;
+                            case LogLevel.ERROR:
+                                logger.Key.ERROR(message, exception);
+                                break;
+                            default:
+                                break;
+                        }
+                }
             }
         }
         public void LOG(LogLevel level, string message, LoggedFileType fileType, string filePath)
         {
-            var logMessage = new LogFile { DataStemp = DateTime.Now, Level = level, FileType = fileType, FilePath = filePath };
-            LogMessages.Add(logMessage);
-
-            foreach (var logger in _loggers)
+            lock (_lock)
             {
-                if (logger.Value <= level)
-                    switch (level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.Key.TRACE(message, fileType, filePath);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.Key.DEBUG(message, fileType, filePath);
-                            break;
-                        case LogLevel.WARN:
-                            logger.Key.WARN(message, fileType, filePath);
-                            break;
-                        case LogLevel.INFO:
-                            logger.Key.INFO(message, fileType, filePath);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.Key.ERROR(message, fileType, filePath);
-                            break;
-                        default:
-                            break;
-                    }
-            }
-        }
+                var logMessage = new LogFile { DataStemp = DateTime.Now, Level = level, FileType = fileType, FilePath = filePath };
+                LogMessages.Add(logMessage);
 
-        public void SpamTo(ILogger logger)
-        {
-            foreach (var logMessage in LogMessages)
-            {
-                var loggedFile = logMessage as LogFile;
-                if (loggedFile != null)
+                foreach (var logger in _loggers)
                 {
-                    switch (loggedFile.Level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.TRACE(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.DEBUG(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.WARN:
-                            logger.WARN(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.INFO:
-                            logger.INFO(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.ERROR(loggedFile.Message, loggedFile.FileType, loggedFile.FilePath);
-                            break;
-                        default:
-                            break;
-                    }
-                    continue;
-                }
-
-                var loggedMessage = logMessage as LogMessage;
-                if (loggedMessage != null)
-                {
-                    switch (loggedMessage.Level)
-                    {
-                        case LogLevel.TRACE:
-                            logger.TRACE(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.DEBUG:
-                            logger.DEBUG(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.WARN:
-                            logger.WARN(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.INFO:
-                            logger.INFO(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        case LogLevel.ERROR:
-                            logger.ERROR(loggedMessage.Message, loggedMessage.Ex);
-                            break;
-                        default:
-                            break;
-                    }
+                    if (logger.Value <= level)
+                        switch (level)
+                        {
+                            case LogLevel.TRACE:
+                                logger.Key.TRACE(message, fileType, filePath);
+                                break;
+                            case LogLevel.DEBUG:
+                                logger.Key.DEBUG(message, fileType, filePath);
+                                break;
+                            case LogLevel.WARN:
+                                logger.Key.WARN(message, fileType, filePath);
+                                break;
+                            case LogLevel.INFO:
+                                logger.Key.INFO(message, fileType, filePath);
+                                break;
+                            case LogLevel.ERROR:
+                                logger.Key.ERROR(message, fileType, filePath);
+                                break;
+                            default:
+                                break;
+                        }
                 }
             }
         }

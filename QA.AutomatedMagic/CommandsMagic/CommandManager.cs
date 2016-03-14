@@ -128,89 +128,6 @@
             return managerObject;
         }
 
-        public object ExecuteCommand(object managerObject, string commandName, List<string> parameters, IContext context, ILogger log)
-        {
-            var propInfos = new List<PropertyInfo>();
-            var possibleCommands = FindCommand(commandName, propInfos);
-
-            if (possibleCommands == null || possibleCommands.Count == 0)
-                throw new NotImplementedException();
-
-            var parObjs = new List<object>();
-            foreach (var parameterString in parameters)
-            {
-                if (parameterString.StartsWith("$"))
-                {
-                    var objStr = context.ResolveBind(parameterString.Substring(2, parameterString.Length - 3));
-                    var parObj = context.ResolveValue(objStr);
-                    parObjs.Add(parObj);
-                }
-                else
-                {
-                    parObjs.Add(context.ResolveBind(parameterString));
-                }
-            }
-
-            Command acceptedCommand = null;
-            var parArray = new List<object>();
-            foreach (var command in possibleCommands)
-            {
-                var curIndex = 0;
-                var isBad = false;
-                for (int i = 0; i < command.Parameters.Length; i++)
-                {
-                    var paramInfo = command.Parameters[i];
-                    if (paramInfo.ParameterType == typeof(ILogger))
-                    {
-                        parArray.Add(log);
-                        continue;
-                    }
-                    if (paramInfo.ParameterType == typeof(IContext))
-                    {
-                        parArray.Add(context);
-                        continue;
-                    }
-                    if (paramInfo.ParameterType.IsAssignableFrom(parObjs[curIndex].GetType()))
-                    {
-                        parArray.Add(parObjs[curIndex]);
-                        curIndex++;
-                    }
-                    else
-                    {
-                        isBad = true;
-                        break;
-                    }
-                }
-
-                if (!isBad)
-                {
-                    acceptedCommand = command;
-                    break;
-                }
-                else
-                {
-                    parArray.Clear();
-                }
-            }
-
-            if (acceptedCommand == null)
-                throw new NotImplementedException();
-
-            foreach (var propInfo in propInfos)
-            {
-                managerObject = propInfo.GetValue(managerObject);
-            }
-
-            try
-            {
-                var result = acceptedCommand.Method.Invoke(managerObject, parArray.ToArray());
-                return result;
-            }
-            catch (TargetInvocationException tie)
-            {
-                throw tie.InnerException;
-            }
-        }
         public object ExecuteCommand(object managerObject, string commandName, List<object> parObjs, ILogger log)
         {
             var propInfos = new List<PropertyInfo>();
@@ -268,7 +185,65 @@
 
             return result;
         }
-        public List<Command> FindCommand(string commandName, List<PropertyInfo> propInfos)
+
+        public CommandExecutionInfo GetCommandExecutionInfo(object managerObject, string commandName, List<object> parObjs, ILogger log)
+        {
+            var propInfos = new List<PropertyInfo>();
+            var possibleCommands = FindCommand(commandName, propInfos);
+
+            if (possibleCommands == null || possibleCommands.Count == 0)
+                return null;
+
+            Command acceptedCommand = null;
+            var parArray = new List<object>();
+            foreach (var command in possibleCommands)
+            {
+                var curIndex = 0;
+                var isBad = false;
+                for (int i = 0; i < command.Parameters.Length; i++)
+                {
+                    var paramInfo = command.Parameters[i];
+                    if (paramInfo.ParameterType == typeof(ILogger))
+                    {
+                        parArray.Add(log);
+                        continue;
+                    }
+                    if (paramInfo.ParameterType.IsAssignableFrom(parObjs[curIndex].GetType()))
+                    {
+                        parArray.Add(parObjs[curIndex]);
+                        curIndex++;
+                    }
+                    else
+                    {
+                        isBad = true;
+                        break;
+                    }
+                }
+
+                if (!isBad)
+                {
+                    acceptedCommand = command;
+                    break;
+                }
+                else
+                {
+                    parArray.Clear();
+                }
+            }
+
+            if (acceptedCommand == null)
+                return null;
+
+            foreach (var propInfo in propInfos)
+            {
+                managerObject = propInfo.GetValue(managerObject);
+            }
+
+            var commandExecutor = new CommandExecutionInfo { Method = acceptedCommand.Method, Arguments = parArray.ToArray(), ManagerObject = managerObject };
+            return commandExecutor;
+        }
+
+        private List<Command> FindCommand(string commandName, List<PropertyInfo> propInfos)
         {
             if (commandName.StartsWith(CommandManagerType.Name + "."))
             {

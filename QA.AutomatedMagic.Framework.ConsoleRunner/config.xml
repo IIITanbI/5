@@ -41,34 +41,33 @@
     </managers>
 
     <contextItems>
-      <objectContextItem>
-        <object>
+      <ContextObjectItem name="LandScape configs">
+        <objects>
           <LandscapeConfig uniqueName="Test1">
             <AuthorHostUrl>http://10.7.14.16:4502</AuthorHostUrl>
             <PublisHostUrl>http://10.7.14.16:4502</PublisHostUrl>
           </LandscapeConfig>
-        </object>
-      </objectContextItem>
-      <objectContextItem>
-        <object>
+        </objects>
+      </ContextObjectItem>
+      <ContextObjectItem name="GitRepositories configs">
+        <objects>
           <GitRepositoryConfig uniqueName="testRepo1">
             <RemoteRepository>https://github.com/ksAutotests/TutorialTest.git</RemoteRepository>
             <LocalRepository>c:\tmp\localgitrepo</LocalRepository>
           </GitRepositoryConfig>
-        </object>
-      </objectContextItem>
-
+        </objects>
+      </ContextObjectItem>
     </contextItems>
 
   </context>
   <Tests>
 
-    <Test name="CreateTuturial" description="Create tutorial page">
+    <TestCase name="CreateTuturial" description="Create tutorial page">
 
       <context>
         <contextItems>
-          <objectContextItem>
-            <object>
+          <ContextObjectItem name="GitHubTutorials config">
+            <objects>
               <GitHubTutorial UniqueName="testTutorial1">
 
                 <Folder>tutorials</Folder>
@@ -135,37 +134,32 @@
 
               </GitHubTutorial>
 
-            </object>
-          </objectContextItem>
-          <objectContextItem>
-            <object>
+            </objects>
+          </ContextObjectItem>
+          <ContextObjectItem name="AemPages configs">
+            <objects>
               <AemPage uniqueName="AutotestTutorialPage1">
-                <title>AutoTestTutorialTry</title>
+                <title>KsAutoTestTutorialTry</title>
                 <parentPath>/content/sapdx/website/languages/en/developer</parentPath>
                 <template>/apps/sapdx/templates/tutorial/tutorialPage</template>
               </AemPage>
-            </object>
-          </objectContextItem>
-          <objectContextItem>
-            <object>
+            </objects>
+          </ContextObjectItem>
+          <ContextObjectItem name="Components configs">
+            <objects>
+
               <TutorialCatalogComponentConfig uniqueName="tccc1">
                 <TutorialCardPath>https://github.com/ksAutotests/TutorialTest</TutorialCardPath>
                 <HideFacetsWithoutResults>True</HideFacetsWithoutResults>
                 <ExternalSource>True</ExternalSource>
               </TutorialCatalogComponentConfig>
-            </object>
-          </objectContextItem>
-          <objectContextItem>
-            <object>
+
               <ContainerFinderComponentConfig uniqueName="cfcc1">
                 <PagePaths>
                   <path>/content/sapdx/website/languages/en/developer/autotesttutorialtry</path>
                 </PagePaths>
               </ContainerFinderComponentConfig>
-            </object>
-          </objectContextItem>
-          <objectContextItem>
-            <object>
+
               <FinderResultsComponentConfig uniqueName="frcc1">
                 <Pagination>5</Pagination>
                 <ShowDescription>True</ShowDescription>
@@ -175,10 +169,7 @@
                 <AlphabeticalSorting>Both</AlphabeticalSorting>
                 <SortingByDate>Both</SortingByDate>
               </FinderResultsComponentConfig>
-            </object>
-          </objectContextItem>
-          <objectContextItem>
-            <object>
+
               <FacetsComponentConfig uniqueName="fcc1">
                 <Namespaces>
                   <namespace>/etc/tags/tutorial/interest</namespace>
@@ -188,40 +179,145 @@
                 <HideFacets>True</HideFacets>
                 <TypeOfSelection>CheckBoxes</TypeOfSelection>
               </FacetsComponentConfig>
-            </object>
-          </objectContextItem>
+
+            </objects>
+          </ContextObjectItem>
         </contextItems>
       </context>
 
       <Steps>
 
-        <step name="CloneGitRepo" description="Clone Git repository">{GitManager} {Clone} ${GitRepositoryConfig.testRepo1}</step>
+        <TestStep name="CloneGitRepo" description="Clone Git repository">
+          <manager>GitManager</manager>
+          <command>Clone</command>
+          <args>
+            <arg type="Context">GitRepositoryConfig.testRepo1</arg>
+          </args>
+        </TestStep>
+        <TestStep name="GenerateTutorial" description="Generate tutorial to local folder">
+          <manager>GitHubTutorialManager</manager>
+          <command>GenerateTutorialPage</command>
+          <args>
+            <arg type="Context">GitHubTutorial.testTutorial1</arg>
+          </args>
+        </TestStep>
+        <TestStep name="CopyTutorialToGitRepository" description="Copy tutorial from local folder to local git repository">
+          <manager>GitHubTutorialManager</manager>
+          <command>CopyToGitRepository</command>
+          <args>
+            <arg type="Context">GitHubTutorial.testTutorial1</arg>
+            <arg type="Context">GitRepositoryConfig.testRepo1</arg>
+          </args>
+        </TestStep>
+        <TestStep name="UpdateRemoteRepo" description="Update remote Git repository">
+          <manager>GitManager</manager>
+          <command>CommitAndPushAll</command>
+          <args>
+            <arg type="Context">GitRepositoryConfig.testRepo1</arg>
+            <arg type="Value">Commit git hub tutorial</arg>
+          </args>
+        </TestStep>
+        <TestStep name="CreateAemTutorialPage" description="Create Tutorial page on Author">
+          <manager>AemPageManager</manager>
+          <command>CreatePage</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.AutotestTutorialPage1</arg>
+            <arg type="Context">LandscapeConfig.Test1</arg>
+          </args>
+        </TestStep>
+        <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
+          <manager>AemPageManager</manager>
+          <command>OpenPageOnAuthor</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">AemPage.AutotestTutorialPage1</arg>
+            <arg type="Context">LandscapeConfig.Test1</arg>
+          </args>
+        </TestStep>
+        <TestStep name="Login" description="Login to Aem">
+          <manager>LoginPageManager</manager>
+          <command>Login</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Value">admin</arg>
+            <arg type="Value">admin</arg>
+          </args>
+        </TestStep>
 
-        <step name="GenerateTutorial" description="Generate tutorial to local folder">{GitHubTutorialManager} {GenerateTutorialPage} ${GitHubTutorial.testTutorial1}</step>
-        <step name="CopyTutorialToGitRepository" description="Copy tutorial from local folder to local git repository">{GitHubTutorialManager} {CopyToGitRepository} ${GitHubTutorial.testTutorial1} ${GitRepositoryConfig.testRepo1}</step>
+        <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>SetUpTutorialCatalog</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">TutorialCatalogComponentConfig.tccc1</arg>
+          </args>
+        </TestStep>
 
-        <step name="UpdateRemoteRepo" description="Update remote Git repository">{GitManager} {CommitAndPushAll} ${GitRepositoryConfig.testRepo1} {Commit git hub tutorial}</step>
+        <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>AddContainerFinderComponent</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Manager">InsertNewComponentFormManager</arg>
+          </args>
+        </TestStep>
+        <TestStep name="SetUpContainerFinder" description="Setup ContainerFinder component">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>SetUpContainerFinder</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">ContainerFinderComponentConfig.cfcc1</arg>
+          </args>
+        </TestStep>
 
-        <step  name="CreateAemTutorialPage" description="Create Tutorial page on Author">{AemPageManager} {CreatePage} ${Manager.ApiManager} ${AemPage.AutotestTutorialPage1} ${LandscapeConfig.Test1.AuthorHostUrl}</step>
+        <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>AddFinderResultsComponent</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Manager">InsertNewComponentFormManager</arg>
+          </args>
+        </TestStep>
+        <TestStep name="SetUpFinderResults" description="Setup FinderResults component">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>SetUpFinderResults</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">FinderResultsComponentConfig.frcc1</arg>
+          </args>
+        </TestStep>
 
-        <step name="OpenCreatedPage" description="Open created tutorial page">{WebDriverManager} {Navigate} ${Step.CreateAemTutorialPage}</step>
-        <step name="Login" description="Login to Aem" tryCount="2">{LoginPageManager} {Login} ${Manager.WebDriverManager} {admin} {admin}</step>
+        <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>AddFacetsComponent</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Manager">InsertNewComponentFormManager</arg>
+          </args>
+        </TestStep>
+        <TestStep name="SetUpFacets" description="Setup Facets component">
+          <manager>TutorialCatalogPageManager</manager>
+          <command>SetUpFacets</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">FacetsComponentConfig.fcc1</arg>
+          </args>
+        </TestStep>
 
-        <step name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">{TutorialCatalogPageManager} {SetUpTutorialCatalog} ${Manager.WebDriverManager} ${TutorialCatalogComponentConfig.tccc1}</step>
+        <TestStep name="ActivatePage" description="Activate Tutorial page">
+          <manager>AemPageManager</manager>
+          <command>ActivatePage</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.AutotestTutorialPage1</arg>
+            <arg type="Context">LandscapeConfig.Test1</arg>
+          </args>
+        </TestStep>
 
-        <step name="AddContainerFinder" description="">{TutorialCatalogPageManager} {AddContainerFinderComponent} ${Manager.WebDriverManager} ${Manager.InsertNewComponentFormManager}</step>
-        <step name="SetUpContainerFinder" description="Setup ContainerFinder component">{TutorialCatalogPageManager} {SetUpContainerFinder} ${Manager.WebDriverManager} ${ContainerFinderComponentConfig.cfcc1}</step>
-
-        <step name="AddFinderResults" description="">{TutorialCatalogPageManager} {AddFinderResultsComponent} ${Manager.WebDriverManager} ${Manager.InsertNewComponentFormManager}</step>
-        <step name="SetUpFinderResults" description="Setup FinderResults component">{TutorialCatalogPageManager} {SetUpFinderResults} ${Manager.WebDriverManager} ${FinderResultsComponentConfig.frcc1}</step>
-
-        <step name="AddFacets" description="">{TutorialCatalogPageManager} {AddFacetsComponent} ${Manager.WebDriverManager} ${Manager.InsertNewComponentFormManager}</step>
-        <step name="SetUpFacets" description="Setup Facets component">{TutorialCatalogPageManager} {SetUpFacets} ${Manager.WebDriverManager} ${FacetsComponentConfig.fcc1}</step>
-
-        <step  name="ActivatePage" description="Activate Tutorial page">{AemPageManager} {ActivatePage} ${Manager.ApiManager} ${AemPage.AutotestTutorialPage1} ${LandscapeConfig.Test1.AuthorHostUrl}</step>
       </Steps>
 
-    </Test>
+    </TestCase>
 
   </Tests>
 </Project>

@@ -10,6 +10,7 @@
     using System.IO;
     using System.Reflection;
     using Reports.HtmlReport;
+
     class Program
     {
         static string _libPath = "Libs";
@@ -45,10 +46,10 @@
 
                 var projectConfig = XDocument.Load(runConfig.PathToProjectConfig);
                 var project = MetaType.Parse<TestProject>(projectConfig.Elements().First());
-                project = (TestProject)project.Build().First();
+                project.Build();
                 project.Execute();
 
-                var result = project.GetReportItem();
+                var result = project.GetTestInfo();
                 var xel = MetaType.SerializeObject(result) as XElement;
                 xel.Save("result.xml");
 

@@ -16,6 +16,9 @@
 
             var objectConfig = XmlHelper.GetElementByNames(xmlConfig, objectMember.Location.PossibleNames);
 
+            if (objectConfig == null && objectMember.Location.CouldBeValue)
+                return xmlConfig;
+
             return objectConfig;
         }
 
@@ -24,6 +27,9 @@
             var xmlConfig = source as XElement;
 
             var objectConfig = XmlHelper.GetElementByNames(xmlConfig, location.PossibleNames);
+
+            if (objectConfig == null && location.CouldBeValue)
+                return xmlConfig;
 
             return objectConfig;
         }

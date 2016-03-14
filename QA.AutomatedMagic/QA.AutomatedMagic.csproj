@@ -43,6 +43,7 @@
     <Compile Include="AutomatedMagicAssemblyAttribute.cs" />
     <Compile Include="AutomatedMagicException.cs" />
     <Compile Include="CommandsMagic\BaseCommandManager.cs" />
+    <Compile Include="CommandsMagic\CommandExecutor.cs" />
     <Compile Include="CommandsMagic\MetaSourceAttribute.cs" />
     <Compile Include="LoggedFileType.cs" />
     <Compile Include="MetaMagic\BaseMetaObject.cs" />
@@ -60,14 +61,13 @@
     <Compile Include="ICollectionWrapper.cs" />
     <Compile Include="IContext.cs" />
     <Compile Include="ILogger.cs" />
-    <Compile Include="IMetaObject.cs" />
+    <Compile Include="MetaMagic\IMetaObject.cs" />
     <Compile Include="IObjectSourceResolver.cs" />
     <Compile Include="IReportGenerator.cs" />
     <Compile Include="ISourceResolver.cs" />
     <Compile Include="IValueParser.cs" />
     <Compile Include="IValueSourceResolver.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="ManagingFillerException.cs" />
     <Compile Include="MetaMagic\MetaConstraint.cs" />
     <Compile Include="MetaMagic\MetaConstraintAttribute.cs" />
     <Compile Include="MetaMagic\MetaTypeAttribute.cs" />

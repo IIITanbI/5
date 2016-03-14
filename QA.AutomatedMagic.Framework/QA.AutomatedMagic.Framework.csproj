@@ -40,26 +40,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseTestContextItem.cs" />
-    <Compile Include="CommandManagerItem.cs" />
+    <Compile Include="FrameworkBuildingException.cs" />
+    <Compile Include="FrameworkContextBuildingException.cs" />
+    <Compile Include="FrameworkContextResolvingException.cs" />
     <Compile Include="FrameworkException.cs" />
+    <Compile Include="FrameworkTestExecutionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestContext.cs" />
-    <Compile Include="TestContextItems\BuildedContextItem.cs" />
-    <Compile Include="TestContextItems\ObjectContextItem.cs" />
+    <Compile Include="TestContextItem.cs" />
+    <Compile Include="TestContextItems\ContextObjectItem.cs" />
+    <Compile Include="TestContextManagerItem.cs" />
     <Compile Include="TestItem.cs" />
+    <Compile Include="TestItemInfo.cs" />
     <Compile Include="TestLogger.cs" />
+    <Compile Include="TestManager.cs" />
     <Compile Include="TestProject.cs" />
     <Compile Include="TestStep.cs" />
+    <Compile Include="TestStepBase.cs" />
+    <Compile Include="TestStepGroup.cs" />
+    <Compile Include="TestStepOrder.cs" />
+    <Compile Include="TestStepArgument.cs" />
+    <Compile Include="TestStepArgumentType.cs" />
     <Compile Include="TestSuite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QA.AutomatedMagic.TestLogger\QA.AutomatedMagic.TestLogger.csproj">
-      <Project>{42a8ae56-c858-4eb6-a879-6be1f8df789a}</Project>
-      <Name>QA.AutomatedMagic.TestLogger</Name>
-    </ProjectReference>
     <ProjectReference Include="..\QA.AutomatedMagic\QA.AutomatedMagic.csproj">
       <Project>{dd5e0bdd-2dba-4aa2-bdd3-9df87487257b}</Project>
       <Name>QA.AutomatedMagic</Name>
