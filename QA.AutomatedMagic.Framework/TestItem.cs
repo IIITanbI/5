@@ -11,6 +11,7 @@
     public abstract class TestItem : BaseMetaObject
     {
         [MetaTypeObject("Test item info")]
+        [MetaLocation(true)]
         public TestItemInfo Info { get; set; }
 
         [MetaTypeValue("Number of tries to execute", IsRequired = false)]

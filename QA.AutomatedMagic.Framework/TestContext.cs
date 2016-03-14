@@ -12,9 +12,11 @@
     public class TestContext : BaseMetaObject, IContext
     {
         [MetaTypeCollection("List of context items", IsRequired = false, IsAssignableTypesAllowed = true)]
+        [MetaLocation("items")]
         public List<TestContextItem> ContextItems { get; set; } = new List<TestContextItem>();
 
-        [MetaTypeCollection("List of context manager items", IsRequired = false, IsAssignableTypesAllowed = true)]
+        [MetaTypeCollection("List of context manager items", "manager", IsRequired = false)]
+        [MetaLocation("managers")]
         public List<TestContextManagerItem> ContextManagerItems { get; set; } = new List<TestContextManagerItem>();
 
         public TestItem Item { get; set; } = null;
@@ -213,7 +215,7 @@
 
             try
             {
-                return Item.Parent?.Context.ResolvePath(path);
+                return Item.Parent?.Context.ResolveValue(path);
             }
             catch (FrameworkContextResolvingException ex)
             {

@@ -208,6 +208,13 @@
                 }
                 Log.DEBUG($"Executing {order} steps was completed");
             }
+            else
+            {
+                if (ItemStatus == TestItemStatus.Failed)
+                    return;
+
+                ItemStatus = TestItemStatus.Passed;
+            }
         }
 
         public virtual TestInfo.TestItem GetTestInfo()

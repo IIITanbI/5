@@ -11,7 +11,7 @@
     [MetaType("Test suite")]
     public class TestSuite : TestCase
     {
-        [MetaTypeCollection("List of child TestCases and TestSuites", "test", "testCase", "suite", "testSuite", IsAssignableTypesAllowed = true)]
+        [MetaTypeCollection("List of child TestCases and TestSuites", IsAssignableTypesAllowed = true)]
         [MetaLocation("Tests", "Suites", "TestCases", "TestSuites")]
         public List<TestCase> Children { get; set; }
 
