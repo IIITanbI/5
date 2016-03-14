@@ -5,12 +5,13 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
     using MetaMagic;
 
 
     public interface ICollectionSourceResolver
     {
-        List<object> ResolveCollection(object source, MetaTypeCollectionMember collectionMember);
-        object Serialize(object obj, MetaTypeCollectionMember collectionMember);
+        List<XElement> ResolveCollection(XElement source, MetaTypeCollectionMember collectionMember);
+        XElement Serialize(object obj, MetaTypeCollectionMember collectionMember);
     }
 }

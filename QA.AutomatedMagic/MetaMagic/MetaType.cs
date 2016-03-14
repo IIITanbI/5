@@ -9,7 +9,7 @@
     using XmlSourceResolver;
     using ValueParsers;
     using CollectionWrappers;
-
+    using System.Xml.Linq;
     public class MetaType
     {
         #region Static
@@ -30,18 +30,18 @@
             new ArrayWrapper()
         };
 
-        public static object Parse(Type type, object source, bool isAssignableTypesAllowed = false)
+        public static object Parse(Type type, XElement source, bool isAssignableTypesAllowed = false)
         {
             var metaType = AutomatedMagicManager.GetMetaType(type);
             return metaType.Parse(source, isAssignableTypesAllowed);
         }
-        public static T Parse<T>(object source, bool isAssignableTypesAllowed = false)
+        public static T Parse<T>(XElement source, bool isAssignableTypesAllowed = false)
         {
             return (T)Parse(typeof(T), source, isAssignableTypesAllowed);
         }
 
 
-        public static object SerializeObject(object obj)
+        public static XElement SerializeObject(object obj)
         {
             var metaType = AutomatedMagicManager.GetMetaType(obj.GetType());
             return metaType.SourceResolver.GetObjectSourceResolver().Serialize(obj, metaType, metaType.Info.Name, false);
@@ -177,11 +177,11 @@
             Members.Add(member);
         }
 
-        public object Parse(object source, bool isAssignableTypesAllowed = false)
+        public object Parse(XElement source, bool isAssignableTypesAllowed = false)
         {
             if (isAssignableTypesAllowed)
             {
-                var name = SourceResolver.GetSourceNodeName(source);
+                var name = source.Name;
                 var assignableType = AssignableTypes.FirstOrDefault(at => at.Info.Name == name);
 
                 if (assignableType == null)
@@ -204,7 +204,7 @@
             return createdObject;
         }
 
-        private void ParseMember(object source, object createdObject, Dictionary<MetaTypeMember, bool> parsedMembersDict, MetaTypeMember memberToParse)
+        private void ParseMember(XElement source, object createdObject, Dictionary<MetaTypeMember, bool> parsedMembersDict, MetaTypeMember memberToParse)
         {
             if (memberToParse.Constraint != null)
             {

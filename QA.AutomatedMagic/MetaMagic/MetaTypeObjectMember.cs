@@ -6,7 +6,7 @@
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
-
+    using System.Xml.Linq;
     public class MetaTypeObjectMember : MetaTypeMember
     {
         public IObjectSourceResolver ObjectSourceResolver { get; private set; }
@@ -36,7 +36,7 @@
                 : ParentType.SourceResolver.GetObjectSourceResolver();
         }
 
-        public override object Parse(object source)
+        public override object Parse(XElement source)
         {
             var resolvedValue = ObjectSourceResolver.ResolveObject(source, this);
 

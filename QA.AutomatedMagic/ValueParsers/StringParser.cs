@@ -13,10 +13,9 @@
             return type.Name == "String";
         }
 
-        public object Parse(object source, Type type)
+        public object Parse(XObject source, Type type)
         {
-            source = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source;
-            return source;
+            return (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source.ToString();
         }
     }
 }

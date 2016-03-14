@@ -19,12 +19,10 @@
                 CouldBeValue = CouldBeValue || locationAtt.CouldBeValue;
             }
         }
-
         public MetaLocation(bool couldBeValue)
         {
             CouldBeValue = couldBeValue;
         }
-
         public MetaLocation(string possibleName)
         {
             Add(possibleName);
@@ -34,7 +32,6 @@
         {
             possibleNames.ForEach(Add);
         }
-
         public void Add(string possibleName)
         {
             if (!PossibleNames.Contains(possibleName))

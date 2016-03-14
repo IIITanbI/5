@@ -14,9 +14,9 @@
             return typeof(XElement).IsAssignableFrom(type);
         }
 
-        public object Parse(object source, Type type)
+        public object Parse(XObject source, Type type)
         {
-            return source;
+            return source as XElement;
         }
     }
 }

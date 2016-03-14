@@ -13,16 +13,16 @@
             return type.IsPrimitive || type.Name == "DateTime" || type.Name == "TimeSpan";
         }
 
-        public object Parse(object source, Type type)
+        public object Parse(XObject source, Type type)
         {
-            source = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source;
+            var str = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source.ToString();
 
             var m = type.GetMethod("TryParse", new Type[] { typeof(string), type.MakeByRefType() });
-            object[] args = { source, null };
+            object[] args = { str, null };
             var r = (bool)m.Invoke(null, args);
 
             if (!r)
-                throw new ParseException(source, type);
+                throw new ParseException(str, type);
 
             return args[1];
         }

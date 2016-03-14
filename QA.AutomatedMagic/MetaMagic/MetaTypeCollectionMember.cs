@@ -6,6 +6,7 @@
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
 
     public class MetaTypeCollectionMember : MetaTypeMember
     {
@@ -94,7 +95,7 @@
                 : ParentType.SourceResolver.GetCollectionSourceReolver();
         }
 
-        public override object Parse(object source)
+        public override object Parse(XElement source)
         {
             var childrenResolvedSources = CollectionSourceResolver.ResolveCollection(source, this);
 
@@ -129,7 +130,7 @@
                 {
                     foreach (var childResolvedSource in childrenResolvedSources)
                     {
-                        var name = ParentType.SourceResolver.GetSourceNodeName(childResolvedSource);
+                        var name = childResolvedSource.Name.LocalName;
                         var assignableType = ChildrenMetaType.Value.AssignableTypes.First(at => at.Location.PossibleNames.Contains(name));
                         var childValue = assignableType.Parse(childResolvedSource);
                         childObjs.Add(childValue);

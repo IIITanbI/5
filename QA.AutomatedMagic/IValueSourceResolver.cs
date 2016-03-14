@@ -6,12 +6,13 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
 
     public interface IValueSourceResolver
     {
-        object ResolveValue(object source, MetaTypeValueMember valueMember);
-        object ResolveValue(object source, MetaLocation valueMember);
-        object Serialize(object parentObj, MetaTypeValueMember valueMember);
-        object Serialize(object obj, string name);
+        XObject ResolveValue(XObject source, MetaTypeValueMember valueMember);
+        XObject ResolveValue(XObject source, MetaLocation valueMember);
+        XElement Serialize(object parentObj, MetaTypeValueMember valueMember);
+        XElement Serialize(object obj, string name);
     }
 }

@@ -6,7 +6,7 @@
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
-
+    using System.Xml.Linq;
     public abstract class MetaTypeMember
     {
         public MetaType ParentType { get; private set; }
@@ -64,7 +64,7 @@
             Setter(obj, value);
         }
 
-        public abstract object Parse(object source);
+        public abstract object Parse(XElement source);
         public abstract void InitSourceResolver(Type type);
         public abstract List<string> GetPaths(object parentObj);
         public abstract object ResolveValue(string path, object parentObj);

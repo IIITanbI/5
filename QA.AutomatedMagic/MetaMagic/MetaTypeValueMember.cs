@@ -6,7 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Reflection;
-
+    using System.Xml.Linq;
     public class MetaTypeValueMember : MetaTypeMember
     {
         public IValueSourceResolver ValueSourceResolver { get; private set; }
@@ -38,7 +38,7 @@
                 : ParentType.SourceResolver.GetValueSourceResolver();
         }
 
-        public override object Parse(object source)
+        public override object Parse(XElement source)
         {
             var resolvedSource = ValueSourceResolver.ResolveValue(source, this);
             if (resolvedSource == null && !IsRequired)

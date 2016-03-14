@@ -10,7 +10,7 @@
 
     public class XmlValueSourceResolver : IValueSourceResolver
     {
-        public object ResolveValue(object source, MetaTypeValueMember valueMember)
+        public XObject ResolveValue(XObject source, MetaTypeValueMember valueMember)
         {
             var xmlConfig = source as XElement;
 
@@ -21,28 +21,28 @@
             {
                 var fn = el.FirstNode;
                 if (fn != null && fn.NodeType == System.Xml.XmlNodeType.CDATA)
-                    return (el.FirstNode as XCData).Value;
+                    return (el.FirstNode as XCData);
                 else
                     return el;
             }
 
             var att = XmlHelper.GetAttributeByNames(xmlConfig, possibleNames);
             if (att != null)
-                return att.Value;
+                return att;
 
             if (valueMember.Location.CouldBeValue)
             {
                 var fn = xmlConfig.FirstNode;
                 if (fn != null && fn.NodeType == System.Xml.XmlNodeType.CDATA)
-                    return (xmlConfig.FirstNode as XCData).Value;
+                    return (xmlConfig.FirstNode as XCData);
                 else
-                    return xmlConfig.Value;
+                    return xmlConfig;
             }
 
             return null;
         }
 
-        public object ResolveValue(object source, MetaLocation location)
+        public XObject ResolveValue(XObject source, MetaLocation location)
         {
             var xmlConfig = source as XElement;
 
@@ -53,28 +53,28 @@
             {
                 var fn = el.FirstNode;
                 if (fn != null && fn.NodeType == System.Xml.XmlNodeType.CDATA)
-                    return (el.FirstNode as XCData).Value;
+                    return (el.FirstNode as XCData);
                 else
-                    return el.Value;
+                    return el;
             }
 
             var att = XmlHelper.GetAttributeByNames(xmlConfig, possibleNames);
             if (att != null)
-                return att.Value;
+                return att;
 
             if (location.CouldBeValue)
             {
                 var fn = xmlConfig.FirstNode;
                 if (fn != null && fn.NodeType == System.Xml.XmlNodeType.CDATA)
-                    return (xmlConfig.FirstNode as XCData).Value;
+                    return (xmlConfig.FirstNode as XCData);
                 else
-                    return xmlConfig.Value;
+                    return xmlConfig;
             }
 
             return null;
         }
 
-        public object Serialize(object parentObj, MetaTypeValueMember valueMember)
+        public XElement Serialize(object parentObj, MetaTypeValueMember valueMember)
         {
             var value = valueMember.GetValue(parentObj);
             if (value == null) return null;
@@ -82,7 +82,7 @@
             return el;
         }
 
-        public object Serialize(object obj, string name)
+        public XElement Serialize(object obj, string name)
         {
             var el = new XElement(name, new XCData(obj.ToString()));
             return el;

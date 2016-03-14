@@ -5,13 +5,14 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
     using MetaMagic;
 
     public interface IObjectSourceResolver
     {
-        object ResolveObject(object source, MetaTypeObjectMember objectMember);
-        object ResolveObject(object source, MetaLocation location);
-        object Serialize(object parentObj, MetaTypeObjectMember objectMember);
-        object Serialize(object obj, MetaType metaType, string name, bool isAssignableTypesAllowed);
+        XElement ResolveObject(XElement source, MetaTypeObjectMember objectMember);
+        XElement ResolveObject(XElement source, MetaLocation location);
+        XElement Serialize(object parentObj, MetaTypeObjectMember objectMember);
+        XElement Serialize(object obj, MetaType metaType, string name, bool isAssignableTypesAllowed);
     }
 }

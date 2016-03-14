@@ -12,6 +12,5 @@
         ICollectionSourceResolver GetCollectionSourceReolver();
         IObjectSourceResolver GetObjectSourceResolver();
         IValueSourceResolver GetValueSourceResolver();
-        string GetSourceNodeName(object obj);
     }
 }

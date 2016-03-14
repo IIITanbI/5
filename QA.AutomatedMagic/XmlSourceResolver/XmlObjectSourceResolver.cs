@@ -10,7 +10,7 @@
 
     public class XmlObjectSourceResolver : IObjectSourceResolver
     {
-        public object ResolveObject(object source, MetaTypeObjectMember objectMember)
+        public XElement ResolveObject(XElement source, MetaTypeObjectMember objectMember)
         {
             var xmlConfig = source as XElement;
 
@@ -22,7 +22,7 @@
             return objectConfig;
         }
 
-        public object ResolveObject(object source, MetaLocation location)
+        public XElement ResolveObject(XElement source, MetaLocation location)
         {
             var xmlConfig = source as XElement;
 
@@ -34,7 +34,7 @@
             return objectConfig;
         }
 
-        public object Serialize(object parentObj, MetaTypeObjectMember objectMember)
+        public XElement Serialize(object parentObj, MetaTypeObjectMember objectMember)
         {
             var memberValue = objectMember.GetValue(parentObj);
             if (memberValue == null) return null;
@@ -48,7 +48,7 @@
             return rootEl;
         }
 
-        public object Serialize(object obj, MetaType metaType, string name, bool isAssignableTypesAllowed)
+        public XElement Serialize(object obj, MetaType metaType, string name, bool isAssignableTypesAllowed)
         {
             if (isAssignableTypesAllowed)
             {

@@ -10,7 +10,7 @@
 
     public class XmlCollectionSourceResolver : ICollectionSourceResolver
     {
-        public List<object> ResolveCollection(object source, MetaTypeCollectionMember collectionMember)
+        public List<XElement> ResolveCollection(XElement source, MetaTypeCollectionMember collectionMember)
         {
             var xmlConfig = source as XElement;
 
@@ -22,10 +22,10 @@
 
             var childrenEls = XmlHelper.GetElementsByNames(rootElement, collectionMember.ChildrenLocation.Value.PossibleNames);
 
-            return childrenEls.Cast<object>().ToList();
+            return childrenEls.ToList();
         }
 
-        public object Serialize(object obj, MetaTypeCollectionMember collectionMember)
+        public XElement Serialize(object obj, MetaTypeCollectionMember collectionMember)
         {
             var collectionObj = collectionMember.GetValue(obj);
             if (collectionObj == null) return null;

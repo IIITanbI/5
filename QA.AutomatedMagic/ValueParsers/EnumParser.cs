@@ -14,20 +14,20 @@
             return type.IsEnum;
         }
 
-        public object Parse(object source, Type type)
+        public object Parse(XObject source, Type type)
         {
-            source = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source;
+            var str = (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source.ToString();
 
             try
             {
-                var enumVal = Enum.Parse(type, source.ToString());
+                var enumVal = Enum.Parse(type, str);
                 if (!Enum.IsDefined(type, enumVal))
-                    throw new ParseException(source, type);
+                    throw new ParseException(str, type);
                 return enumVal;
             }
             catch
             {
-                throw new ParseException(source, type);
+                throw new ParseException(str, type);
             }
         }
     }
