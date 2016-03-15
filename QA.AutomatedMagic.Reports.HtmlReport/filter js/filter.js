@@ -6,9 +6,7 @@ var FILTER = {
 };
 
 FILTER.prepare = function(button) {
-    var $filterButtons = this.getFilterButtons(button);
     var $defaultButton = this.getDefaultButton(button);
-
 	$defaultButton.click();
 };
 
@@ -83,9 +81,6 @@ FILTER.getFilterFromButton = function (button) {
 
     filter = $filters.split(new RegExp("\\s+"));
 
-	//for (var i = 0; i < matches.length; i++){
-	//	filter.push(matches[i].substr(this.className.length));
-	//}
 
     console.log("filter = " + filter);
     return filter;
@@ -95,7 +90,7 @@ FILTER.getChilds = function (button) { return $() };
 FILTER.getFilterButtons = function (button) {return $() };
 FILTER.getDefaultButton = function (button) {return $() };
 FILTER.getChildStatus = function (child) { return $()};
-
+FILTER.getParent = function (button) {return $()};
 
 FILTER.isActive = function(button){
     return($(button).hasClass(this.activatedClassName));
@@ -118,6 +113,7 @@ FILTER.doFilter = function (button) {
     }
 
     var $childs = this.getChilds(button);
+	var $parent = $(this.getParent(button));
     for (var i = 0; i < $childs.length; i++) {
         var $child = $($childs[i]);
 		var $status = this.getChildStatus($child);
@@ -125,17 +121,21 @@ FILTER.doFilter = function (button) {
 		var css = $child.css("display");
         if ($.inArray($status, $filters) === -1) {
 			if (css == "block"){
-				$child.slideToggle();
+				if (!$parent.is(":visible")) 
+					$child.css("display", "none");
+				else
+					$child.slideToggle();
 			}
         } else {
 			if (css == "none"){
-				$child.slideToggle();
+				if (!$parent.is(":visible")) 
+					$child.css("display", "block");
+				else
+					$child.slideToggle();
 			}
         }
     }
 };
-
-
 
 
 
