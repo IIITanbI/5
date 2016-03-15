@@ -1,4 +1,9 @@
 $(function () {
+	$(".btnexp").click(function (e) {
+		$(this).closest(".test").children('.tests').toggle(500);
+		myFilter.prepare($(this).closest(".test").find('.test-fltr-btns').find("button").first());
+	});
+	
     var myFilter = Object.create(FILTER);
     myFilter.className = "filter-";
 
@@ -19,14 +24,16 @@ $(function () {
 
         return $status;
     };
-
+	
+	
+	
 	$(".test-fltr-btns button").click(function (e) {
         myFilter.filterButtonClick(this);
     });
 
-    var $btnsPanel = $(".test-fltr-btns");
-    for(var i = 0; i < $btnsPanel.length; i++){
-        myFilter.prepare($($btnsPanel[i]).find("button").first());
-    }
+    // var $btnsPanel = $(".test-fltr-btns");
+    // for(var i = 0; i < $btnsPanel.length; i++){
+        // myFilter.prepare($($btnsPanel[i]).find("button").first());
+    // }
 });
 

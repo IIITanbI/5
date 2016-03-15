@@ -72,7 +72,8 @@
                     res
                 );
 
-            head.Add(charset, httpEquiv, name, title, css, mcss);
+            //head.Add(charset, httpEquiv, name, title, css, mcss);
+            head.Add(charset, httpEquiv, name, title, css, css1);
             return head;
         }
 
@@ -104,8 +105,8 @@
             res = File.ReadAllText(@"filter js/logFilter.js"); script.Add(res);
             res = File.ReadAllText(@"filter js/stepFilter.js"); script.Add(res);
 
-            //body.Add(container, jQuery, js, jsCustom, jsCustom1, jsCustom2, jsCustom3, jsCustom4);
-            body.Add(container, jQuery, js, script);
+            body.Add(container, jQuery, js, jsCustom, jsCustom1, jsCustom2, jsCustom3, jsCustom4);
+            //body.Add(container, jQuery, js, script);
 
             return body;
         }
@@ -243,7 +244,8 @@
                                         new XElement("tr",
                                             new XElement("td",
                                                 new XAttribute("colspan", "3"),
-                                                $"{step.Description}"
+                                                $"{step.Description}  ",
+                                                GetLogExpander(step)
                                             )
                                         ),
                                         new XElement("tr",
@@ -267,10 +269,14 @@
 
             return btn;
         }
-        public XElement GetStepExpander(TestItem testItem)
+        public XElement GetStepExpander(BaseMetaObject obj)
         {
+            var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
+            if (steps == null)
+                return null;
+
             XElement btn = null;
-            if (testItem.Steps.Count != 0)
+            if (steps.Count != 0)
             {
                 btn = new XElement("button", new XAttribute("class", "btn btnstep btn-warning"), "Steps");
             }
@@ -281,6 +287,10 @@
         {
             if (!(obj is TestItem || obj is Step))
                 return null;
+            var logs = obj is TestItem ? ((TestItem)obj).LogMessages : obj is Step ? ((Step)obj).Messages : null;
+            if (logs == null || logs.Count == 0)
+                return null;
+
 
             XElement btn = new XElement("button", new XAttribute("class", "btn btnlog btn-info"), "Logs");
             return btn;
@@ -288,13 +298,18 @@
 
         public XElement GetException(LogMessage logMessage)
         {
-            XElement log = null;
+            XElement ex = null;
             if (logMessage.Ex != null)
             {
-                log = new XElement("div", $"Exception: {logMessage.Ex}", new XAttribute("class", "log-exception"));
+                var messageLines = logMessage.Ex.ToString().Split(new string[] {"\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                ex = new XElement("div", new XAttribute("class", "log-exception"));
+                foreach (var line in messageLines)
+                {
+                    ex.Add(new XElement("p", line));
+                }
             }
             
-            return log;
+            return ex;
         }
         public XElement GetMessage(LogItem logMessage)
         {
@@ -324,9 +339,10 @@
 
             return btns;
         }
-        public XElement GetStepButtons(TestItem testItem)
+        public XElement GetStepButtons(BaseMetaObject obj)
         {
-            if (testItem.Steps.Count == 0)
+            var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
+            if (steps?.Count == null)
                 return null;
 
             //NotExecuted, Unknown, Passed, Failed, Skipped
@@ -473,16 +489,20 @@
         }
 
 
-        public XElement GetSteps(TestItem testItem)
+        public XElement GetSteps(BaseMetaObject obj)
         {
-            if (testItem.Steps.Count == 0)
+            var steps = obj is TestItem ? ((TestItem)obj).Steps : (obj is Step ? ((Step)obj).Steps : null);
+            string name = obj is Step ? ((Step)obj).Description : null;
+
+           
+            if (steps?.Count == null)
                 return null;
 
             XElement acc = new XElement("div", new XAttribute("class", "steps"));
 
-            acc.Add(GetStepButtons(testItem));
+            acc.Add(GetStepButtons(obj));
 
-            foreach (var step in testItem.Steps)
+            foreach (var step in steps)
             {
                 acc.Add(
                     new XElement("div",
@@ -492,10 +512,11 @@
                             new XElement("div",
                                 new XAttribute("class", "panel-heading"),
                                 GetStepInfoTable(step),
-                                GetLogExpander(step)
+                                GetStepExpander(step)
                             ),
                             GetLogs(step)
-                        )
+                        ),
+                        GetSteps(step)
                     )
                 );
             }
