@@ -35,7 +35,9 @@
                         continue;
                     }
 
+                    step.SWatch.Start();
                     step.Execute();
+                    step.SWatch.Stop();
 
                     if (step.ItemStatus == TestItemStatus.Failed)
                     {
@@ -65,7 +67,9 @@
                         continue;
                     }
 
+                    step.SWatch.Start();
                     step.Execute();
+                    step.SWatch.Stop();
 
                     if (step.ItemStatus == TestItemStatus.Failed)
                     {

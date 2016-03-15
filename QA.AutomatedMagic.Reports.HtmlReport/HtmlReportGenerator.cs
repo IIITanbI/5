@@ -135,6 +135,7 @@
                 new XElement("tr",
                     new XElement("td", testEnvironmentInfo.CLRVersion),
                     new XElement("td", testEnvironmentInfo.OSName),
+                    new XElement("td", testEnvironmentInfo.OSVersion),
                     new XElement("td", testEnvironmentInfo.Platform),
                     new XElement("td", testEnvironmentInfo.MachineName),
                     new XElement("td", testEnvironmentInfo.User),
@@ -299,9 +300,9 @@
         public XElement GetException(LogMessage logMessage)
         {
             XElement ex = null;
-            if (logMessage.Ex != null)
+            if (logMessage.ExceptionString != null)
             {
-                var messageLines = logMessage.Ex.ToString().Split(new string[] {"\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var messageLines = logMessage.ExceptionString.Split(new string[] {"\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 ex = new XElement("div", new XAttribute("class", "log-exception"));
                 foreach (var line in messageLines)
                 {

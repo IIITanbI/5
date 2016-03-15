@@ -6,6 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using MetaMagic;
+    using System.Diagnostics;
 
     [MetaType("Base class for all Test items")]
     public abstract class TestItem : BaseMetaObject
@@ -29,6 +30,8 @@
         public abstract TestItemType ItemType { get; protected set; }
         public TestItemStatus ItemStatus { get; set; } = TestItemStatus.NotExecuted;
         protected int _tryNumber = 1;
+
+        public Stopwatch SWatch = new Stopwatch();
 
         public virtual void Build()
         {

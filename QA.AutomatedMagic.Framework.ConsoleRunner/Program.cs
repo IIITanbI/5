@@ -54,7 +54,7 @@
                 xel.Save("result.xml");
 
                 var rg = new HtmlReportGenerator("out.html");
-                rg.CreateReport(result, new TestInfo.TestEnvironmentInfo(), null);
+                rg.CreateReport(result, project.EnvironmentInfo, null);
             }
             catch (Exception ex)
             {

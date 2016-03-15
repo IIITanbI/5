@@ -121,6 +121,7 @@
 
         public override void Execute()
         {
+            SWatch.Start();
             Log.INFO($"Start executing {this}");
             Parent?.Log.INFO($"Start executing {this}");
             ItemStatus = TestItemStatus.Unknown;
@@ -184,7 +185,10 @@
 
                     foreach (var step in stepsToExecute)
                     {
+                        step.SWatch.Start();
                         step.Execute();
+                        step.SWatch.Stop();
+
                         if (step.ItemStatus == TestItemStatus.Failed)
                             isFailed = true;
                     }
@@ -204,7 +208,10 @@
                             continue;
                         }
 
+                        step.SWatch.Start();
                         step.Execute();
+                        step.SWatch.Stop();
+
                         ItemStatus = step.ItemStatus;
                     }
                 }
@@ -228,6 +235,7 @@
             ti.Status = ItemStatus;
             ti.LogMessages.AddRange(Log.LogMessages);
             ti.Type = ItemType;
+            ti.Duration = SWatch.Elapsed;
 
             foreach (var step in TestSteps)
             {

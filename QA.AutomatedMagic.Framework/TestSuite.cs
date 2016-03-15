@@ -71,7 +71,9 @@
                         Log.DEBUG($"Execute children in sequence mode");
                         foreach (var child in Children)
                         {
+                            child.SWatch.Start();
                             child.Execute();
+                            child.SWatch.Stop();
                         }
                     }
                     else
@@ -83,7 +85,12 @@
                         if (ThreadNumber != 0)
                             parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
 
-                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                        Parallel.ForEach(Children, parallelOptions, child =>
+                        {
+                            child.SWatch.Start();
+                            child.Execute();
+                            child.SWatch.Stop();
+                        });
                     }
                     Log.DEBUG("Children execution was completed");
 

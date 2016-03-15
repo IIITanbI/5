@@ -10,6 +10,21 @@
     [MetaType("Logged message")]
     public class LogMessage : LogItem
     {
-        public Exception Ex { get; set; }
+        [MetaTypeValue("Exception string", IsRequired = false)]
+        public string ExceptionString { get; set; } = null;
+
+        private Exception _ex;
+        public Exception Ex
+        {
+            get
+            {
+                return _ex;
+            }
+            set
+            {
+                _ex = value;
+                ExceptionString = value?.ToString();
+            }
+        }
     }
 }

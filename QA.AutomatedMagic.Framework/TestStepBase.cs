@@ -39,6 +39,7 @@
             si.Description = Info.Description;
             si.Status = ItemStatus;
             si.Messages.AddRange(Log.LogMessages);
+            si.Duration = SWatch.Elapsed;
 
             return si;
         }
