@@ -139,7 +139,7 @@
 
             if (ContextValues.ContainsKey(typeName) && ContextValues[typeName].ContainsKey(objectKey))
             {
-                var obj = ContextValues[typeName][objectKey];
+                var obj = ContextValues[typeName][objectKey].Value;
 
                 if (parts.Length == 2)
                     return obj;
@@ -151,7 +151,7 @@
 
                     try
                     {
-                        return obj.Value.ResolvePath(innerPath);
+                        return obj.ResolvePath(innerPath);
                     }
                     catch (Exception ex)
                     {

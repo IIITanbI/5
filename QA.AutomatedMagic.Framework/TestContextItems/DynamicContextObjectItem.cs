@@ -8,7 +8,7 @@
     using MetaMagic;
     using System.Xml.Linq;
     using XmlSourceResolver;
-
+    using Dynamic;
     [MetaType("Resolvable context object item")]
     public class DynamicContextObjectItem : TestContextItem
     {
@@ -67,8 +67,8 @@
                             catch (Exception ex)
                             {
                                 throw new FrameworkContextBuildingException(context.Item, $"Error occurred during parsing object", ex,
-                                $"Object key: {key}",
-                                $"Context value object MetaType: {metaType}");
+                                    $"Object key: {key}",
+                                    $"Context value object MetaType: {metaType}");
                             }
                         })
                 });
@@ -79,31 +79,22 @@
 
         private void ResolveNode(string key, XElement element, TestContext context)
         {
-            var children = element.Elements().ToList();
-            if (children.Count == 1)
+            if (element.Name == "DynamicNode")
             {
-                var child = children[0];
-                if (child.Name == "DynamicNode")
+                try
                 {
-                    var type = child.Attribute("type")?.Value;
-                    if (type == null)
-                        throw new FrameworkContextBuildingException(context.Item, "Dynamic node type isn't specified",
-                            $"Object key: {key}");
-
-                    switch (type)
-                    {
-                        case "Context":
-
-                            var obj = context.ResolveValue(child.Value);
-                            element.Value = obj.ToString();
-
-                            break;
-                        default:
-                            throw new FrameworkContextBuildingException(context.Item, $"Unknown dynamic node type: {type}",
-                                $"Object key: {key}");
-                    }
+                    var node = MetaType.Parse<DynamicNode>(element);
+                    element.ReplaceWith(new XCData(node.GetValue(context).ToString()));
                 }
+                catch (Exception ex)
+                {
+                    throw new FrameworkContextBuildingException(context.Item, $"Error occurred during dynamic node resolving", ex,
+                        $"Object key: {key}");
+                }
+                return;
             }
+
+            var children = element.Elements().ToList();
 
             for (int i = 0; i < children.Count; i++)
             {

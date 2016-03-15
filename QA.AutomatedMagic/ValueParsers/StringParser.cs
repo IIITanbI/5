@@ -15,7 +15,13 @@
 
         public object Parse(XObject source, Type type)
         {
-            return (source as XElement)?.Value ?? (source as XAttribute)?.Value ?? source.ToString();
+            var str = (source as XElement)?.Value
+                ?? (source as XAttribute)?.Value
+                ?? (source as XCData)?.Value
+                ?? (source as XText)?.Value
+                ?? source.ToString();
+
+            return str;
         }
     }
 }

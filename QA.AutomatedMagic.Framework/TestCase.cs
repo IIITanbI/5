@@ -42,6 +42,12 @@
                 MergeSteps();
             }
 
+            if (ItemType == TestItemType.Test)
+                foreach (var testStep in TestSteps)
+                {
+                    testStep.Order = TestStepOrder.Case;
+                }
+
             TestManager.Log.INFO($"Start building TestSteps for item: {this}");
             TestManager.Log.INFO($"TestSteps count: {TestSteps.Count}");
             foreach (var testStep in TestSteps)
@@ -75,8 +81,6 @@
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
                             if (step.Order == TestStepOrder.PrePost)
                                 step.Order = TestStepOrder.Pre;
-                            if ((step.Order == TestStepOrder.CasePost || step.Order == TestStepOrder.CasePre) && ItemType == TestItemType.Test)
-                                step.Order = TestStepOrder.Case;
 
                             var first = TestSteps.FirstOrDefault(s => s.Order > parentStep.Order);
 
@@ -92,8 +96,6 @@
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
                             if (step.Order == TestStepOrder.PostPre)
                                 step.Order = TestStepOrder.Post;
-                            if (step.Order == TestStepOrder.CasePre && ItemType == TestItemType.Test)
-                                step.Order = TestStepOrder.Case;
 
                             var first = TestSteps.FirstOrDefault(s => s.Order >= parentStep.Order);
 

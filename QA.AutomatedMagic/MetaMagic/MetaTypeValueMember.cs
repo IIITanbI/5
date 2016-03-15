@@ -43,6 +43,10 @@
             var resolvedSource = ValueSourceResolver.ResolveValue(source, this);
             if (resolvedSource == null && !IsRequired)
                 return null;
+
+            if (resolvedSource == null)
+                throw new ParseException("Couldn't resolve value from source", source, this);
+
             return ValueParser.Parse(resolvedSource, MemberType);
         }
 

@@ -112,6 +112,10 @@
                 foreach (var childResolvedSource in childrenResolvedSources)
                 {
                     var valueToParse = childValueResolver.ResolveValue(childResolvedSource, location);
+
+                    if (valueToParse == null)
+                        throw new ParseException("Couldn't resolve child value", childResolvedSource, this);
+
                     var childValue = ChildValueParser.Parse(valueToParse, ChildrenType);
                     childObjs.Add(childValue);
                 }
@@ -123,6 +127,10 @@
                     foreach (var childResolvedSource in childrenResolvedSources)
                     {
                         var childValue = ChildrenMetaType.Value.Parse(childResolvedSource);
+                        
+                        if (childValue == null)
+                            throw new ParseException("Couldn't resolve child object", childResolvedSource, this);
+
                         childObjs.Add(childValue);
                     }
                 }
@@ -133,6 +141,10 @@
                         var name = childResolvedSource.Name.LocalName;
                         var assignableType = ChildrenMetaType.Value.AssignableTypes.First(at => at.Location.PossibleNames.Contains(name));
                         var childValue = assignableType.Parse(childResolvedSource);
+
+                        if (childValue == null)
+                            throw new ParseException("Couldn't resolve child object", childResolvedSource, this);
+
                         childObjs.Add(childValue);
                     }
                 }
