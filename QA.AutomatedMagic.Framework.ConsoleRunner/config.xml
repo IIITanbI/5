@@ -10,14 +10,7 @@
           </FirefoxWebDriverConfig>
         </Config>
       </manager>
-      <manager type="ApiManager">
-        <Config>
-          <ApiManagerConfig>
-            <username>admin</username>
-            <password>admin</password>
-          </ApiManagerConfig>
-        </Config>
-      </manager>
+      <manager type="ApiManager"></manager>
       <manager type="GitHubTutorialManager">
         <Config>
           <GitHubTutorialManagerConfig>
@@ -43,7 +36,7 @@
     <contextItems>
       <ContextObjectItem name="LandScape configs">
         <objects>
-          <LandscapeConfig uniqueName="EnvConfig">
+          <LandscapeConfig uniqueName="LandscapeConfig">
             <AuthorHostUrl>http://10.7.14.16:4502</AuthorHostUrl>
             <PublisHostUrl>http://10.7.14.16:4502</PublisHostUrl>
           </LandscapeConfig>
@@ -54,7 +47,7 @@
   </context>
 
   <Steps>
-    <!--<TestStep name="CloneGitRepository" description="Clone Git repository">
+    <TestStep name="CloneGitRepository" description="Clone Git repository">
       <manager>GitManager</manager>
       <command>Clone</command>
       <order>CasePre</order>
@@ -87,7 +80,7 @@
         <arg type="Context">GitRepositoryConfig.TutorialRepo</arg>
         <arg type="Value">Commit git hub tutorial</arg>
       </args>
-    </TestStep>-->
+    </TestStep>
     <TestStep name="CreateAemTutorialPage" description="Create Tutorial page on Author">
       <manager>AemPageManager</manager>
       <command>CreatePage</command>
@@ -95,19 +88,20 @@
       <args>
         <arg type="Manager">ApiManager</arg>
         <arg type="Context">AemPage.AutotestTutorialPage</arg>
-        <arg type="Context">LandscapeConfig.EnvConfig</arg>
+        <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
       </args>
     </TestStep>
-    <!--<TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
+    <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
       <manager>AemPageManager</manager>
       <command>OpenPageOnAuthor</command>
       <order>CasePre</order>
       <args>
         <arg type="Manager">WebDriverManager</arg>
         <arg type="Context">AemPage.AutotestTutorialPage</arg>
-        <arg type="Context">LandscapeConfig.EnvConfig</arg>
+        <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
       </args>
     </TestStep>
+    
     <TestStep name="Login" description="Login to Aem">
       <manager>LoginPageManager</manager>
       <command>Login</command>
@@ -193,9 +187,9 @@
       <args>
         <arg type="Manager">ApiManager</arg>
         <arg type="Context">AemPage.AutotestTutorialPage</arg>
-        <arg type="Context">LandscapeConfig.EnvConfig</arg>
+        <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
       </args>
-    </TestStep>-->
+    </TestStep>
   </Steps>
 
   <Tests>
