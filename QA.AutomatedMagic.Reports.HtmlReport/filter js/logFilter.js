@@ -1,15 +1,4 @@
 $(function () {
-	$('.btnlog').click(function (e) {
-		if ($(this).closest(".step").length > 0) {
-			myFilter.prepare($(this).closest(".step").find('.log-fltr-btns').find("button").first());
-			$(this).closest(".step").find('.logPanel').first().slideToggle();
-		}
-		else if ($(this).closest(".test").length > 0){
-			myFilter.prepare($(this).closest(".test").find('.log-fltr-btns').find("button").first());
-			$(this).closest(".test").find('.logPanel').first().slideToggle();
-		}
-	});
-	
     var myFilter = Object.create(FILTER);
     myFilter.className = "log-filter-";
     myFilter.multiSelect = false;
@@ -30,10 +19,7 @@ $(function () {
         var $status = $($(child).find("span")[0]).text().toLowerCase();
         return $status;
     };
-	
-	myFilter.getParent = function (button){
-		return $(button).closest(".logPanel");
-	};
+
 
     $(".log-fltr-btn-exp").click(function (e) {
         var $cur = $(e.currentTarget).children("span");
@@ -67,10 +53,10 @@ $(function () {
 	$(".log-fltr-btns button").click(function (e) {
         myFilter.filterButtonClick(this);
     });
-	
-    // var $btnsPanel = $(".log-fltr-btns");
-    // for(var i = 0; i < $btnsPanel.length; i++){
-        // myFilter.prepare($($btnsPanel[i]).find("button").first());
-    // }
+    var $btnsPanel = $(".log-fltr-btns");
+    for(var i = 0; i < $btnsPanel.length; i++){
+        myFilter.prepare($($btnsPanel[i]).find("button").first());
+    }
 
+    
 });
