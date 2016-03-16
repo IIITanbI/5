@@ -75,7 +75,10 @@
         {
             lock (_lock)
             {
-                Console.WriteLine($"{Name}\t{level}\t{message}");
+                if (exception == null)
+                    Console.WriteLine($"{Name}\t{level}\t{message}");
+                else
+                    Console.WriteLine($"{Name}\t{level}\t{message}\nException:\n{exception}");
 
                 var logMessage = new LogMessage { DataStemp = DateTime.Now, Level = level, Message = message, Ex = exception };
                 LogMessages.Add(logMessage);

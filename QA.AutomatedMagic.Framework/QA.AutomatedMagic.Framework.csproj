@@ -47,6 +47,7 @@
     <Compile Include="FrameworkException.cs" />
     <Compile Include="FrameworkTestExecutionException.cs" />
     <Compile Include="TestContextItems\Dynamic\ComplexNode.cs" />
+    <Compile Include="TestContextItems\Dynamic\ContextObjectNode.cs" />
     <Compile Include="TestContextItems\Dynamic\ValueGeneration\StringGenerator.cs" />
     <Compile Include="TestContextItems\Dynamic\ValueGeneration\BaseValueGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

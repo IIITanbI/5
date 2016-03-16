@@ -58,7 +58,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                TestManager.Log.ERROR("Error occurred during project building", ex);
             }
             Console.ReadLine();
         }
