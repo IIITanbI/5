@@ -1,0 +1,47 @@
+﻿@model QA.AutomatedMagic.MagicServer.Models.MagicSolution
+
+@{
+    ViewBag.Title = "Magic Solution Details";
+}
+
+<h2>Magic Solution Details</h2>
+
+<div>
+    <h4>MagicSolution</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Path)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Path)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>@Html.DisplayNameFor(model => model.Projects)</dt>
+
+        <dd>
+            <ul>
+                @foreach(var project in Model.Projects)
+                {
+                <li>@project.Name</li>
+                }
+            </ul>
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { name = Model.Name }) |
+    @Html.ActionLink("Edit Projects", "PickProjects", new { name = Model.Name }) |    
+    @Html.ActionLink("Edit References", "PickReferences", new { name = Model.Name }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
