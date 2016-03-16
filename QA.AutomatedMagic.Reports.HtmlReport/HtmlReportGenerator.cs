@@ -1,6 +1,5 @@
 ﻿namespace QA.AutomatedMagic.Reports.HtmlReport
 {
-
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -8,11 +7,12 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using TestInfo;
-    using QA.AutomatedMagic.MetaMagic;
+    using MetaMagic;
     using System.IO;
     public class HtmlReportGenerator : IReportGenerator
     {
         private string Path;
+        public bool BuildInOneFile { get; set; } = true;
 
         public HtmlReportGenerator(string path)
         {
@@ -27,13 +27,19 @@
                 GetBody(testItem, testEnvironmentInfo)
             );
 
-            string final = html.ToString();
-            final = final.Replace("&gt;", ">");
-            final = final.Replace("&lt;", "<");
-            //&gt; >
-            //&lt; <
-            File.WriteAllText(Path, final);
-            //html.Save(Path);
+            if (BuildInOneFile)
+            {
+                //&gt; >
+                //&lt; <
+                string final = html.ToString();
+                final = final.Replace("&gt;", ">");
+                final = final.Replace("&lt;", "<");
+                File.WriteAllText(Path, final);
+            }
+            else
+            {
+                html.Save(Path);
+            }
         }
 
 
@@ -59,21 +65,28 @@
                 new XAttribute("href", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
             );
 
-            var css1 = new XElement("link",
-                new XAttribute("rel", "stylesheet"),
-                new XAttribute("href", "css/css.css")
-            );
+
+            XElement customCss = null;
 
 
-            string res;
-            res = File.ReadAllText(@"css/css.css");
-            var mcss = new XElement("style",
-                    new XAttribute("type", "text/css"),
-                    res
+            if (BuildInOneFile)
+            {
+                string res;
+                res = File.ReadAllText(@"css/css.css");
+                customCss = new XElement("style",
+                        new XAttribute("type", "text/css"),
+                        res
                 );
-
-            //head.Add(charset, httpEquiv, name, title, css, mcss);
-            head.Add(charset, httpEquiv, name, title, css, css1);
+            }
+            else
+            {
+                customCss = new XElement("link",
+                    new XAttribute("rel", "stylesheet"),
+                    new XAttribute("href", "css/css.css")
+                );
+            }
+                
+            head.Add(charset, httpEquiv, name, title, css, customCss);
             return head;
         }
 
@@ -81,32 +94,36 @@
         {
             var body = new XElement("body");
 
-            var js = new XElement("script", "", new XAttribute("src", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"));
+            var bootstrapJS = new XElement("script", "", new XAttribute("src", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"));
 
             var jQuery = new XElement("script", "", new XAttribute("src", "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"));
-
-            var jsCustom = new XElement("script", "", new XAttribute("src", "filter js/init.js"));
-            var jsCustom1 = new XElement("script", "", new XAttribute("src", "filter js/filter.js"));
-            var jsCustom2 = new XElement("script", "", new XAttribute("src", "filter js/testFilter.js"));
-            var jsCustom3 = new XElement("script", "", new XAttribute("src", "filter js/logFilter.js"));
-            var jsCustom4 = new XElement("script", "", new XAttribute("src", "filter js/stepFilter.js"));
 
             var container = new XElement("div", new XAttribute("class", "container"),
                 GetEnvironment(testEnvironmentInfo),
                 GetReport(testItem)
             );
 
-            var script = new XElement("script");
-
-            string res;
-            res = File.ReadAllText(@"filter js/init.js"); script.Add(res);
-            res = File.ReadAllText(@"filter js/filter.js"); script.Add(res);
-            res = File.ReadAllText(@"filter js/testFilter.js"); script.Add(res);
-            res = File.ReadAllText(@"filter js/logFilter.js"); script.Add(res);
-            res = File.ReadAllText(@"filter js/stepFilter.js"); script.Add(res);
-
-            body.Add(container, jQuery, js, jsCustom, jsCustom1, jsCustom2, jsCustom3, jsCustom4);
-            //body.Add(container, jQuery, js, script);
+            body.Add(container, jQuery, bootstrapJS);
+            if (BuildInOneFile)
+            {
+                var script = new XElement("script");
+                string res;
+                res = File.ReadAllText(@"filter js/init.js"); script.Add(res);
+                res = File.ReadAllText(@"filter js/filter.js"); script.Add(res);
+                res = File.ReadAllText(@"filter js/testFilter.js"); script.Add(res);
+                res = File.ReadAllText(@"filter js/logFilter.js"); script.Add(res);
+                res = File.ReadAllText(@"filter js/stepFilter.js"); script.Add(res);
+                body.Add(script);
+            }
+            else
+            {
+                var jsCustom = new XElement("script", "", new XAttribute("src", "filter js/init.js"));
+                var jsCustom1 = new XElement("script", "", new XAttribute("src", "filter js/filter.js"));
+                var jsCustom2 = new XElement("script", "", new XAttribute("src", "filter js/testFilter.js"));
+                var jsCustom3 = new XElement("script", "", new XAttribute("src", "filter js/logFilter.js"));
+                var jsCustom4 = new XElement("script", "", new XAttribute("src", "filter js/stepFilter.js"));
+                body.Add(jsCustom, jsCustom1, jsCustom2, jsCustom3, jsCustom4);
+            }
 
             return body;
         }
