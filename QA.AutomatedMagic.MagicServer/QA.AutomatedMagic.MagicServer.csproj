@@ -133,6 +133,9 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MagicProjectController.cs" />
     <Compile Include="Controllers\MagicSolutionController.cs" />
+    <Compile Include="Controllers\Vs\VsMagicController.cs" />
+    <Compile Include="Controllers\Vs\VsProjectController.cs" />
+    <Compile Include="Controllers\Vs\VsReferencesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -193,6 +196,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\VsProject\" />
+    <Folder Include="Views\VsReferences\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -203,6 +208,10 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QA.AutomatedMagic.Core\QA.AutomatedMagic.Core.csproj">
+      <Project>{caf57862-9351-438f-8356-cea1d24dc739}</Project>
+      <Name>QA.AutomatedMagic.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QA.AutomatedMagic\QA.AutomatedMagic.csproj">
       <Project>{dd5e0bdd-2dba-4aa2-bdd3-9df87487257b}</Project>
       <Name>QA.AutomatedMagic</Name>

@@ -177,7 +177,7 @@
             Members.Add(member);
         }
 
-        public object Parse(XElement source, bool isAssignableTypesAllowed = false)
+        public IMetaObject Parse(XElement source, bool isAssignableTypesAllowed = false)
         {
             if (isAssignableTypesAllowed)
             {
@@ -190,7 +190,7 @@
                 return assignableType.Parse(source, false);
             }
 
-            var createdObject = Activator.CreateInstance(TargetType);
+            var createdObject = (IMetaObject)Activator.CreateInstance(TargetType);
 
             var parsedMembersDict = new Dictionary<MetaTypeMember, bool>();
             Members.ForEach(m => parsedMembersDict.Add(m, false));
@@ -199,6 +199,15 @@
             {
                 var memberToParse = parsedMembersDict.First(m => !m.Value).Key;
                 ParseMember(source, createdObject, parsedMembersDict, memberToParse);
+            }
+
+            try
+            {
+                createdObject.MetaInit();
+            }
+            catch (Exception ex)
+            {
+                throw new AutomatedMagicException("Error occurred during MetaInitialziation", ex);
             }
 
             return createdObject;
