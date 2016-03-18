@@ -3,18 +3,24 @@
   <context>
 
     <managers>
-      <manager type="WebDriverManager">
+      <manager type="ApiManager"></manager>
+      <manager type="AemUserManager">
         <Config>
-          <FirefoxWebDriverConfig>
-            <ProfileDirectoryPath>c:\tmp\ffprofiles</ProfileDirectoryPath>
-          </FirefoxWebDriverConfig>
+          <AemUserManagerConfig>
+            <Admin>
+              <Username>admin</Username>
+              <Password>admin</Password>
+            </Admin>
+            <UserPath>/home/users/autotest</UserPath>
+            <GroupPath>/home/groups/autotest</GroupPath>
+          </AemUserManagerConfig>
         </Config>
       </manager>
-      <manager type="ApiManager"></manager>
+
       <manager type="GitHubTutorialManager">
         <Config>
           <GitHubTutorialManagerConfig>
-            <TempFolderPath>c:\temp\tutorials</TempFolderPath>
+            <TempFolderPath>c:\temp\tutorialstemp</TempFolderPath>
           </GitHubTutorialManagerConfig>
         </Config>
       </manager>
@@ -27,10 +33,22 @@
           </GitManagerConfig>
         </Config>
       </manager>
+
       <manager type="AemPageManager"></manager>
+
+      <manager type="WebDriverManager">
+        <Config>
+          <FirefoxWebDriverConfig>
+            <ProfileDirectoryPath>c:\tmp\ffprofiles</ProfileDirectoryPath>
+          </FirefoxWebDriverConfig>
+        </Config>
+      </manager>
       <manager type="LoginPageManager"></manager>
       <manager type="TutorialCatalogPageManager"></manager>
       <manager type="InsertNewComponentFormManager"></manager>
+
+      <manager type="JobManager"></manager>
+
     </managers>
 
     <contextItems>
@@ -47,215 +65,353 @@
   </context>
 
   <Steps>
-    <TestStep name="CloneGitRepository" description="Clone Git repository">
-      <manager>GitManager</manager>
-      <command>Clone</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Context">GitRepositoryConfig.TutorialRepo</arg>
-      </args>
-    </TestStep>
-    <TestStep name="GenerateTutorial" description="Generate tutorial to local folder">
-      <manager>GitHubTutorialManager</manager>
-      <command>GenerateTutorialPage</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Context">GitHubTutorial.Tutorial</arg>
-      </args>
-    </TestStep>
-    <TestStep name="CopyTutorialToGitRepository" description="Copy tutorial from local folder to local git repository">
-      <manager>GitHubTutorialManager</manager>
-      <command>CopyToGitRepository</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Context">GitHubTutorial.TutorialRepo</arg>
-        <arg type="Context">GitRepositoryConfig.Tutorial</arg>
-      </args>
-    </TestStep>
-    <TestStep name="UpdateRemoteRepo" description="Update remote Git repository">
-      <manager>GitManager</manager>
-      <command>CommitAndPushAll</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Context">GitRepositoryConfig.TutorialRepo</arg>
-        <arg type="Value">Commit git hub tutorial</arg>
-      </args>
-    </TestStep>
-    <TestStep name="CreateAemTutorialPage" description="Create Tutorial page on Author">
-      <manager>AemPageManager</manager>
-      <command>CreatePage</command>
-      <order>CasePre</order>
+
+    <TestStepGroup name="PrepareAemUserForTests" description="Prepare Aem user for tests">
+      <order>PrePre</order>
+      <Steps>
+
+        <TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
+          <manager>AemUserManager</manager>
+          <command>CreateUser</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
+        <TestStep name="AuthorizeUserInAuthor" description="Authorize created user in Aem Author">
+          <manager>AemUserManager</manager>
+          <command>CreateUser</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
+
+      </Steps>
+    </TestStepGroup>
+    <TestStepGroup name="PrepareGitHubTutorial" description="Prepare GitHubTutorial for tests">
+      <order>PrePre</order>
+      <Steps>
+
+        <TestStep name="GenerateTutorial" description="Generate tutorial to local folder">
+          <manager>GitHubTutorialManager</manager>
+          <command>GenerateTutorial</command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+          </args>
+        </TestStep>
+        <TestStep name="CloneGitRepository" description="Clone Git repository">
+          <manager>GitManager</manager>
+          <command>Clone</command>
+          <args>
+            <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
+          </args>
+        </TestStep>
+        <TestStep name="CopyTutorialToGitRepository" description="Copy tutorial from local folder to local git repository">
+          <manager>GitHubTutorialManager</manager>
+          <command>CopyToGitRepository</command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
+          </args>
+        </TestStep>
+        <TestStep name="UpdateRemoteRepo" description="Update remote Git repository">
+          <manager>GitManager</manager>
+          <command>CommitAndPushAll</command>
+          <args>
+            <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
+            <arg type="Value">Commit git hub tutorial</arg>
+          </args>
+        </TestStep>
+
+      </Steps>
+    </TestStepGroup>
+    <TestStepGroup name="PrepareAemTutorialPage" description="Prepare Tutorial page for tests">
+      <order>PrePre</order>
+      <Steps>
+
+        <TestStep name="CreateAemTutorialPage" description="Create Tutorial page on Author">
+          <manager>AemPageManager</manager>
+          <command>CreatePage</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+          </args>
+        </TestStep>
+
+        <TestStepGroup name="SetUpTutorialPage" description="SetUp created Tutorial page">
+          <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
+            <manager>AemPageManager</manager>
+            <command>OpenPageOnAuthor</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">AemPage.TutorialPage</arg>
+              <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            </args>
+          </TestStep>
+          <TestStep name="Login" description="Login to Aem">
+            <manager>LoginPageManager</manager>
+            <command>Login</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">AemUser.AutotestUser</arg>
+            </args>
+          </TestStep>
+          <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>SetUpTutorialCatalog</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">TutorialCatalogComponentConfig.TutorialCatalogComponentConfig</arg>
+            </args>
+          </TestStep>
+          <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>AddContainerFinderComponent</command>
+            <order>CasePre</order>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Manager">InsertNewComponentFormManager</arg>
+            </args>
+          </TestStep>
+          <TestStep name="SetUpContainerFinder" description="Setup ContainerFinder component">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>SetUpContainerFinder</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">ContainerFinderComponentConfig.ContainerFinderComponentConfig</arg>
+            </args>
+          </TestStep>
+          <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>AddFinderResultsComponent</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Manager">InsertNewComponentFormManager</arg>
+            </args>
+          </TestStep>
+          <TestStep name="SetUpFinderResults" description="Setup FinderResults component">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>SetUpFinderResults</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">FinderResultsComponentConfig.FinderResultsComponentConfig</arg>
+            </args>
+          </TestStep>
+          <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>AddFacetsComponent</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Manager">InsertNewComponentFormManager</arg>
+            </args>
+          </TestStep>
+          <TestStep name="SetUpFacets" description="Setup Facets component">
+            <manager>TutorialCatalogPageManager</manager>
+            <command>SetUpFacets</command>
+            <args>
+              <arg type="Manager">WebDriverManager</arg>
+              <arg type="Context">FacetsComponentConfig.FacetsComponentConfig</arg>
+            </args>
+          </TestStep>
+        </TestStepGroup>
+
+      </Steps>
+    </TestStepGroup>
+
+    <TestStepGroup name="ActivateTutorialCatalogPage" desctiption="Activate created tutorial catalog page">
+      <order>PrePre</order>
+      <Steps>
+        <TestStep name="ActivateTutorialCatalogPage" desctiption="Activate created Tutorial catalog page">
+          <Manager>AemPageManager</Manager>
+          <Command>ActivatePage</Command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+          </args>
+        </TestStep>
+        <TestStep name="WaitForPageActivation" desctiption="Wait until created Tutorial catalog page being activated">
+          <Manager>AemPageManager</Manager>
+          <Command>WaitForPageActivation</Command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+          </args>
+        </TestStep>
+      </Steps>
+    </TestStepGroup>
+
+    <TestStep name="RunGitHubJob" description="Run GitHub job for tutorial export">
+      <Manager>JobManager</Manager>
+      <Command>RunGitHubJob</Command>
+      <Order>PrePre</Order>
       <args>
         <arg type="Manager">ApiManager</arg>
-        <arg type="Context">AemPage.AutotestTutorialPage</arg>
         <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
       </args>
     </TestStep>
-    <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
-      <manager>AemPageManager</manager>
-      <command>OpenPageOnAuthor</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Context">AemPage.AutotestTutorialPage</arg>
-        <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-      </args>
-    </TestStep>
-    
-    <TestStep name="Login" description="Login to Aem">
-      <manager>LoginPageManager</manager>
-      <command>Login</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Value">admin</arg>
-        <arg type="Value">admin</arg>
-      </args>
-    </TestStep>
 
-    <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>SetUpTutorialCatalog</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Context">TutorialCatalogComponentConfig.TutorialCatalogComponentConfig</arg>
-      </args>
-    </TestStep>
+    <TestStepGroup name="VeifyChildrenPagesActivation" description="Verify that children page have staus ACTIVATE and wait until their activation completed">
+      <Order>PrePre</Order>
+      <Steps>
+        <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
+          <Manager>AemPageManager</Manager>
+          <Command>VerifyChildrenPageStatus</Command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Value">ACTIVATE</arg>
+          </args>
+        </TestStep>
+        <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
+          <Manager>AemPageManager</Manager>
+          <Command>WaitForChildPagesActivation</Command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+          </args>
+        </TestStep>
+      </Steps>
+    </TestStepGroup>
 
-    <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>AddContainerFinderComponent</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Manager">InsertNewComponentFormManager</arg>
-      </args>
-    </TestStep>
-    <TestStep name="SetUpContainerFinder" description="Setup ContainerFinder component">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>SetUpContainerFinder</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Context">ContainerFinderComponentConfig.ContainerFinderComponentConfig</arg>
-      </args>
-    </TestStep>
+    <TestGroup name="GetAndVerifyIssues" description="Get issues and verify with tutorial md files">
+      <Order>CasePost</Order>
+      <Steps>
+        <TestStep name="GetGitHubIssues" description="Get GitHub issues for tutroial repository">
+          <Manager>GitManager</Manager>
+          <Command>GetIssues</Command>
+          <args>
+            <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
+          </args>
+        </TestStep>
+        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
+          <Manager>GitHubTutorialManager</Manager>
+          <Command>VerifyTutorialIssues</Command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="StepResult">GetAndVeifyIssues.GetGitHubIssues</arg>
+          </args>
+        </TestStep>
+      </Steps>
+    </TestGroup>
 
-    <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>AddFinderResultsComponent</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Manager">InsertNewComponentFormManager</arg>
-      </args>
-    </TestStep>
-    <TestStep name="SetUpFinderResults" description="Setup FinderResults component">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>SetUpFinderResults</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Context">FinderResultsComponentConfig.FinderResultsComponentConfig</arg>
-      </args>
-    </TestStep>
+    <TestGroup name="GetAndVerifyTutorialCardsOnAuthor" description="Get cards and verify with tutorial md files on Author">
+      <Order>CasePost</Order>
+      <Steps>
+        <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
+          <Manager>TutorialCatalogPageManager</Manager>
+          <Command>GetTutorialCardsOnAuthor</Command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+          </args>
+        </TestStep>
+        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
+          <Manager>GitHubTutorialManager</Manager>
+          <Command>VerifyTutorialCards</Command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialCardsFromTutorialPage</arg>
+          </args>
+        </TestStep>
+      </Steps>
+    </TestGroup>
 
-    <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>AddFacetsComponent</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Manager">InsertNewComponentFormManager</arg>
-      </args>
-    </TestStep>
-    <TestStep name="SetUpFacets" description="Setup Facets component">
-      <manager>TutorialCatalogPageManager</manager>
-      <command>SetUpFacets</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">WebDriverManager</arg>
-        <arg type="Context">FacetsComponentConfig.FacetsComponentConfig</arg>
-      </args>
-    </TestStep>
+    <TestGroup name="GetAndVerifyTutorialCardsOnPublish" description="Get cards and verify with tutorial md files on Author">
+      <Order>CasePost</Order>
+      <Steps>
+        <TestStep name="OpenCreatedPageOnPubslih" description="Open created tutorial page on Pubslih">
+          <manager>AemPageManager</manager>
+          <command>OpenPageOnPubslih</command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+            <arg type="Context">AemPage.TutorialPage</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
+        <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
+          <Manager>TutorialCatalogPageManager</Manager>
+          <Command>GetTutorialCardsOnPubslih</Command>
+          <args>
+            <arg type="Manager">WebDriverManager</arg>
+          </args>
+        </TestStep>
+        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
+          <Manager>GitHubTutorialManager</Manager>
+          <Command>VerifyTutorialCards</Command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialCardsFromTutorialPage</arg>
+          </args>
+        </TestStep>
+      </Steps>
+    </TestGroup>
 
-    <TestStep name="ActivatePage" description="Activate Tutorial page">
-      <manager>AemPageManager</manager>
-      <command>ActivatePage</command>
-      <order>CasePre</order>
-      <args>
-        <arg type="Manager">ApiManager</arg>
-        <arg type="Context">AemPage.AutotestTutorialPage</arg>
-        <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-      </args>
-    </TestStep>
   </Steps>
 
-  <Tests>
+  <Suites>
 
-    <TestCase name="CreateSimpleTutorial" description="Create simple tutorial page">
+    <TestSuite name="CreateUpdateTutorial" description="Create/Update new tutorial">
 
       <context>
         <contextItems>
+
+          <DynamicContextObjectItem name="Users">
+            <DynamicObjects>
+              <AemUser uniqueName="AutotestUser">
+                <Username>
+                  <DynamicNode>
+                    <Node>
+                      <ComplexNode>
+                        <Nodes>
+                          <ValueNode>autotest_user_</ValueNode>
+                          <GenerationNode>
+                            <Generator>
+                              <StringGenerator></StringGenerator>
+                            </Generator>
+                          </GenerationNode>
+                        </Nodes>
+                      </ComplexNode>
+                    </Node>
+                  </DynamicNode>
+                </Username>
+                <Password>autotest</Password>
+                <FirstName>autotest</FirstName>
+                <LastName>autotest</LastName>
+                <Mail>autotest@mail.com</Mail>
+              </AemUser>
+            </DynamicObjects>
+          </DynamicContextObjectItem>
+
           <ContextObjectItem name="GitRepositories configs">
             <objects>
-              <GitRepositoryConfig uniqueName="TutorialRepo">
-                <RemoteRepository>https://github.com/ksAutotests/SimpleTutorial</RemoteRepository>
-                <LocalRepository>c:\tmp\localgitrepo\SimpleTutorial</LocalRepository>
+              <GitRepositoryConfig uniqueName="TutorialRepository">
+                <RemoteRepository>https://github.com/ksAutotests/CreateUpdateTutorial</RemoteRepository>
+                <LocalRepository>c:\tmp\localgitrepo\CreateUpdateTutorial</LocalRepository>
               </GitRepositoryConfig>
             </objects>
           </ContextObjectItem>
-          <ContextObjectItem name="GitHubTutorials config">
-            <objects>
-              <GitHubTutorial UniqueName="Tutorial">
 
-                <Folder>tutorials</Folder>
-
-                <GitHubTutorialItems>
-
-                  <GitHubTutorialItem>
-                    <FolderName>SimpleTutorials</FolderName>
-                    <GitHubTutorialFiles>
-                      <GitHubTutorialFile>
-                        <Name>SimpleTutorial1</Name>
-                        <Title>SimpleTutorial1 Title</Title>
-                        <Description>SimpleTutorial1 Description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>SimpleTutorial1 Content</Content>
-                      </GitHubTutorialFile>
-                      <GitHubTutorialFile>
-                        <Name>SimpleTutorial2</Name>
-                        <Title>SimpleTutorial2 Title</Title>
-                        <Description>SimpleTutorial2 Description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>SimpleTutorial2 Content</Content>
-                      </GitHubTutorialFile>
-                    </GitHubTutorialFiles>
-                  </GitHubTutorialItem>
-
-                </GitHubTutorialItems>
-
-              </GitHubTutorial>
-            </objects>
-          </ContextObjectItem>
           <DynamicContextObjectItem name="AemPages configs">
             <DynamicObjects>
-              <AemPage uniqueName="AutotestTutorialPage">
+              <AemPage uniqueName="TutorialPage">
                 <title>
                   <DynamicNode>
                     <Node>
                       <ComplexNode>
                         <Nodes>
-                          <ValueNode>AutoTestTutorialTry_</ValueNode>
+                          <ValueNode>autotest-Tutorial-</ValueNode>
                           <GenerationNode>
                             <Generator>
                               <StringGenerator></StringGenerator>
@@ -271,32 +427,8 @@
               </AemPage>
             </DynamicObjects>
           </DynamicContextObjectItem>
-          <ContextObjectItem name="Components configs">
-            <objects>
 
-              <FinderResultsComponentConfig uniqueName="FinderResultsComponentConfig">
-                <Pagination>5</Pagination>
-                <ShowDescription>True</ShowDescription>
-                <DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
-                <DefaultPageIcon>/content/dam/application/shared/icons/icon_gold_document_nopadding.svg</DefaultPageIcon>
-                <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>
-                <AlphabeticalSorting>Both</AlphabeticalSorting>
-                <SortingByDate>Both</SortingByDate>
-              </FinderResultsComponentConfig>
-
-              <FacetsComponentConfig uniqueName="FacetsComponentConfig">
-                <Namespaces>
-                  <namespace>/etc/tags/tutorial/interest</namespace>
-                  <namespace>/etc/tags/tutorial/product</namespace>
-                  <namespace>/etc/tags/tutorial/technology</namespace>
-                </Namespaces>
-                <HideFacets>True</HideFacets>
-                <TypeOfSelection>CheckBoxes</TypeOfSelection>
-              </FacetsComponentConfig>
-
-            </objects>
-          </ContextObjectItem>
-          <DynamicContextObjectItem name="Dynamic items">
+          <DynamicContextObjectItem name="Dynamic Component configs">
             <DynamicObjects>
 
               <TutorialCatalogComponentConfig uniqueName="TutorialCatalogComponentConfig">
@@ -325,112 +457,24 @@
 
             </DynamicObjects>
           </DynamicContextObjectItem>
-        </contextItems>
-      </context>
 
-    </TestCase>
-
-    <TestCase name="CreateTutorialWithoutDescription" description="Create tutorial page with tutorial without description">
-
-      <context>
-        <contextItems>
-          <ContextObjectItem name="GitRepositories configs">
-            <objects>
-              <GitRepositoryConfig uniqueName="TutorialRepo">
-                <RemoteRepository>https://github.com/ksAutotests/TutorialTest</RemoteRepository>
-                <LocalRepository>c:\tmp\localgitrepo</LocalRepository>
-              </GitRepositoryConfig>
-            </objects>
-          </ContextObjectItem>
-          <ContextObjectItem name="GitHubTutorials config">
-            <objects>
-              <GitHubTutorial UniqueName="Tutorial">
-
-                <Folder>tutorials</Folder>
-
-                <GitHubTutorialItems>
-
-                  <GitHubTutorialItem>
-                    <FolderName>tutorial1</FolderName>
-                    <GitHubTutorialFiles>
-                      <GitHubTutorialFile>
-                        <Name>tutorial1test1</Name>
-                        <Title>Some_tutorial1test1_Title</Title>
-                        <Description>Some tutorial1test1 description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>Some tutorial1test1 content</Content>
-                      </GitHubTutorialFile>
-                      <GitHubTutorialFile>
-                        <Name>tutorial1tes2</Name>
-                        <Title>Some_tutorial1tes2_Title</Title>
-                        <Description>Some tutorial1tes2 description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>Some tutorial1tes2 content</Content>
-                      </GitHubTutorialFile>
-                    </GitHubTutorialFiles>
-                  </GitHubTutorialItem>
-
-                  <GitHubTutorialItem>
-                    <FolderName>tutorial2</FolderName>
-                    <GitHubTutorialFiles>
-                      <GitHubTutorialFile>
-                        <Name>tutorial2test1</Name>
-                        <Title>Some_tutorial2test1_Title</Title>
-                        <Description>Some tutorial2test1 description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>Some tutorial2test1 content</Content>
-                      </GitHubTutorialFile>
-                      <GitHubTutorialFile>
-                        <Name>tutorial2tes2</Name>
-                        <Title>Some_tutorial2tes2_Title</Title>
-                        <Description>Some tutorial2tes2 description</Description>
-                        <Tags>
-                          <tag>tag1</tag>
-                          <tag>tag2</tag>
-                          <tag>tag3</tag>
-                        </Tags>
-                        <Content>Some tutorial2tes2 content</Content>
-                      </GitHubTutorialFile>
-                    </GitHubTutorialFiles>
-                  </GitHubTutorialItem>
-
-                </GitHubTutorialItems>
-
-              </GitHubTutorial>
-            </objects>
-          </ContextObjectItem>
-          <ContextObjectItem name="AemPages configs">
-            <objects>
-              <AemPage uniqueName="AutotestTutorialPage">
-                <title>KsAutoTestTutorialTry</title>
-                <parentPath>/content/sapdx/website/languages/en/developer</parentPath>
-                <template>/apps/sapdx/templates/tutorial/tutorialPage</template>
-              </AemPage>
-            </objects>
-          </ContextObjectItem>
           <ContextObjectItem name="Components configs">
             <objects>
 
               <FinderResultsComponentConfig uniqueName="FinderResultsComponentConfig">
                 <Pagination>5</Pagination>
-                <ShowDescription>True</ShowDescription>
                 <DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
                 <DefaultPageIcon>/content/dam/application/shared/icons/icon_gold_document_nopadding.svg</DefaultPageIcon>
                 <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>
+
                 <AlphabeticalSorting>Both</AlphabeticalSorting>
                 <SortingByDate>Both</SortingByDate>
+                <DefaultSorting>Newest</DefaultSorting>
+
+                <ResultView>Grid</ResultView>
+                <ShowDescription>True</ShowDescription>
+                <ShowTags>True</ShowTags>
+                <ShowUpdateDate>True</ShowUpdateDate>
               </FinderResultsComponentConfig>
 
               <FacetsComponentConfig uniqueName="FacetsComponentConfig">
@@ -445,31 +489,131 @@
 
             </objects>
           </ContextObjectItem>
-          <DynamicContextObjectItem name="Dynamic items">
-            <DynamicObjects>
 
-              <TutorialCatalogComponentConfig uniqueName="TutorialCatalogComponentConfig">
-                <TutorialCardPath>
-                  <DynamicNode type="Context">GitRepositoryConfig.testRepo1.RemoteRepository</DynamicNode>
-                </TutorialCardPath>
-                <HideFacetsWithoutResults>True</HideFacetsWithoutResults>
-                <ExternalSource>True</ExternalSource>
-              </TutorialCatalogComponentConfig>
-
-              <ContainerFinderComponentConfig uniqueName="ContainerFinderComponentConfig">
-                <PagePaths>
-                  <path>
-                    <DynamicNode type="Context">AemPage.AutotestTutorialPage.Path</DynamicNode>
-                  </path>
-                </PagePaths>
-              </ContainerFinderComponentConfig>
-
-            </DynamicObjects>
-          </DynamicContextObjectItem>
         </contextItems>
       </context>
 
-    </TestCase>
+      <Tests>
 
-  </Tests>
+        <Test name="CreateTutorial" description="Create tutorial">
+
+          <context>
+            <contextItems>
+
+              <ContextObjectItem name="GitHubTutorials config">
+                <objects>
+                  <GitHubTutorial UniqueName="Tutorial">
+
+                    <Folder>tutorials</Folder>
+
+                    <GitHubTutorialItems>
+
+                      <GitHubTutorialItem>
+                        <FolderName>SimpleTutorials</FolderName>
+                        <GitHubTutorialFiles>
+                          <GitHubTutorialFile>
+                            <Name>SimpleTutorial1</Name>
+                            <Title>SimpleTutorial1 Title</Title>
+                            <Description>SimpleTutorial1 Description</Description>
+                            <Tags>
+                              <tag>
+                                <tag>tutorials:technology/github</tag>
+                              </tag>
+                              <tag>
+                                <tag>tutorials:technology/java</tag>
+                              </tag>
+                              <tag>
+                                <tag>tutorials:product/mobile</tag>
+                              </tag>
+                            </Tags>
+                            <Content>SimpleTutorial1 Content</Content>
+                          </GitHubTutorialFile>
+                          <GitHubTutorialFile>
+                            <Name>SimpleTutorial2</Name>
+                            <Title>SimpleTutorial2 Title</Title>
+                            <Description>SimpleTutorial2 Description</Description>
+                            <Tags>
+                              <tag>
+                                <tag>tutorials:technology/github</tag>
+                              </tag>
+                              <tag>
+                                <tag>tutorials:interest/bigData</tag>
+                              </tag>
+                            </Tags>
+                            <Content>SimpleTutorial2 Content</Content>
+                          </GitHubTutorialFile>
+                        </GitHubTutorialFiles>
+                      </GitHubTutorialItem>
+
+                    </GitHubTutorialItems>
+
+                  </GitHubTutorial>
+                </objects>
+              </ContextObjectItem>
+
+            </contextItems>
+          </context>
+
+        </Test>
+
+        <Test name="UpdateTutorial" description="Update tutorial">
+
+          <context>
+            <contextItems>
+
+              <ContextObjectItem name="GitHubTutorials config">
+                <objects>
+                  <GitHubTutorial UniqueName="Tutorial">
+
+                    <Folder>tutorials</Folder>
+
+                    <GitHubTutorialItems>
+
+                      <GitHubTutorialItem>
+                        <FolderName>SimpleTutorials</FolderName>
+                        <GitHubTutorialFiles>
+                          <GitHubTutorialFile>
+                            <Name>SimpleTutorial1</Name>
+                            <Title>SimpleTutorial1 Updated Title</Title>
+                            <Description>SimpleTutorial1 Updated Description</Description>
+                            <Tags>
+                              <tag>
+                                <tag>tutorials:technology/github</tag>
+                              </tag>
+                              <tag>
+                                <tag>tutorials:technology/java</tag>
+                              </tag>
+                            </Tags>
+                            <Content>SimpleTutorial1 Updated Content</Content>
+                          </GitHubTutorialFile>
+                          <GitHubTutorialFile>
+                            <Name>SimpleTutorial2</Name>
+                            <Title>SimpleTutorial2 Updated Title</Title>
+                            <Description>SimpleTutorial2 Updated Description</Description>
+                            <Tags>
+                              <tag>
+                                <tag>tutorials:technology/github</tag>
+                              </tag>
+                            </Tags>
+                            <Content>SimpleTutorial2 Updated Content</Content>
+                          </GitHubTutorialFile>
+                        </GitHubTutorialFiles>
+                      </GitHubTutorialItem>
+
+                    </GitHubTutorialItems>
+
+                  </GitHubTutorial>
+                </objects>
+              </ContextObjectItem>
+
+            </contextItems>
+          </context>
+
+        </Test>
+
+      </Tests>
+
+    </TestSuite>
+
+  </Suites>
 </Project>
