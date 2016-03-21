@@ -366,7 +366,7 @@
             //NotExecuted, Unknown, Passed, Failed, Skipped
             var bdiv = new XElement("div",
                 new XAttribute("class", "step-fltr-btns"),
-                new XElement("button", "All", new XAttribute("class", "btn step-fltr-btn-all"), new XAttribute("filter", "passed failed skipped unknown")),
+                new XElement("button", "All", new XAttribute("class", "btn step-fltr-btn-all"), new XAttribute("filter", "passed failed skipped unknown notexecuted")),
                 new XElement("button", "NotExecuted", new XAttribute("class", "btn step-fltr-btn-notexctd"), new XAttribute("filter", "notexecuted")),
                 new XElement("button", "Passed", new XAttribute("class", "btn step-fltr-btn-psd"), new XAttribute("filter", "passed")),
                 new XElement("button", "Failed", new XAttribute("class", "btn step-fltr-btn-fld"), new XAttribute("filter", "failed")),
