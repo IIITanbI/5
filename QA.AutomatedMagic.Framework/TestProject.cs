@@ -20,6 +20,7 @@
         {
             base.Build();
             ClearSteps();
+            BuildSteps();
         }
 
         public override void Execute()

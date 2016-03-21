@@ -106,7 +106,6 @@
 
         public override void Build()
         {
-            if (!(Order == TestStepOrder.Pre || Order == TestStepOrder.Case || Order == TestStepOrder.Post)) return;
             TestManager.Log.INFO($"Start building item: {this}");
             base.Build();
 

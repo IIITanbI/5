@@ -64,6 +64,34 @@
           </LandscapeConfig>
         </objects>
       </ContextObjectItem>
+
+      <DynamicContextObjectItem name="Users">
+        <DynamicObjects>
+          <AemUser uniqueName="AutotestUser">
+            <Username>
+              <DynamicNode>
+                <Node>
+                  <ComplexNode>
+                    <Nodes>
+                      <ValueNode>autotest_user_</ValueNode>
+                      <GenerationNode>
+                        <Generator>
+                          <StringGenerator></StringGenerator>
+                        </Generator>
+                      </GenerationNode>
+                    </Nodes>
+                  </ComplexNode>
+                </Node>
+              </DynamicNode>
+            </Username>
+            <Password>autotest</Password>
+            <FirstName>autotest</FirstName>
+            <LastName>autotest</LastName>
+            <Mail>autotest@mail.com</Mail>
+          </AemUser>
+        </DynamicObjects>
+      </DynamicContextObjectItem>
+      
     </contextItems>
 
   </context>
@@ -85,6 +113,15 @@
         <TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
           <manager>AemUserManager</manager>
           <command>CreateUser</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
+        <TestStep name="ActivateAutotestUser" description="Create Aem user to perform test uder it">
+          <manager>AemUserManager</manager>
+          <command>ActivateUser</command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemUser.AutotestUser</arg>
@@ -394,33 +431,6 @@
 
       <context>
         <contextItems>
-
-          <DynamicContextObjectItem name="Users">
-            <DynamicObjects>
-              <AemUser uniqueName="AutotestUser">
-                <Username>
-                  <DynamicNode>
-                    <Node>
-                      <ComplexNode>
-                        <Nodes>
-                          <ValueNode>autotest_user_</ValueNode>
-                          <GenerationNode>
-                            <Generator>
-                              <StringGenerator></StringGenerator>
-                            </Generator>
-                          </GenerationNode>
-                        </Nodes>
-                      </ComplexNode>
-                    </Node>
-                  </DynamicNode>
-                </Username>
-                <Password>autotest</Password>
-                <FirstName>autotest</FirstName>
-                <LastName>autotest</LastName>
-                <Mail>autotest@mail.com</Mail>
-              </AemUser>
-            </DynamicObjects>
-          </DynamicContextObjectItem>
 
           <ContextObjectItem name="GitRepositories configs">
             <objects>
