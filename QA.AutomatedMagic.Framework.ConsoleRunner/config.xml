@@ -65,7 +65,19 @@
         </objects>
       </ContextObjectItem>
 
-      <DynamicContextObjectItem name="Users">
+      <ContextObjectItem name="Users">
+        <objects>
+          <AemUser uniqueName="AutotestUser">
+            <Username>admin</Username>
+            <Password>admin</Password>
+            <FirstName>autotest</FirstName>
+            <LastName>autotest</LastName>
+            <Mail>autotest@mail.com</Mail>
+          </AemUser>
+        </objects>
+      </ContextObjectItem>
+
+      <!--<DynamicContextObjectItem name="Users">
         <DynamicObjects>
           <AemUser uniqueName="AutotestUser">
             <Username>
@@ -90,7 +102,7 @@
             <Mail>autotest@mail.com</Mail>
           </AemUser>
         </DynamicObjects>
-      </DynamicContextObjectItem>
+      </DynamicContextObjectItem>-->
       
     </contextItems>
 
@@ -110,7 +122,7 @@
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
         </TestStep>
-        <TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
+        <!--<TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
           <manager>AemUserManager</manager>
           <command>CreateUser</command>
           <args>
@@ -127,10 +139,10 @@
             <arg type="Context">AemUser.AutotestUser</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
-        </TestStep>
+        </TestStep>-->
         <TestStep name="AuthorizeUserInAuthor" description="Authorize created user in Aem Author">
           <manager>AemUserManager</manager>
-          <command>CreateUser</command>
+          <command>AuthorizeUserInAuthor</command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemUser.AutotestUser</arg>
@@ -312,6 +324,7 @@
       <args>
         <arg type="Manager">ApiManager</arg>
         <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+        <arg type="Context">AemUser.AutotestUser</arg>
       </args>
     </TestStep>
 
@@ -320,7 +333,7 @@
       <Steps>
         <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
           <Manager>AemPageManager</Manager>
-          <Command>VerifyChildrenPageStatus</Command>
+          <Command>VerifyChildrenPagesStatus</Command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemPage.TutorialPage</arg>
@@ -473,7 +486,7 @@
                 <TutorialCardPath>
                   <DynamicNode>
                     <Node>
-                      <ContextValueNode value="GitRepositoryConfig.testRepo1.RemoteRepository"></ContextValueNode>
+                      <ContextValueNode value="GitRepositoryConfig.TutorialRepository.RemoteRepository"></ContextValueNode>
                     </Node>
                   </DynamicNode>
                 </TutorialCardPath>
@@ -486,7 +499,7 @@
                   <path>
                     <DynamicNode>
                       <Node>
-                        <ContextValueNode value="AemPage.AutotestTutorialPage.Path"></ContextValueNode>
+                        <ContextValueNode value="AemPage.TutorialPage.Path"></ContextValueNode>
                       </Node>
                     </DynamicNode>
                   </path>
@@ -501,9 +514,9 @@
 
               <FinderResultsComponentConfig uniqueName="FinderResultsComponentConfig">
                 <Pagination>5</Pagination>
-                <DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
+                <!--<DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
                 <DefaultPageIcon>/content/dam/application/shared/icons/icon_gold_document_nopadding.svg</DefaultPageIcon>
-                <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>
+                <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>-->
 
                 <AlphabeticalSorting>Both</AlphabeticalSorting>
                 <SortingByDate>Both</SortingByDate>
@@ -534,7 +547,7 @@
       <Suites>
 
         <TestSuite name="CreateTutorial" description="Create tutorial">
-
+          <FailParentOnFail>True</FailParentOnFail>
           <StepMarks>
             <StepMark>PreparePage</StepMark>
           </StepMarks>

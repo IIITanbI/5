@@ -32,7 +32,6 @@
             Log.INFO($"Start executing {this}");
             Parent.Log.INFO($"Start executing {this}");
 
-
             var argObjs = new List<object>();
 
             #region Resolve arguments

@@ -122,6 +122,16 @@
             TestManager.Log.INFO($"Build was successfully completed for item: {this}");
         }
 
+        public override void Skip()
+        {
+            base.Skip();
+
+            foreach (var testStep in TestSteps)
+            {
+                testStep.Skip();
+            }
+        }
+
         public override Step GetTestInfo()
         {
             var si = base.GetTestInfo();

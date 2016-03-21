@@ -47,6 +47,11 @@
         }
         public abstract void Execute();
 
+        public virtual void Skip()
+        {
+            ItemStatus = TestItemStatus.Skipped;
+        }
+
         public override string ToString()
         {
             return $"{GetType().Name} : {Info}";
