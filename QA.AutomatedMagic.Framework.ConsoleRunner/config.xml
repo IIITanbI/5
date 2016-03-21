@@ -7,7 +7,7 @@
       <manager type="AemUserManager">
         <Config>
           <AemUserManagerConfig>
-            <Admin>
+            <Admin uniqueName="AdminUser">
               <Username>admin</Username>
               <Password>admin</Password>
             </Admin>
@@ -34,7 +34,11 @@
         </Config>
       </manager>
 
-      <manager type="AemPageManager"></manager>
+      <manager type="AemPageManager">
+        <Config>
+          <AemPageManagerConfig></AemPageManagerConfig>
+        </Config>
+      </manager>
 
       <manager type="WebDriverManager">
         <Config>
@@ -56,7 +60,7 @@
         <objects>
           <LandscapeConfig uniqueName="LandscapeConfig">
             <AuthorHostUrl>http://10.7.14.16:4502</AuthorHostUrl>
-            <PublisHostUrl>http://10.7.14.16:4502</PublisHostUrl>
+            <PublishHostUrl>http://10.7.14.16:4502</PublishHostUrl>
           </LandscapeConfig>
         </objects>
       </ContextObjectItem>
@@ -67,9 +71,17 @@
   <Steps>
 
     <TestStepGroup name="PrepareAemUserForTests" description="Prepare Aem user for tests">
-      <order>PrePre</order>
+      <order>Pre</order>
       <Steps>
 
+        <TestStep name="AuthorizeAdminInAuthor" description="Authorize Admin user in Aem Author">
+          <manager>AemUserManager</manager>
+          <command>AuthorizeAdmin</command>
+          <args>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
         <TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
           <manager>AemUserManager</manager>
           <command>CreateUser</command>
@@ -91,6 +103,7 @@
 
       </Steps>
     </TestStepGroup>
+
     <TestStepGroup name="PrepareGitHubTutorial" description="Prepare GitHubTutorial for tests">
       <order>PrePre</order>
       <Steps>
@@ -128,7 +141,11 @@
 
       </Steps>
     </TestStepGroup>
+
     <TestStepGroup name="PrepareAemTutorialPage" description="Prepare Tutorial page for tests">
+      <StepMarks>
+        <StepMark>PreparePage</StepMark>
+      </StepMarks>
       <order>PrePre</order>
       <Steps>
 
@@ -144,108 +161,110 @@
         </TestStep>
 
         <TestStepGroup name="SetUpTutorialPage" description="SetUp created Tutorial page">
-          <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
-            <manager>AemPageManager</manager>
-            <command>OpenPageOnAuthor</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">AemPage.TutorialPage</arg>
-              <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-            </args>
-          </TestStep>
-          <TestStep name="Login" description="Login to Aem">
-            <manager>LoginPageManager</manager>
-            <command>Login</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">AemUser.AutotestUser</arg>
-            </args>
-          </TestStep>
-          <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>SetUpTutorialCatalog</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">TutorialCatalogComponentConfig.TutorialCatalogComponentConfig</arg>
-            </args>
-          </TestStep>
-          <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>AddContainerFinderComponent</command>
-            <order>CasePre</order>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Manager">InsertNewComponentFormManager</arg>
-            </args>
-          </TestStep>
-          <TestStep name="SetUpContainerFinder" description="Setup ContainerFinder component">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>SetUpContainerFinder</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">ContainerFinderComponentConfig.ContainerFinderComponentConfig</arg>
-            </args>
-          </TestStep>
-          <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>AddFinderResultsComponent</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Manager">InsertNewComponentFormManager</arg>
-            </args>
-          </TestStep>
-          <TestStep name="SetUpFinderResults" description="Setup FinderResults component">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>SetUpFinderResults</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">FinderResultsComponentConfig.FinderResultsComponentConfig</arg>
-            </args>
-          </TestStep>
-          <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>AddFacetsComponent</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Manager">InsertNewComponentFormManager</arg>
-            </args>
-          </TestStep>
-          <TestStep name="SetUpFacets" description="Setup Facets component">
-            <manager>TutorialCatalogPageManager</manager>
-            <command>SetUpFacets</command>
-            <args>
-              <arg type="Manager">WebDriverManager</arg>
-              <arg type="Context">FacetsComponentConfig.FacetsComponentConfig</arg>
-            </args>
-          </TestStep>
+          <Steps>
+            <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
+              <manager>AemPageManager</manager>
+              <command>OpenPageOnAuthor</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">AemPage.TutorialPage</arg>
+                <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="Login" description="Login to Aem">
+              <manager>LoginPageManager</manager>
+              <command>Login</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">AemUser.AutotestUser</arg>
+              </args>
+            </TestStep>
+            <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>SetUpTutorialCatalog</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">TutorialCatalogComponentConfig.TutorialCatalogComponentConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>AddContainerFinderComponent</command>
+              <order>CasePre</order>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Manager">InsertNewComponentFormManager</arg>
+              </args>
+            </TestStep>
+            <TestStep name="SetUpContainerFinder" description="Setup ContainerFinder component">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>SetUpContainerFinder</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">ContainerFinderComponentConfig.ContainerFinderComponentConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>AddFinderResultsComponent</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Manager">InsertNewComponentFormManager</arg>
+              </args>
+            </TestStep>
+            <TestStep name="SetUpFinderResults" description="Setup FinderResults component">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>SetUpFinderResults</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">FinderResultsComponentConfig.FinderResultsComponentConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>AddFacetsComponent</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Manager">InsertNewComponentFormManager</arg>
+              </args>
+            </TestStep>
+            <TestStep name="SetUpFacets" description="Setup Facets component">
+              <manager>TutorialCatalogPageManager</manager>
+              <command>SetUpFacets</command>
+              <args>
+                <arg type="Manager">WebDriverManager</arg>
+                <arg type="Context">FacetsComponentConfig.FacetsComponentConfig</arg>
+              </args>
+            </TestStep>
+          </Steps>
         </TestStepGroup>
 
-      </Steps>
-    </TestStepGroup>
+        <TestStepGroup name="ActivateTutorialCatalogPage" description="Activate created tutorial catalog page">
+          <order>PrePre</order>
+          <Steps>
+            <TestStep name="ActivateTutorialCatalogPage" description="Activate created Tutorial catalog page">
+              <Manager>AemPageManager</Manager>
+              <Command>ActivatePage</Command>
+              <args>
+                <arg type="Manager">ApiManager</arg>
+                <arg type="Context">AemPage.TutorialPage</arg>
+                <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+                <arg type="Context">AemUser.AutotestUser</arg>
+              </args>
+            </TestStep>
+            <TestStep name="WaitForPageActivation" description="Wait until created Tutorial catalog page being activated">
+              <Manager>AemPageManager</Manager>
+              <Command>WaitForPageActivation</Command>
+              <args>
+                <arg type="Manager">ApiManager</arg>
+                <arg type="Context">AemPage.TutorialPage</arg>
+                <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+                <arg type="Context">AemUser.AutotestUser</arg>
+              </args>
+            </TestStep>
+          </Steps>
+        </TestStepGroup>
 
-    <TestStepGroup name="ActivateTutorialCatalogPage" desctiption="Activate created tutorial catalog page">
-      <order>PrePre</order>
-      <Steps>
-        <TestStep name="ActivateTutorialCatalogPage" desctiption="Activate created Tutorial catalog page">
-          <Manager>AemPageManager</Manager>
-          <Command>ActivatePage</Command>
-          <args>
-            <arg type="Manager">ApiManager</arg>
-            <arg type="Context">AemPage.TutorialPage</arg>
-            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-            <arg type="Context">AemUser.AutotestUser</arg>
-          </args>
-        </TestStep>
-        <TestStep name="WaitForPageActivation" desctiption="Wait until created Tutorial catalog page being activated">
-          <Manager>AemPageManager</Manager>
-          <Command>WaitForPageActivation</Command>
-          <args>
-            <arg type="Manager">ApiManager</arg>
-            <arg type="Context">AemPage.TutorialPage</arg>
-            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-            <arg type="Context">AemUser.AutotestUser</arg>
-          </args>
-        </TestStep>
       </Steps>
     </TestStepGroup>
 
@@ -286,7 +305,10 @@
       </Steps>
     </TestStepGroup>
 
-    <TestGroup name="GetAndVerifyIssues" description="Get issues and verify with tutorial md files">
+    <TestStepGroup name="GetAndVerifyIssues" description="Get issues and verify with tutorial md files">
+      <StepMarks>
+        <StepMark>VerifyIssues</StepMark>
+      </StepMarks>
       <Order>CasePost</Order>
       <Steps>
         <TestStep name="GetGitHubIssues" description="Get GitHub issues for tutroial repository">
@@ -305,9 +327,12 @@
           </args>
         </TestStep>
       </Steps>
-    </TestGroup>
+    </TestStepGroup>
 
-    <TestGroup name="GetAndVerifyTutorialCardsOnAuthor" description="Get cards and verify with tutorial md files on Author">
+    <TestStepGroup name="GetAndVerifyTutorialCardsOnAuthor" description="Get cards and verify with tutorial md files on Author">
+      <StepMarks>
+        <StepMark>VerifyCardsOnAuthor</StepMark>
+      </StepMarks>
       <Order>CasePost</Order>
       <Steps>
         <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
@@ -326,9 +351,12 @@
           </args>
         </TestStep>
       </Steps>
-    </TestGroup>
+    </TestStepGroup>
 
-    <TestGroup name="GetAndVerifyTutorialCardsOnPublish" description="Get cards and verify with tutorial md files on Author">
+    <TestStepGroup name="GetAndVerifyTutorialCardsOnPublish" description="Get cards and verify with tutorial md files on Author">
+      <StepMarks>
+        <StepMark>VerifyCardsOnPublish</StepMark>
+      </StepMarks>
       <Order>CasePost</Order>
       <Steps>
         <TestStep name="OpenCreatedPageOnPubslih" description="Open created tutorial page on Pubslih">
@@ -356,7 +384,7 @@
           </args>
         </TestStep>
       </Steps>
-    </TestGroup>
+    </TestStepGroup>
 
   </Steps>
 
@@ -493,9 +521,13 @@
         </contextItems>
       </context>
 
-      <Tests>
+      <Suites>
 
-        <Test name="CreateTutorial" description="Create tutorial">
+        <TestSuite name="CreateTutorial" description="Create tutorial">
+
+          <StepMarks>
+            <StepMark>PreparePage</StepMark>
+          </StepMarks>
 
           <context>
             <contextItems>
@@ -554,9 +586,27 @@
             </contextItems>
           </context>
 
-        </Test>
+          <Tests>
+            <TestCase name="VerifyIssues" description="Verify tutorial issues">
+              <StepMarks>
+                <StepMark>VerifyIssues</StepMark>
+              </StepMarks>
+            </TestCase>
+            <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
+              <StepMarks>
+                <StepMark>VerifyCardsOnAuthor</StepMark>
+              </StepMarks>
+            </TestCase>
+            <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
+              <StepMarks>
+                <StepMark>VerifyCardsOnPublish</StepMark>
+              </StepMarks>
+            </TestCase>
+          </Tests>
 
-        <Test name="UpdateTutorial" description="Update tutorial">
+        </TestSuite>
+
+        <TestSuite name="UpdateTutorial" description="Update tutorial">
 
           <context>
             <contextItems>
@@ -609,9 +659,27 @@
             </contextItems>
           </context>
 
-        </Test>
+          <Tests>
+            <TestCase name="VerifyIssues" description="Verify tutorial issues">
+              <StepMarks>
+                <StepMark>VerifyIssues</StepMark>
+              </StepMarks>
+            </TestCase>
+            <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
+              <StepMarks>
+                <StepMark>VerifyCardsOnAuthor</StepMark>
+              </StepMarks>
+            </TestCase>
+            <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
+              <StepMarks>
+                <StepMark>VerifyCardsOnPublish</StepMark>
+              </StepMarks>
+            </TestCase>
+          </Tests>
 
-      </Tests>
+        </TestSuite>
+
+      </Suites>
 
     </TestSuite>
 

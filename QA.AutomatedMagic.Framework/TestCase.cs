@@ -24,11 +24,16 @@
             ItemType = TestItemType.Test;
         }
 
+        public override void MetaInit()
+        {
+            base.MetaInit();
+            StepMarks.Add("TestCase");
+        }
+
         public override void Build()
         {
             TestManager.Log.INFO($"Start building item: {this}");
             base.Build();
-
 
             TestManager.Log.INFO($"Sort steps for item: {this}");
             var steps = TestSteps.ToList();
@@ -42,11 +47,6 @@
                 MergeSteps();
             }
 
-            if (ItemType == TestItemType.Test)
-                foreach (var testStep in TestSteps)
-                {
-                    testStep.Order = TestStepOrder.Case;
-                }
 
             TestManager.Log.INFO($"Start building TestSteps for item: {this}");
             TestManager.Log.INFO($"TestSteps count: {TestSteps.Count}");
@@ -67,10 +67,38 @@
             {
                 switch (parentStep.Order)
                 {
+                    case TestStepOrder.Pre:
+                    case TestStepOrder.Case:
+                    case TestStepOrder.Post:
+                        continue;
+                }
+
+                switch (ItemType)
+                {
+                    case TestItemType.Project:
+                    case TestItemType.Suite:
+                        break;
+                    case TestItemType.Test:
+
+                        switch (parentStep.Order)
+                        {
+                            case TestStepOrder.PrePre:
+                            case TestStepOrder.Pre:
+                            case TestStepOrder.PrePost:
+                            case TestStepOrder.PostPre:
+                            case TestStepOrder.Post:
+                            case TestStepOrder.PostPost:
+                                continue;
+                        }
+
+                        break;
+                }
+
+                switch (parentStep.Order)
+                {
                     case TestStepOrder.PrePre:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
-                            step.Order = TestStepOrder.Pre;
                             TestSteps.AddFirst(step);
                             break;
                         }
@@ -79,8 +107,6 @@
                     case TestStepOrder.CasePost:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
-                            if (step.Order == TestStepOrder.PrePost)
-                                step.Order = TestStepOrder.Pre;
 
                             var first = TestSteps.FirstOrDefault(s => s.Order > parentStep.Order);
 
@@ -94,8 +120,6 @@
                     case TestStepOrder.PostPre:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
-                            if (step.Order == TestStepOrder.PostPre)
-                                step.Order = TestStepOrder.Post;
 
                             var first = TestSteps.FirstOrDefault(s => s.Order >= parentStep.Order);
 
@@ -109,13 +133,92 @@
                     case TestStepOrder.PostPost:
                         {
                             var step = (TestStepBase)MetaType.CopyObject(parentStep);
-                            step.Order = TestStepOrder.Post;
                             TestSteps.AddLast(step);
                             break;
                         }
                     default:
                         break;
                 }
+            }
+        }
+
+        public virtual void ClearSteps()
+        {
+            var stepsToRemove = new List<TestStepBase>();
+            foreach (var testStep in TestSteps)
+            {
+                if (testStep.StepMarks.Count > 0)
+                {
+                    if (!StepMarks.Any(sm => testStep.StepMarks.Contains(sm)))
+                    {
+                        stepsToRemove.Add(testStep);
+                        continue;
+                    }
+                }
+
+                switch (ItemType)
+                {
+                    case TestItemType.Project:
+                    case TestItemType.Suite:
+
+                        var suite = (TestSuite)this;
+                        var hasSuite = suite.Children.Any(c => c.ItemType != TestItemType.Test);
+
+                        if (!hasSuite)
+                            switch (testStep.Order)
+                            {
+                                case TestStepOrder.PrePre:
+                                case TestStepOrder.PrePost:
+                                    testStep.Order = TestStepOrder.Pre;
+                                    break;
+                                case TestStepOrder.PostPre:
+                                case TestStepOrder.PostPost:
+                                    testStep.Order = TestStepOrder.Post;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        else
+                            switch (testStep.Order)
+                            {
+                                case TestStepOrder.PrePre:
+                                case TestStepOrder.PrePost:
+                                case TestStepOrder.CasePre:
+                                case TestStepOrder.CasePost:
+                                case TestStepOrder.PostPre:
+                                case TestStepOrder.PostPost:
+                                    stepsToRemove.Add(testStep);
+                                    break;
+                            }
+
+                        break;
+                    case TestItemType.Test:
+
+                        switch (testStep.Order)
+                        {
+                            case TestStepOrder.PrePre:
+                            case TestStepOrder.PrePost:
+                                testStep.Order = TestStepOrder.Pre;
+                                break;
+                            case TestStepOrder.CasePre:
+                            case TestStepOrder.CasePost:
+                                testStep.Order = TestStepOrder.Case;
+                                break;
+                            case TestStepOrder.PostPre:
+                            case TestStepOrder.PostPost:
+                                testStep.Order = TestStepOrder.Post;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        break;
+                }
+            }
+
+            foreach (var step in stepsToRemove)
+            {
+                TestSteps.Remove(step);
             }
         }
 

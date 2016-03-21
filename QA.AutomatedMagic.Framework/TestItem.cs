@@ -24,6 +24,9 @@
         [MetaTypeValue("Is item enabled?", IsRequired = false)]
         public bool IsEnabled { get; set; } = true;
 
+        [MetaTypeCollection("List of Step marks. Used for step inheritance", "stepMark", IsRequired = false)]
+        public List<string> StepMarks { get; set; } = new List<string>();
+
         public TestItem Parent { get; set; } = null;
         public TestLogger Log { get; set; } = null;
 
