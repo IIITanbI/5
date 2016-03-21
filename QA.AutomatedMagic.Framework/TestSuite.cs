@@ -60,6 +60,18 @@
             }
         }
 
+        public override void BuildSteps()
+        {
+            base.BuildSteps();
+
+            TestManager.Log.INFO($"Start building steps for children in: {this}");
+            foreach (var child in Children)
+            {
+                child.BuildSteps();
+            }
+            TestManager.Log.INFO($"Building steps for children in: {this} successfully completed");
+        }
+
         public override void Execute()
         {
             Log.INFO($"Start executing {this}");

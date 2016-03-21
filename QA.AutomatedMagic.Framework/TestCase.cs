@@ -47,16 +47,6 @@
                 MergeSteps();
             }
 
-
-            TestManager.Log.INFO($"Start building TestSteps for item: {this}");
-            TestManager.Log.INFO($"TestSteps count: {TestSteps.Count}");
-            foreach (var testStep in TestSteps)
-            {
-                testStep.Parent = this;
-                testStep.Build();
-            }
-            TestManager.Log.INFO($"TestSteps were successfully built for item: {this}");
-
             if (ItemType == TestItemType.Test)
                 TestManager.Log.INFO($"Build was successfully completed for item: {this}");
         }
@@ -220,6 +210,18 @@
             {
                 TestSteps.Remove(step);
             }
+        }
+
+        public virtual void BuildSteps()
+        {
+            TestManager.Log.INFO($"Start building TestSteps for item: {this}");
+            TestManager.Log.INFO($"TestSteps count: {TestSteps.Count}");
+            foreach (var testStep in TestSteps)
+            {
+                testStep.Parent = this;
+                testStep.Build();
+            }
+            TestManager.Log.INFO($"TestSteps were successfully built for item: {this}");
         }
 
         public override void Execute()
