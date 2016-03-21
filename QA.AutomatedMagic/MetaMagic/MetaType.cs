@@ -108,64 +108,78 @@
             var properties = type.GetProperties();
             foreach (var property in properties)
             {
-                var memberAtt = property.GetCustomAttribute<MetaTypeMemberAttribute>(true);
-                if (memberAtt != null)
+                try
                 {
-                    var locationAtts = property.GetCustomAttributes<MetaLocationAttribute>().ToList();
-                    locationAtts.Add(new MetaLocationAttribute(property.Name));
-                    var collectionAtt = memberAtt as MetaTypeCollectionAttribute;
-                    if (collectionAtt != null)
+                    var memberAtt = property.GetCustomAttribute<MetaTypeMemberAttribute>(true);
+                    if (memberAtt != null)
                     {
-                        var newMember = new MetaTypeCollectionMember(this, property, collectionAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
+                        var locationAtts = property.GetCustomAttributes<MetaLocationAttribute>().ToList();
+                        locationAtts.Add(new MetaLocationAttribute(property.Name));
+                        var collectionAtt = memberAtt as MetaTypeCollectionAttribute;
+                        if (collectionAtt != null)
+                        {
+                            var newMember = new MetaTypeCollectionMember(this, property, collectionAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
+                        var objectAtt = memberAtt as MetaTypeObjectAttribute;
+                        if (objectAtt != null)
+                        {
+                            var newMember = new MetaTypeObjectMember(this, property, objectAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
+                        var valueAtt = memberAtt as MetaTypeValueAttribute;
+                        if (valueAtt != null)
+                        {
+                            var newMember = new MetaTypeValueMember(this, property, valueAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
                     }
-                    var objectAtt = memberAtt as MetaTypeObjectAttribute;
-                    if (objectAtt != null)
-                    {
-                        var newMember = new MetaTypeObjectMember(this, property, objectAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
-                    }
-                    var valueAtt = memberAtt as MetaTypeValueAttribute;
-                    if (valueAtt != null)
-                    {
-                        var newMember = new MetaTypeValueMember(this, property, valueAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
-                    }
+                }
+                catch(Exception ex)
+                {
+                    throw new AutomatedMagicException("Error occurred during initialization property", type, property, ex);
                 }
             }
 
             var fields = type.GetFields();
             foreach (var field in fields)
             {
-                var memberAtt = field.GetCustomAttribute<MetaTypeMemberAttribute>(true);
-                if (memberAtt != null)
+                try
                 {
-                    var locationAtts = field.GetCustomAttributes<MetaLocationAttribute>().ToList();
-                    locationAtts.Add(new MetaLocationAttribute(field.Name));
-                    var collectionAtt = memberAtt as MetaTypeCollectionAttribute;
-                    if (collectionAtt != null)
+                    var memberAtt = field.GetCustomAttribute<MetaTypeMemberAttribute>(true);
+                    if (memberAtt != null)
                     {
-                        var newMember = new MetaTypeCollectionMember(this, field, collectionAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
+                        var locationAtts = field.GetCustomAttributes<MetaLocationAttribute>().ToList();
+                        locationAtts.Add(new MetaLocationAttribute(field.Name));
+                        var collectionAtt = memberAtt as MetaTypeCollectionAttribute;
+                        if (collectionAtt != null)
+                        {
+                            var newMember = new MetaTypeCollectionMember(this, field, collectionAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
+                        var objectAtt = memberAtt as MetaTypeObjectAttribute;
+                        if (objectAtt != null)
+                        {
+                            var newMember = new MetaTypeObjectMember(this, field, objectAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
+                        var valueAtt = memberAtt as MetaTypeValueAttribute;
+                        if (valueAtt != null)
+                        {
+                            var newMember = new MetaTypeValueMember(this, field, valueAtt, locationAtts);
+                            AddMember(newMember);
+                            continue;
+                        }
                     }
-                    var objectAtt = memberAtt as MetaTypeObjectAttribute;
-                    if (objectAtt != null)
-                    {
-                        var newMember = new MetaTypeObjectMember(this, field, objectAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
-                    }
-                    var valueAtt = memberAtt as MetaTypeValueAttribute;
-                    if (valueAtt != null)
-                    {
-                        var newMember = new MetaTypeValueMember(this, field, valueAtt, locationAtts);
-                        AddMember(newMember);
-                        continue;
-                    }
+                }
+                catch(Exception ex)
+                {
+                    throw new AutomatedMagicException("Error occurred during initialization field", type, field, ex);
                 }
             }
         }
