@@ -9,10 +9,14 @@
 
     public class ParseException : Exception
     {
-        public ParseException(object source, MetaTypeMember member)
-            : base($"Couldn't parse:\n{member}\nusing its location:\n{member.Location}\nfrom source:\n{source}")
-        {
+        private StringBuilder _sb = new StringBuilder();
 
+        public ParseException(object source, MetaTypeMember member)
+        {
+            _sb.AppendLine($"Couldn't parse:\n{member}");
+            _sb.AppendLine($"Location:\n{member.Location}");
+            _sb.AppendLine($"Source:\n{source}");
+            _sb.AppendLine($"StackTrace:\n{StackTrace}");
         }
 
         public ParseException(object source, Type type)
@@ -22,9 +26,19 @@
         }
 
         public ParseException(string message, object source, MetaTypeMember member)
-            : base($"{message}\nCouldn't parse:\n{member}\nusing its location:\n{member.Location}\nfrom source:\n{source}")
         {
+            _sb.AppendLine($"{message}");
+            _sb.AppendLine($"Couldn't parse:\n{member}");
+            _sb.AppendLine($"Location:\n{member.Location}");
+            _sb.AppendLine($"Source:\n{source}");
+            _sb.AppendLine($"StackTrace:\n{StackTrace}");
+        }
 
+        public override string ToString()
+        {
+            if (_sb.Length == 0)
+                return base.ToString();
+            return _sb.ToString();
         }
     }
 }
