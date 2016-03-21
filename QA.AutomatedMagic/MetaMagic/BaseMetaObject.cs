@@ -16,6 +16,11 @@
             return metaType.GetPaths(this);
         }
 
+        public virtual void MetaInit()
+        {
+            
+        }
+
         public virtual object ResolvePath(string path)
         {
             var metaType = AutomatedMagicManager.GetMetaType(GetType());

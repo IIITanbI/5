@@ -12,5 +12,6 @@
     {
         List<string> GetPaths();
         object ResolvePath(string path);
+        void MetaInit();
     }
 }

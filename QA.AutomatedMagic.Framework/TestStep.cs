@@ -65,6 +65,8 @@
                             var ftte = new FrameworkTestExecutionException(this, "Couldn't resolve Context value",
                                 $"Value to resolve: {arg.Value}");
 
+                            ItemStatus = TestItemStatus.Failed;
+
                             Log.ERROR("Couldn't resolve Context value", ftte);
                             Log.ERROR($"Execution of {this} completed with status: {ItemStatus}");
                             Parent.Log.ERROR($"Execution of {this} completed with status: {ItemStatus}", ftte);
@@ -82,6 +84,8 @@
                         {
                             var ftte = new FrameworkTestExecutionException(this, $"Couldn't resolve Context manager value",
                                 $"Manager value: {arg.Value}");
+
+                            ItemStatus = TestItemStatus.Failed;
 
                             Log.ERROR("Couldn't resolve Context manager value", ftte);
                             Log.ERROR($"Execution of {this} completed with status: {ItemStatus}");
@@ -105,6 +109,8 @@
                         {
                             var ftte = new FrameworkTestExecutionException(this, $"Couldn't resolve Context StepResult value",
                                 $"Step name: {arg.Value}");
+
+                            ItemStatus = TestItemStatus.Failed;
 
                             Log.ERROR("Couldn't resolve Context StepResult value", ftte);
                             Log.ERROR($"Execution of {this} completed with status: {ItemStatus}");
@@ -211,6 +217,7 @@
                 AddStepResult(Info.Name, result);
 
             ItemStatus = TestItemStatus.Passed;
+
             Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");
             Log.INFO($"Execution of {this} completed with status: {ItemStatus}");
             Parent.Log.INFO($"Execution of {this} completed with status: {ItemStatus}");
