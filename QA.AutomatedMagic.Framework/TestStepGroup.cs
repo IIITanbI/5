@@ -13,7 +13,7 @@
     {
         [MetaTypeCollection("List of test steps", IsAssignableTypesAllowed = true)]
         [MetaLocation("steps")]
-        public List<TestStep> TestSteps { get; set; }
+        public List<TestStepBase> TestSteps { get; set; }
 
         public override void Execute()
         {

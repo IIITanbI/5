@@ -26,6 +26,13 @@
             ItemType = TestItemType.Suite;
         }
 
+        public override void MetaInit()
+        {
+            base.MetaInit();
+            StepMarks.Remove("TestCase");
+            StepMarks.Add("TestSuite");
+        }
+
         public override void Build()
         {
             base.Build();
@@ -39,12 +46,18 @@
                 child.Build();
             }
 
-            var stepsToRemove = TestSteps.Where(s => s.Order != TestStepOrder.Pre || s.Order != TestStepOrder.Post).ToList();
-            stepsToRemove.ForEach(s => TestSteps.Remove(s));
-            stepsToRemove.Clear();
-
             TestManager.Log.INFO($"Children were successfully built for item: {this}");
             TestManager.Log.INFO($"Build was successfully completed for item: {this}");
+        }
+
+        public override void ClearSteps()
+        {
+            base.ClearSteps();
+
+            foreach (var child in Children)
+            {
+                child.ClearSteps();
+            }
         }
 
         public override void Execute()

@@ -19,6 +19,7 @@
         public override void Build()
         {
             base.Build();
+            ClearSteps();
         }
 
         public override void Execute()
