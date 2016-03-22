@@ -23,5 +23,7 @@
 
         void ERROR(string message, Exception exception = null);
         void ERROR(string message, LoggedFileType fileType, string filePath);
+
+        string GetLoggedFilesFolder();
     }
 }
