@@ -103,7 +103,7 @@
           </AemUser>
         </DynamicObjects>
       </DynamicContextObjectItem>-->
-      
+
     </contextItems>
 
   </context>
@@ -125,15 +125,6 @@
         <!--<TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
           <manager>AemUserManager</manager>
           <command>CreateUser</command>
-          <args>
-            <arg type="Manager">ApiManager</arg>
-            <arg type="Context">AemUser.AutotestUser</arg>
-            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-          </args>
-        </TestStep>
-        <TestStep name="ActivateAutotestUser" description="Create Aem user to perform test uder it">
-          <manager>AemUserManager</manager>
-          <command>ActivateUser</command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemUser.AutotestUser</arg>
@@ -373,7 +364,7 @@
           <Command>VerifyTutorialIssues</Command>
           <args>
             <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVeifyIssues.GetGitHubIssues</arg>
+            <arg type="StepResult">GetAndVerifyIssues.GetGitHubIssues</arg>
           </args>
         </TestStep>
       </Steps>
@@ -385,6 +376,10 @@
       </StepMarks>
       <Order>CasePost</Order>
       <Steps>
+        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
+          <Manager>WebDriverManager</Manager>
+          <Command>Refresh</Command>
+        </TestStep>
         <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
           <Manager>TutorialCatalogPageManager</Manager>
           <Command>GetTutorialCardsOnAuthor</Command>
@@ -411,7 +406,7 @@
       <Steps>
         <TestStep name="OpenCreatedPageOnPubslih" description="Open created tutorial page on Pubslih">
           <manager>AemPageManager</manager>
-          <command>OpenPageOnPubslih</command>
+          <command>OpenPageOnPublish</command>
           <args>
             <arg type="Manager">WebDriverManager</arg>
             <arg type="Context">AemPage.TutorialPage</arg>
@@ -420,7 +415,7 @@
         </TestStep>
         <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
           <Manager>TutorialCatalogPageManager</Manager>
-          <Command>GetTutorialCardsOnPubslih</Command>
+          <Command>GetTutorialCardsOnPublish</Command>
           <args>
             <arg type="Manager">WebDriverManager</arg>
           </args>
@@ -572,13 +567,13 @@
                             <Description>SimpleTutorial1 Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:technology/java</tag>
+                                <tag>tutorial:technology/java</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:product/mobile</tag>
+                                <tag>tutorial:product/mobile</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial1 Content</Content>
@@ -589,10 +584,10 @@
                             <Description>SimpleTutorial2 Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:interest/bigData</tag>
+                                <tag>tutorial:interest/bigData</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial2 Content</Content>
@@ -651,10 +646,10 @@
                             <Description>SimpleTutorial1 Updated Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:technology/java</tag>
+                                <tag>tutorial:technology/java</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial1 Updated Content</Content>
@@ -665,7 +660,7 @@
                             <Description>SimpleTutorial2 Updated Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial2 Updated Content</Content>
