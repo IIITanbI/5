@@ -9,6 +9,7 @@
     using System.Xml.Linq;
     using XmlSourceResolver;
     using Dynamic;
+
     [MetaType("Resolvable context object item")]
     public class DynamicContextObjectItem : TestContextItem
     {

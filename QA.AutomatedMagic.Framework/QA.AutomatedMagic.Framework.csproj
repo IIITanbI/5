@@ -45,7 +45,10 @@
     <Compile Include="FrameworkContextBuildingException.cs" />
     <Compile Include="FrameworkContextResolvingException.cs" />
     <Compile Include="FrameworkException.cs" />
+    <Compile Include="FrameworkGeneratingException.cs" />
     <Compile Include="FrameworkTestExecutionException.cs" />
+    <Compile Include="GenericConfig.cs" />
+    <Compile Include="GenericTestSuite.cs" />
     <Compile Include="Managers\FrameworkManager.cs" />
     <Compile Include="TestContextItems\Dynamic\ComplexNode.cs" />
     <Compile Include="TestContextItems\Dynamic\ContextObjectNode.cs" />

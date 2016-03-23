@@ -27,12 +27,6 @@
             ItemType = TestItemType.Test;
         }
 
-        public override void MetaInit()
-        {
-            base.MetaInit();
-            StepMarks.Add("TestCase");
-        }
-
         public override void Build()
         {
             TestManager.Log.INFO($"Start building item: {this}");
@@ -90,11 +84,6 @@
                 switch (parentStep.Order)
                 {
                     case TestStepOrder.PrePre:
-                        {
-                            var step = (TestStepBase)MetaType.CopyObject(parentStep);
-                            TestSteps.AddFirst(step);
-                            break;
-                        }
                     case TestStepOrder.PrePost:
                     case TestStepOrder.CasePre:
                     case TestStepOrder.CasePost:
@@ -145,6 +134,23 @@
                     if (!StepMarks.Any(sm => testStep.StepMarks.Contains(sm)))
                     {
                         stepsToRemove.Add(testStep);
+                        continue;
+                    }
+                    else
+                    {
+                        switch (testStep.Order)
+                        {
+                            case TestStepOrder.PrePre:
+                            case TestStepOrder.PrePost:
+                                testStep.Order = TestStepOrder.Pre;
+                                break;
+                            case TestStepOrder.PostPre:
+                            case TestStepOrder.PostPost:
+                                testStep.Order = TestStepOrder.Post;
+                                break;
+                            default:
+                                break;
+                        }
                         continue;
                     }
                 }
