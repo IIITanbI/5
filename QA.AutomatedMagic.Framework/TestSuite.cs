@@ -11,9 +11,9 @@
     [MetaType("Test suite")]
     public class TestSuite : TestCase
     {
-        [MetaTypeCollection("List of child TestCases and TestSuites", IsAssignableTypesAllowed = true)]
+        [MetaTypeCollection("List of child TestCases and TestSuites", IsRequired = false, IsAssignableTypesAllowed = true)]
         [MetaLocation("Tests", "Suites", "TestCases", "TestSuites")]
-        public List<TestCase> Children { get; set; }
+        public List<TestCase> Children { get; set; } = new List<TestCase>();
 
         [MetaTypeValue("Is parallelism enabled?", IsRequired = false)]
         public bool IsParallelismEnabled { get; set; } = false;
@@ -24,13 +24,6 @@
         public TestSuite()
         {
             ItemType = TestItemType.Suite;
-        }
-
-        public override void MetaInit()
-        {
-            base.MetaInit();
-            StepMarks.Remove("TestCase");
-            StepMarks.Add("TestSuite");
         }
 
         public override void Build()

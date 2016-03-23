@@ -138,7 +138,7 @@
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new AutomatedMagicException("Error occurred during initialization property", type, property, ex);
                 }
@@ -177,7 +177,7 @@
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw new AutomatedMagicException("Error occurred during initialization field", type, field, ex);
                 }
@@ -296,7 +296,10 @@
                 memberName = memberName.Substring(0, path.IndexOf('['));
             }
 
-            var member = Members.First(m => m.Info.Name == memberName);
+            var member = Members.FirstOrDefault(m => m.Info.Name == memberName);
+
+            if (member == null)
+                throw new AutomatedMagicException($"Couldn't find member in MetaType: {this} to resolve path: {path}");
 
             return member.ResolveValue(path, parentObj);
         }

@@ -3,6 +3,7 @@
   <context>
 
     <managers>
+
       <manager type="FrameworkManager"></manager>
       <manager type="ApiManager"></manager>
       <manager type="AemUserManager">
@@ -63,6 +64,12 @@
             <AuthorHostUrl>http://10.7.14.16:4502</AuthorHostUrl>
             <PublishHostUrl>http://10.7.14.16:4502</PublishHostUrl>
           </LandscapeConfig>
+        </objects>
+      </ContextObjectItem>
+
+      <ContextObjectItem name="Groups">
+        <objects>
+
         </objects>
       </ContextObjectItem>
 
@@ -146,6 +153,9 @@
     </TestStepGroup>
 
     <TestStepGroup name="PrepareGitHubTutorial" description="Prepare GitHubTutorial for tests">
+      <StepMarks>
+        <StepMark>PrepareGit</StepMark>
+      </StepMarks>
       <order>PrePre</order>
       <Steps>
 
@@ -352,6 +362,9 @@
     </TestStepGroup>
 
     <TestStep name="RunGitHubJob" description="Run GitHub job for tutorial export">
+      <StepMarks>
+        <StepMark>ExportPages</StepMark>
+      </StepMarks>
       <Manager>JobManager</Manager>
       <Command>RunGitHubJob</Command>
       <Order>PrePre</Order>
@@ -363,6 +376,9 @@
     </TestStep>
 
     <TestStepGroup name="VeifyChildrenPagesActivation" description="Verify that children page have staus ACTIVATE and wait until their activation completed">
+      <StepMarks>
+        <StepMark>ExportPages</StepMark>
+      </StepMarks>
       <Order>PrePre</Order>
       <Steps>
         <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
@@ -407,14 +423,6 @@
           <Command>GetIssues</Command>
           <args>
             <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
-          </args>
-        </TestStep>
-        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
-          <Manager>GitHubTutorialManager</Manager>
-          <Command>VerifyTutorialIssues</Command>
-          <args>
-            <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVerifyIssues.GetGitHubIssues</arg>
           </args>
         </TestStep>
       </Steps>
@@ -462,15 +470,6 @@
             <arg type="Manager">WebDriverManager</arg>
           </args>
         </TestStep>
-        <TestStep name="VerifyTutorialIssues" description="Verify tutorial cards for turotial md files">
-          <Manager>GitHubTutorialManager</Manager>
-          <Command>VerifyTutorialCards</Command>
-          <args>
-            <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialCardsFromTutorialPage</arg>
-            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialAemTags</arg>
-          </args>
-        </TestStep>
       </Steps>
     </TestStepGroup>
 
@@ -514,15 +513,6 @@
             <arg type="Manager">WebDriverManager</arg>
           </args>
         </TestStep>
-        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
-          <Manager>GitHubTutorialManager</Manager>
-          <Command>VerifyTutorialCards</Command>
-          <args>
-            <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVerifyTutorialCardsOnPublish.GetTutorialCardsFromTutorialPage</arg>
-            <arg type="StepResult">GetAndVerifyTutorialCardsOnPublish.GetTutorialAemTags</arg>
-          </args>
-        </TestStep>
       </Steps>
     </TestStepGroup>
 
@@ -530,7 +520,10 @@
 
   <Suites>
 
-    <TestSuite name="CreateUpdateTutorial" description="Create/Update new tutorial">
+    <TestSuite name="TutorialTests" description="Test for tutorial">
+      <StepMarks>
+        <StepMark>PreparePage</StepMark>
+      </StepMarks>
 
       <context>
         <contextItems>
@@ -538,8 +531,8 @@
           <ContextObjectItem name="GitRepositories configs">
             <objects>
               <GitRepositoryConfig uniqueName="TutorialRepository">
-                <RemoteRepository>https://github.com/ksAutotests/CreateUpdateTutorial</RemoteRepository>
-                <LocalRepository>c:\tmp\localgitrepo\CreateUpdateTutorial</LocalRepository>
+                <RemoteRepository>https://github.com/ksAutotests/TutorialsTest</RemoteRepository>
+                <LocalRepository>c:\tmp\localgitrepo\TutorialsTest</LocalRepository>
               </GitRepositoryConfig>
             </objects>
           </ContextObjectItem>
@@ -636,161 +629,274 @@
 
       <Suites>
 
-        <TestSuite name="CreateTutorial" description="Create tutorial">
-          <FailParentOnFail>True</FailParentOnFail>
+        <GenericTestSuite name="GenericSuiteForTutorials" description="Generic TestSuite for tutorial creating tests">
           <StepMarks>
-            <StepMark>PreparePage</StepMark>
+            <StepMark>ExportPages</StepMark>
+            <StepMark>PrepareGit</StepMark>
           </StepMarks>
 
           <context>
             <contextItems>
-
               <ContextObjectItem name="GitHubTutorials config">
                 <objects>
                   <GitHubTutorial UniqueName="Tutorial">
 
-                    <Folder>tutorials</Folder>
+                    <GitHubTutorialTests>
+                      <GitHubTutorialTest name="CreateTutorial" description="Create tutorial. SAP1DX-921:Create/update a new tutorial">
+                        <UniqueName>TutorialTest</UniqueName>
+                        <TutorialFile>
+                          <Folder>Tutorial921</Folder>
+                          <Name>Tutorial921</Name>
+                          <Title>Tutorial921 Title</Title>
+                          <Description>Tutorial921 Description</Description>
 
-                    <GitHubTutorialItems>
+                          <Tags>
+                            <tag>
+                              <tag>tutorial:technology/github</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:technology/java</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:product/mobile</tag>
+                            </tag>
+                          </Tags>
+                          <Content>Tutorial921 content</Content>
 
-                      <GitHubTutorialItem>
-                        <FolderName>SimpleTutorials</FolderName>
-                        <GitHubTutorialFiles>
-                          <GitHubTutorialFile>
-                            <Name>SimpleTutorial1</Name>
-                            <Title>SimpleTutorial1 Title</Title>
-                            <Description>SimpleTutorial1 Description</Description>
-                            <Tags>
-                              <tag>
-                                <tag>tutorial:technology/github</tag>
-                              </tag>
-                              <tag>
-                                <tag>tutorial:technology/java</tag>
-                              </tag>
-                              <tag>
-                                <tag>tutorial:product/mobile</tag>
-                              </tag>
-                            </Tags>
-                            <Content>SimpleTutorial1 Content</Content>
-                          </GitHubTutorialFile>
-                          <GitHubTutorialFile>
-                            <Name>SimpleTutorial2</Name>
-                            <Title>SimpleTutorial2 Title</Title>
-                            <Description>SimpleTutorial2 Description</Description>
-                            <Tags>
-                              <tag>
-                                <tag>tutorial:technology/github</tag>
-                              </tag>
-                              <tag>
-                                <tag>tutorial:interest/bigData</tag>
-                              </tag>
-                            </Tags>
-                            <Content>SimpleTutorial2 Content</Content>
-                          </GitHubTutorialFile>
-                        </GitHubTutorialFiles>
-                      </GitHubTutorialItem>
+                        </TutorialFile>
 
-                    </GitHubTutorialItems>
+                        <ExpectedCard>
+                          <Title>Tutorial921 Title</Title>
+                          <Description>Tutorial921 Description</Description>
+                          <Tags>
+                            <tag>GitHub</tag>
+                            <tag>Java</tag>
+                            <tag>Mobile</tag>
+                          </Tags>
+                        </ExpectedCard>
+
+                      </GitHubTutorialTest>
+                      <GitHubTutorialTest name="CreateTutorialWithEmptyTitle" description="Create tutorial with empty title. SAP1DX-941:Create/update a new tutorial without title">
+                        <UniqueName>TutorialTest</UniqueName>
+
+                        <TutorialFile>
+                          <Folder>Tutorial941</Folder>
+                          <Name>Tutorial941</Name>
+                          <Title></Title>
+                          <Description>Tutorial941 Description</Description>
+
+                          <Tags>
+                            <tag>
+                              <tag>tutorial:technology/github</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:technology/java</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:product/mobile</tag>
+                            </tag>
+                          </Tags>
+                          <Content>Tutorial921 content</Content>
+
+                        </TutorialFile>
+
+                        <ExpectedCard>
+                          <Title>Tutorial941</Title>
+                          <Description>Tutorial941 Description</Description>
+                          <Tags>
+                            <tag>GitHub</tag>
+                            <tag>Java</tag>
+                            <tag>Mobile</tag>
+                          </Tags>
+                        </ExpectedCard>
+
+                        <ExpectedIssue>
+                          <Title>Issue about empty Title</Title>
+                          <Content>Issue about empty Title</Content>
+                        </ExpectedIssue>
+
+                      </GitHubTutorialTest>
+                      <GitHubTutorialTest name="CreateTutorialWithEmptyDescription" description="Create tutorial with empty description. SAP1DX-942:Create/update a new tutorial without description">
+                        <UniqueName>TutorialTest</UniqueName>
+
+                        <TutorialFile>
+                          <Folder>Tutorial942</Folder>
+                          <Name>Tutorial942</Name>
+                          <Title>Tutorial942 Title</Title>
+                          <Description></Description>
+
+                          <Tags>
+                            <tag>
+                              <tag>tutorial:technology/github</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:technology/java</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:product/mobile</tag>
+                            </tag>
+                          </Tags>
+                          <Content>Tutorial921 content</Content>
+
+                        </TutorialFile>
+
+                        <ExpectedCard>
+                          <Title>Tutorial942 Title</Title>
+                          <Description>Tutorial Page, contents hosted on GitHub</Description>
+                          <Tags>
+                            <tag>GitHub</tag>
+                            <tag>Java</tag>
+                            <tag>Mobile</tag>
+                          </Tags>
+                        </ExpectedCard>
+
+                        <ExpectedIssue>
+                          <Title>Issue about empty Description</Title>
+                          <Content>Issue about empty Description</Content>
+                        </ExpectedIssue>
+
+                      </GitHubTutorialTest>
+                    </GitHubTutorialTests>
 
                   </GitHubTutorial>
                 </objects>
               </ContextObjectItem>
-
             </contextItems>
           </context>
 
-          <Tests>
-            <TestCase name="VerifyIssues" description="Verify tutorial issues">
-              <StepMarks>
-                <StepMark>VerifyIssues</StepMark>
-              </StepMarks>
-            </TestCase>
-            <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
-              <StepMarks>
-                <StepMark>VerifyCardsOnAuthor</StepMark>
-              </StepMarks>
-            </TestCase>
-            <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
-              <StepMarks>
-                <StepMark>VerifyCardsOnPublish</StepMark>
-              </StepMarks>
-            </TestCase>
-          </Tests>
+          <Config>
+            <ForeachItemIn>GitHubTutorial.Tutorial.GitHubTutorialTests</ForeachItemIn>
 
-        </TestSuite>
+            <ChildTemplate>
+              <TestSuite>
+                <Info>
+                  <Name>
+                    <GenericNode>Name</GenericNode>
+                  </Name>
+                  <Description>
+                    <GenericNode>Description</GenericNode>
+                  </Description>
+                </Info>
 
-        <TestSuite name="UpdateTutorial" description="Update tutorial">
+                <Tests>
+                  <TestCase name="VerifyIssues" description="Verify tutorial issues">
+                    <StepMarks>
+                      <StepMark>VerifyIssues</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
+                    <StepMarks>
+                      <StepMark>VerifyCardsOnAuthor</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
+                    <StepMarks>
+                      <StepMark>VerifyCardsOnPublish</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                </Tests>
+              </TestSuite>
+            </ChildTemplate>
+          </Config>
+
+        </GenericTestSuite>
+
+
+        <GenericTestSuite name="GenericSuiteForTutorials" description="Generic TestSuite for tutorial updating tests">
+          <StepMarks>
+            <StepMark>ExportPages</StepMark>
+            <StepMark>PrepareGit</StepMark>
+          </StepMarks>
 
           <context>
             <contextItems>
-
               <ContextObjectItem name="GitHubTutorials config">
                 <objects>
+
                   <GitHubTutorial UniqueName="Tutorial">
 
-                    <Folder>tutorials</Folder>
+                    <GitHubTutorialTests>
+                      <GitHubTutorialTest name="UpdateTutorial" description="Update tutorial. SAP1DX-921:Create/update a new tutorial">
+                        <UniqueName>TutorialTest</UniqueName>
 
-                    <GitHubTutorialItems>
+                        <TutorialFile>
+                          <Folder>Tutorial921</Folder>
+                          <Name>Tutorial921</Name>
 
-                      <GitHubTutorialItem>
-                        <FolderName>SimpleTutorials</FolderName>
-                        <GitHubTutorialFiles>
-                          <GitHubTutorialFile>
-                            <Name>SimpleTutorial1</Name>
-                            <Title>SimpleTutorial1 Updated Title</Title>
-                            <Description>SimpleTutorial1 Updated Description</Description>
-                            <Tags>
-                              <tag>
-                                <tag>tutorial:technology/github</tag>
-                              </tag>
-                              <tag>
-                                <tag>tutorial:technology/java</tag>
-                              </tag>
-                            </Tags>
-                            <Content>SimpleTutorial1 Updated Content</Content>
-                          </GitHubTutorialFile>
-                          <GitHubTutorialFile>
-                            <Name>SimpleTutorial2</Name>
-                            <Title>SimpleTutorial2 Updated Title</Title>
-                            <Description>SimpleTutorial2 Updated Description</Description>
-                            <Tags>
-                              <tag>
-                                <tag>tutorial:technology/github</tag>
-                              </tag>
-                            </Tags>
-                            <Content>SimpleTutorial2 Updated Content</Content>
-                          </GitHubTutorialFile>
-                        </GitHubTutorialFiles>
-                      </GitHubTutorialItem>
+                          <Title>Tutorial921 updated Title</Title>
+                          <Description>Tutorial921 updated Description</Description>
 
-                    </GitHubTutorialItems>
+                          <Tags>
+                            <tag>
+                              <tag>tutorial:technology/github</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:technology/java</tag>
+                            </tag>
+                            <tag>
+                              <tag>tutorial:interest/security</tag>
+                            </tag>
+                          </Tags>
+                          <Content>Tutorial921 updated content</Content>
+
+                        </TutorialFile>
+
+                        <ExpectedCard>
+                          <Title>Tutorial921 updated Title</Title>
+                          <Description>Tutorial921 updated Description</Description>
+                          <Tags>
+                            <tag>GitHub</tag>
+                            <tag>Java</tag>
+                            <tag>Security</tag>
+                          </Tags>
+                        </ExpectedCard>
+
+                      </GitHubTutorialTest>
+                    </GitHubTutorialTests>
 
                   </GitHubTutorial>
+
                 </objects>
               </ContextObjectItem>
-
             </contextItems>
           </context>
 
-          <Tests>
-            <TestCase name="VerifyIssues" description="Verify tutorial issues">
-              <StepMarks>
-                <StepMark>VerifyIssues</StepMark>
-              </StepMarks>
-            </TestCase>
-            <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
-              <StepMarks>
-                <StepMark>VerifyCardsOnAuthor</StepMark>
-              </StepMarks>
-            </TestCase>
-            <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
-              <StepMarks>
-                <StepMark>VerifyCardsOnPublish</StepMark>
-              </StepMarks>
-            </TestCase>
-          </Tests>
+          <Config>
+            <ForeachItemIn>GitHubTutorial.Tutorial.GitHubTutorialTests</ForeachItemIn>
 
-        </TestSuite>
+            <ChildTemplate>
+              <TestSuite>
+                <Info>
+                  <Name>
+                    <GenericNode>Name</GenericNode>
+                  </Name>
+                  <Description>
+                    <GenericNode>Description</GenericNode>
+                  </Description>
+                </Info>
+
+                <Tests>
+                  <TestCase name="VerifyIssues" description="Verify tutorial issues">
+                    <StepMarks>
+                      <StepMark>VerifyIssues</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardsOnAuthor" description="Verify tutorial cards on Author">
+                    <StepMarks>
+                      <StepMark>VerifyCardsOnAuthor</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
+                    <StepMarks>
+                      <StepMark>VerifyCardsOnPublish</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                </Tests>
+              </TestSuite>
+            </ChildTemplate>
+          </Config>
+
+        </GenericTestSuite>
 
       </Suites>
 
