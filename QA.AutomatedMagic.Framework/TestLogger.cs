@@ -9,6 +9,7 @@
 
     public class TestLogger : ILogger
     {
+        public static string LoggedFilesFolderPath = "Log\\LoggedFiles";
         public string Name { get; }
         public List<LogItem> LogMessages { get; private set; } = new List<LogItem>();
         private object _lock = new object();
@@ -141,6 +142,11 @@
                         }
                 }
             }
+        }
+
+        public string GetLoggedFilesFolder()
+        {
+            return LoggedFilesFolderPath;
         }
     }
 }

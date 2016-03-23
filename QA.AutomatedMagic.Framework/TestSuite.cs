@@ -94,11 +94,22 @@
                     if (!IsParallelismEnabled)
                     {
                         Log.DEBUG($"Execute children in sequence mode");
+                        bool skip = false;
                         foreach (var child in Children)
                         {
-                            child.SWatch.Start();
-                            child.Execute();
-                            child.SWatch.Stop();
+                            if (skip)
+                            {
+                                child.Skip();
+                                continue;
+                            }
+
+                            ExecuteChild(child);
+
+                            if (child.ItemStatus == TestItemStatus.Failed)
+                                if (child.FailParentOnFail)
+                                {
+                                    skip = true;
+                                }
                         }
                     }
                     else
@@ -110,12 +121,7 @@
                         if (ThreadNumber != 0)
                             parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
 
-                        Parallel.ForEach(Children, parallelOptions, child =>
-                        {
-                            child.SWatch.Start();
-                            child.Execute();
-                            child.SWatch.Stop();
-                        });
+                        Parallel.ForEach(Children, parallelOptions, child => ExecuteChild(child));
                     }
                     Log.DEBUG("Children execution was completed");
 
@@ -152,9 +158,22 @@
                     if (!IsParallelismEnabled)
                     {
                         Log.DEBUG($"Execute children in sequence mode");
+                        bool skip = false;
                         foreach (var child in Children)
                         {
-                            child.Execute();
+                            if (skip)
+                            {
+                                child.Skip();
+                                continue;
+                            }
+
+                            ExecuteChild(child);
+
+                            if (child.ItemStatus == TestItemStatus.Failed)
+                                if (child.FailParentOnFail)
+                                {
+                                    skip = true;
+                                }
                         }
                     }
                     else
@@ -166,7 +185,7 @@
                         if (ThreadNumber != 0)
                             parallelOptions.MaxDegreeOfParallelism = ThreadNumber;
 
-                        Parallel.ForEach(Children, parallelOptions, child => child.Execute());
+                        Parallel.ForEach(Children, parallelOptions, child => ExecuteChild(child));
                     }
                     Log.DEBUG("Children execution was completed");
 
@@ -192,6 +211,24 @@
             Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");
             Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
             Parent?.Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
+        }
+
+
+        private void ExecuteChild(TestCase child)
+        {
+            child.SWatch.Start();
+            child.Execute();
+            child.SWatch.Stop();
+        }
+
+        public override void Skip()
+        {
+            base.Skip();
+
+            foreach (var child in Children)
+            {
+                child.Skip();
+            }
         }
 
         public override TestInfo.TestItem GetTestInfo()

@@ -147,7 +147,7 @@
                 if (parts.Length > 2)
                 {
                     var innerPath = path.Substring(path.IndexOf('.') + 1);
-                    innerPath = innerPath.Substring(path.IndexOf('.') + 1);
+                    innerPath = innerPath.Substring(innerPath.IndexOf('.') + 1);
 
                     try
                     {

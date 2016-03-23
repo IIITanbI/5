@@ -3,6 +3,7 @@
   <context>
 
     <managers>
+      <manager type="FrameworkManager"></manager>
       <manager type="ApiManager"></manager>
       <manager type="AemUserManager">
         <Config>
@@ -20,7 +21,7 @@
       <manager type="GitHubTutorialManager">
         <Config>
           <GitHubTutorialManagerConfig>
-            <TempFolderPath>c:\temp\tutorialstemp</TempFolderPath>
+            <TempFolderPath>c:\tmp\tutorialstemp</TempFolderPath>
           </GitHubTutorialManagerConfig>
         </Config>
       </manager>
@@ -65,7 +66,19 @@
         </objects>
       </ContextObjectItem>
 
-      <DynamicContextObjectItem name="Users">
+      <ContextObjectItem name="Users">
+        <objects>
+          <AemUser uniqueName="AutotestUser">
+            <Username>admin</Username>
+            <Password>admin</Password>
+            <FirstName>autotest</FirstName>
+            <LastName>autotest</LastName>
+            <Mail>autotest@mail.com</Mail>
+          </AemUser>
+        </objects>
+      </ContextObjectItem>
+
+      <!--<DynamicContextObjectItem name="Users">
         <DynamicObjects>
           <AemUser uniqueName="AutotestUser">
             <Username>
@@ -90,8 +103,8 @@
             <Mail>autotest@mail.com</Mail>
           </AemUser>
         </DynamicObjects>
-      </DynamicContextObjectItem>
-      
+      </DynamicContextObjectItem>-->
+
     </contextItems>
 
   </context>
@@ -110,7 +123,7 @@
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
         </TestStep>
-        <TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
+        <!--<TestStep name="CreateAutotestUser" description="Create Aem user to perform test uder it">
           <manager>AemUserManager</manager>
           <command>CreateUser</command>
           <args>
@@ -118,19 +131,10 @@
             <arg type="Context">AemUser.AutotestUser</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
-        </TestStep>
-        <TestStep name="ActivateAutotestUser" description="Create Aem user to perform test uder it">
-          <manager>AemUserManager</manager>
-          <command>ActivateUser</command>
-          <args>
-            <arg type="Manager">ApiManager</arg>
-            <arg type="Context">AemUser.AutotestUser</arg>
-            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
-          </args>
-        </TestStep>
+        </TestStep>-->
         <TestStep name="AuthorizeUserInAuthor" description="Authorize created user in Aem Author">
           <manager>AemUserManager</manager>
-          <command>CreateUser</command>
+          <command>AuthorizeUserInAuthor</command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemUser.AutotestUser</arg>
@@ -216,12 +220,26 @@
                 <arg type="Context">AemUser.AutotestUser</arg>
               </args>
             </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
+              </args>
+            </TestStep>
             <TestStep name="SetUpTutorialCatalogComponent" description="Setup TutorialCatalog component">
               <manager>TutorialCatalogPageManager</manager>
               <command>SetUpTutorialCatalog</command>
               <args>
                 <arg type="Manager">WebDriverManager</arg>
                 <arg type="Context">TutorialCatalogComponentConfig.TutorialCatalogComponentConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
               </args>
             </TestStep>
             <TestStep name="AddContainerFinder" description="Add Container finder component to Tutorial Catalog page">
@@ -241,6 +259,13 @@
                 <arg type="Context">ContainerFinderComponentConfig.ContainerFinderComponentConfig</arg>
               </args>
             </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
+              </args>
+            </TestStep>
             <TestStep name="AddFinderResults" description="Add Finder results component to Tutorial Catalog page">
               <manager>TutorialCatalogPageManager</manager>
               <command>AddFinderResultsComponent</command>
@@ -257,6 +282,13 @@
                 <arg type="Context">FinderResultsComponentConfig.FinderResultsComponentConfig</arg>
               </args>
             </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
+              </args>
+            </TestStep>
             <TestStep name="AddFacets" description="Add Facets component to Tutorial Catalog page">
               <manager>TutorialCatalogPageManager</manager>
               <command>AddFacetsComponent</command>
@@ -271,6 +303,13 @@
               <args>
                 <arg type="Manager">WebDriverManager</arg>
                 <arg type="Context">FacetsComponentConfig.FacetsComponentConfig</arg>
+              </args>
+            </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
               </args>
             </TestStep>
           </Steps>
@@ -299,6 +338,13 @@
                 <arg type="Context">AemUser.AutotestUser</arg>
               </args>
             </TestStep>
+            <TestStep name="Sleep" description="Sleep">
+              <Manager>FrameworkManager</Manager>
+              <Command>Sleep</Command>
+              <args>
+                <arg type="Value">5</arg>
+              </args>
+            </TestStep>
           </Steps>
         </TestStepGroup>
 
@@ -312,6 +358,7 @@
       <args>
         <arg type="Manager">ApiManager</arg>
         <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+        <arg type="Context">AemUser.AutotestUser</arg>
       </args>
     </TestStep>
 
@@ -320,7 +367,7 @@
       <Steps>
         <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
           <Manager>AemPageManager</Manager>
-          <Command>VerifyChildrenPageStatus</Command>
+          <Command>VerifyChildrenPagesStatus</Command>
           <args>
             <arg type="Manager">ApiManager</arg>
             <arg type="Context">AemPage.TutorialPage</arg>
@@ -329,7 +376,7 @@
             <arg type="Value">ACTIVATE</arg>
           </args>
         </TestStep>
-        <TestStep name="VerifyThatChildrenActivated" description="Veirfy that all children Tutorial page are Activated">
+        <TestStep name="WaitForChildPagesActivation" description="Wait for all children Tutorial page are Activated">
           <Manager>AemPageManager</Manager>
           <Command>WaitForChildPagesActivation</Command>
           <args>
@@ -337,6 +384,13 @@
             <arg type="Context">AemPage.TutorialPage</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
             <arg type="Context">AemUser.AutotestUser</arg>
+          </args>
+        </TestStep>
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
           </args>
         </TestStep>
       </Steps>
@@ -360,7 +414,7 @@
           <Command>VerifyTutorialIssues</Command>
           <args>
             <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVeifyIssues.GetGitHubIssues</arg>
+            <arg type="StepResult">GetAndVerifyIssues.GetGitHubIssues</arg>
           </args>
         </TestStep>
       </Steps>
@@ -372,6 +426,35 @@
       </StepMarks>
       <Order>CasePost</Order>
       <Steps>
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
+          </args>
+        </TestStep>
+        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
+          <Manager>WebDriverManager</Manager>
+          <Command>Refresh</Command>
+        </TestStep>
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
+          </args>
+        </TestStep>
+        <TestStep name="GetAemTags" description="Get aem tags used in tutorial">
+          <Manager>GitHubTutorialManager</Manager>
+          <Command>GetTutorialAemTags</Command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="Manager">AemTagManager</arg>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
         <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
           <Manager>TutorialCatalogPageManager</Manager>
           <Command>GetTutorialCardsOnAuthor</Command>
@@ -379,35 +462,54 @@
             <arg type="Manager">WebDriverManager</arg>
           </args>
         </TestStep>
-        <TestStep name="VerifyTutorialIssues" description="Verify issues for turotial md files">
+        <TestStep name="VerifyTutorialIssues" description="Verify tutorial cards for turotial md files">
           <Manager>GitHubTutorialManager</Manager>
           <Command>VerifyTutorialCards</Command>
           <args>
             <arg type="Context">GitHubTutorial.Tutorial</arg>
             <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialCardsFromTutorialPage</arg>
+            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialAemTags</arg>
           </args>
         </TestStep>
       </Steps>
     </TestStepGroup>
 
-    <TestStepGroup name="GetAndVerifyTutorialCardsOnPublish" description="Get cards and verify with tutorial md files on Author">
+    <TestStepGroup name="GetAndVerifyTutorialCardsOnPublish" description="Get cards and verify with tutorial md files on Publish">
       <StepMarks>
         <StepMark>VerifyCardsOnPublish</StepMark>
       </StepMarks>
       <Order>CasePost</Order>
       <Steps>
-        <TestStep name="OpenCreatedPageOnPubslih" description="Open created tutorial page on Pubslih">
+        <TestStep name="OpenCreatedPageOnPubslih" description="Open created tutorial page on Publish">
           <manager>AemPageManager</manager>
-          <command>OpenPageOnPubslih</command>
+          <command>OpenPageOnPublish</command>
           <args>
             <arg type="Manager">WebDriverManager</arg>
             <arg type="Context">AemPage.TutorialPage</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
         </TestStep>
-        <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
+          </args>
+        </TestStep>
+        <TestStep name="GetAemTags" description="Get aem tags used in tutorial">
+          <Manager>GitHubTutorialManager</Manager>
+          <Command>GetTutorialAemTags</Command>
+          <args>
+            <arg type="Context">GitHubTutorial.Tutorial</arg>
+            <arg type="Manager">AemTagManager</arg>
+            <arg type="Manager">ApiManager</arg>
+            <arg type="Context">AemUser.AutotestUser</arg>
+            <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
+          </args>
+        </TestStep>
+        <TestStep name="GetTutorialCardsFromTutorialPage" description="Get GitHub tutorial cards from TutorialCatalogPage on Publish">
           <Manager>TutorialCatalogPageManager</Manager>
-          <Command>GetTutorialCardsOnPubslih</Command>
+          <Command>GetTutorialCardsOnPublish</Command>
           <args>
             <arg type="Manager">WebDriverManager</arg>
           </args>
@@ -417,7 +519,8 @@
           <Command>VerifyTutorialCards</Command>
           <args>
             <arg type="Context">GitHubTutorial.Tutorial</arg>
-            <arg type="StepResult">GetAndVerifyTutorialCardsOnAuthor.GetTutorialCardsFromTutorialPage</arg>
+            <arg type="StepResult">GetAndVerifyTutorialCardsOnPublish.GetTutorialCardsFromTutorialPage</arg>
+            <arg type="StepResult">GetAndVerifyTutorialCardsOnPublish.GetTutorialAemTags</arg>
           </args>
         </TestStep>
       </Steps>
@@ -473,7 +576,7 @@
                 <TutorialCardPath>
                   <DynamicNode>
                     <Node>
-                      <ContextValueNode value="GitRepositoryConfig.testRepo1.RemoteRepository"></ContextValueNode>
+                      <ContextValueNode value="GitRepositoryConfig.TutorialRepository.RemoteRepository"></ContextValueNode>
                     </Node>
                   </DynamicNode>
                 </TutorialCardPath>
@@ -486,7 +589,7 @@
                   <path>
                     <DynamicNode>
                       <Node>
-                        <ContextValueNode value="AemPage.AutotestTutorialPage.Path"></ContextValueNode>
+                        <ContextValueNode value="AemPage.TutorialPage.Path"></ContextValueNode>
                       </Node>
                     </DynamicNode>
                   </path>
@@ -501,9 +604,9 @@
 
               <FinderResultsComponentConfig uniqueName="FinderResultsComponentConfig">
                 <Pagination>5</Pagination>
-                <DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
+                <!--<DefaultDocumentIcon>/content/dam/application/shared/icons/finder</DefaultDocumentIcon>
                 <DefaultPageIcon>/content/dam/application/shared/icons/icon_gold_document_nopadding.svg</DefaultPageIcon>
-                <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>
+                <DefaultVideotIcon>/content/dam/application/shared/icons/finder</DefaultVideotIcon>-->
 
                 <AlphabeticalSorting>Both</AlphabeticalSorting>
                 <SortingByDate>Both</SortingByDate>
@@ -534,7 +637,7 @@
       <Suites>
 
         <TestSuite name="CreateTutorial" description="Create tutorial">
-
+          <FailParentOnFail>True</FailParentOnFail>
           <StepMarks>
             <StepMark>PreparePage</StepMark>
           </StepMarks>
@@ -559,13 +662,13 @@
                             <Description>SimpleTutorial1 Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:technology/java</tag>
+                                <tag>tutorial:technology/java</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:product/mobile</tag>
+                                <tag>tutorial:product/mobile</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial1 Content</Content>
@@ -576,10 +679,10 @@
                             <Description>SimpleTutorial2 Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:interest/bigData</tag>
+                                <tag>tutorial:interest/bigData</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial2 Content</Content>
@@ -638,10 +741,10 @@
                             <Description>SimpleTutorial1 Updated Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                               <tag>
-                                <tag>tutorials:technology/java</tag>
+                                <tag>tutorial:technology/java</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial1 Updated Content</Content>
@@ -652,7 +755,7 @@
                             <Description>SimpleTutorial2 Updated Description</Description>
                             <Tags>
                               <tag>
-                                <tag>tutorials:technology/github</tag>
+                                <tag>tutorial:technology/github</tag>
                               </tag>
                             </Tags>
                             <Content>SimpleTutorial2 Updated Content</Content>

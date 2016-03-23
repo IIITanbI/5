@@ -17,6 +17,9 @@
         [MetaTypeCollection("List of tags for test item", "tag", IsRequired = false)]
         public List<string> Tags { get; set; } = new List<string> { "All" };
 
+        [MetaTypeValue("Is parent failed if this item has failed?", IsRequired = false)]
+        public bool FailParentOnFail { get; set; } = false;
+
         public override TestItemType ItemType { get; protected set; }
 
         public TestCase()
@@ -274,6 +277,16 @@
             Log.DEBUG($"Try #{_tryNumber} of {TryCount} was successfully completed");
             Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
             Parent?.Log.INFO($"Execution of item: {this} completed with status: {ItemStatus}");
+        }
+
+        public override void Skip()
+        {
+            base.Skip();
+
+            foreach (var testStep in TestSteps)
+            {
+                testStep.Skip();
+            }
         }
 
         public void ExecuteSteps(TestStepOrder order)

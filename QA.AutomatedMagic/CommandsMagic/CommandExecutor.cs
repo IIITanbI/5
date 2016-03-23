@@ -15,6 +15,11 @@
 
         public object Execute()
         {
+            if(Method.Name == "GetIssues")
+            {
+
+            }
+
             try
             {
                 return Method.Invoke(ManagerObject, Arguments);
