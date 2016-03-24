@@ -54,7 +54,7 @@
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
+                        //Console.WriteLine(ex);
                     }
                 }
             }
@@ -141,6 +141,28 @@
             var key = _type_metaType.Keys.FirstOrDefault(k => k.Name == typeName);
             if (key == null) return null;
             return _type_metaType[key];
+        }
+
+        public static string GetReflectionInfo()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Loaded assemblies count: {_loadedAssemblyNames.Count}");
+            sb.AppendLine($"Loaded MetaTypes count: {LoadedMetaTypes.Count}");
+            sb.AppendLine($"Loaded CommandManagers count: {LoadedCommandManagers.Count}");
+
+            sb.AppendLine($"Loaded assemblies:");
+            var counter = 1;
+            _loadedAssemblyNames.ForEach(lan => sb.AppendLine($"#{counter++} : {lan}"));
+
+            sb.AppendLine($"Loaded MetaTypes:");
+            counter = 1;
+            LoadedMetaTypes.ForEach(lmt => sb.AppendLine($"#{counter++} : {lmt}"));
+
+            sb.AppendLine($"Loaded CommandManagers:");
+            counter = 1;
+            LoadedCommandManagers.ForEach(lcm => sb.AppendLine($"#{counter++} : {lcm}"));
+
+            return sb.ToString();
         }
     }
 }

@@ -138,20 +138,46 @@
                     }
                     else
                     {
-                        switch (testStep.Order)
+                        switch (ItemType)
                         {
-                            case TestStepOrder.PrePre:
-                            case TestStepOrder.PrePost:
-                                testStep.Order = TestStepOrder.Pre;
-                                break;
-                            case TestStepOrder.PostPre:
-                            case TestStepOrder.PostPost:
-                                testStep.Order = TestStepOrder.Post;
-                                break;
-                            default:
-                                break;
+                            case TestItemType.Project:
+                            case TestItemType.Suite:
+
+                                switch (testStep.Order)
+                                {
+                                    case TestStepOrder.PrePre:
+                                    case TestStepOrder.PrePost:
+                                        testStep.Order = TestStepOrder.Pre;
+                                        break;
+                                    case TestStepOrder.PostPre:
+                                    case TestStepOrder.PostPost:
+                                        testStep.Order = TestStepOrder.Post;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                continue;
+
+                            case TestItemType.Test:
+                                switch (testStep.Order)
+                                {
+                                    case TestStepOrder.PrePre:
+                                    case TestStepOrder.PrePost:
+                                        testStep.Order = TestStepOrder.Pre;
+                                        break;
+                                    case TestStepOrder.CasePre:
+                                    case TestStepOrder.CasePost:
+                                        testStep.Order = TestStepOrder.Case;
+                                        break;
+                                    case TestStepOrder.PostPre:
+                                    case TestStepOrder.PostPost:
+                                        testStep.Order = TestStepOrder.Post;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                continue;
                         }
-                        continue;
                     }
                 }
 

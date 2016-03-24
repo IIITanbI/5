@@ -194,6 +194,7 @@
 
                 if (ItemStatus == TestItemStatus.Failed)
                 {
+                    Skip();
                     Log.ERROR($"Try #{_tryNumber} of {TryCount} completed with error.");
                     Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
                     Parent?.Log.ERROR($"Execution of item: {this} completed with status: {ItemStatus}");
