@@ -43,6 +43,21 @@
   <ItemGroup>
     <Compile Include="HtmlReportGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="filter js 2.0\filter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js 2.0\init.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js 2.0\logFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js 2.0\stepFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="filter js 2.0\testFilter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\css.css">

@@ -76,11 +76,11 @@ FILTER.getFilterFromButton = function (button) {
     var filter = [];
 
     var $filters = $(button).attr('filter');
-    if ($filters != null)
-        $filters = $filters.trim();
-
-    filter = $filters.split(new RegExp("\\s+"));
-
+    if ($filters) {
+       $filters = $filters.trim();
+       filter = $filters.split(new RegExp("\\s+"));
+    }
+       
 
     console.log("filter = " + filter);
     return filter;

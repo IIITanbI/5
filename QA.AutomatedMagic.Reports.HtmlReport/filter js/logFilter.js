@@ -1,13 +1,19 @@
 $(function () {
 	$('.btnlog').click(function (e) {
+        
+        
+        
 		if ($(this).closest(".step").length > 0) {
-			myFilter.prepare($(this).closest(".step").find('.log-fltr-btns').find("button").first());
+            if ($(this).attr("magic") != "true") 
+			     myFilter.prepare($(this).closest(".step").find('.log-fltr-btns').find("button").first());
 			$(this).closest(".step").find('.logPanel').first().slideToggle();
 		}
 		else if ($(this).closest(".test").length > 0){
-			myFilter.prepare($(this).closest(".test").find('.log-fltr-btns').find("button").first());
+            if ($(this).attr("magic") != "true") 
+			     myFilter.prepare($(this).closest(".test").find('.log-fltr-btns').find("button").first());
 			$(this).closest(".test").find('.logPanel').first().slideToggle();
 		}
+        $(this).attr("magic", true);
 	});
 	
     var myFilter = Object.create(FILTER);
