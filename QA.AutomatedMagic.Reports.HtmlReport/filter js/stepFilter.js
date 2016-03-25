@@ -1,13 +1,21 @@
 $(function () {
 	$(".btnstep").click(function (e) {
+        
+       
+        
 		if ($(this).closest(".step").length > 0) {
-			myFilter.prepare($(this).closest(".step").find('.step-fltr-btns').find("button").first());
-			$(this).closest(".step").children('.steps').toggle(500);
+            if ($(this).attr("magic") != "true")
+                myFilter.prepare($(this).closest(".step").find('.step-fltr-btns').find("button").first());
+			//$(this).closest(".step").children('.steps').toggle(500);
+            $(this).closest(".step").children('.stepContainer').toggle(500);
 		}
 		else if ($(this).closest(".test").length > 0){
-			myFilter.prepare($(this).closest(".test").find('.step-fltr-btns').find("button").first());
-			$(this).closest(".test").children('.steps').toggle(500);
+            if ($(this).attr("magic") != "true")
+			     myFilter.prepare($(this).closest(".test").find('.step-fltr-btns').find("button").first());
+			//$(this).closest(".test").children('.steps').toggle(500);
+            $(this).closest(".test").children('.stepContainer').toggle(500);
 		}
+         $(this).attr("magic", true);
 	});
 	
     var myFilter = Object.create(FILTER);
@@ -31,11 +39,11 @@ $(function () {
         return $status;
     };
 	myFilter.getParent = function (button){
-		if ($(this).closest(".step").length > 0) {
-			return $(this).closest(".step").children('.steps');
+		if ($(button).closest(".step").length > 0) {
+			return $(button).closest(".step").children('.steps');
 		}
-		else if ($(this).closest(".test").length > 0){
-			return $(this).closest(".test").children('.steps');
+		else if ($(button).closest(".test").length > 0){
+			return $(button).closest(".test").children('.steps');
 		}
 	};
 	

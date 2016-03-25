@@ -2,16 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Xml.Linq;
     using TestInfo;
     using MetaMagic;
     using System.IO;
+
     public class HtmlReportGenerator : IReportGenerator
     {
         private string Path;
+
         public bool BuildInOneFile { get; set; } = true;
 
         public HtmlReportGenerator(string path)
@@ -60,19 +59,35 @@
             );
 
             var title = new XElement("title", "Test result");
-            var css = new XElement("link",
-                new XAttribute("rel", "stylesheet"),
-                new XAttribute("href", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
-            );
 
 
+            head.Add(charset, httpEquiv, name, title);
+
+            head.Add(GetCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", true));
+            head.Add(GetCss(@"css/css.css"));
+            
+
+            //head.Add(GetCss(@"css/checkbox.css"));
+            //head.Add(GetCss(@"css/font-awesome.css"));
+            return head;
+        }
+
+        public XElement GetCss(string name, bool isLink = false)
+        {
             XElement customCss = null;
-
+            if (isLink)
+            {
+                customCss = new XElement("link",
+                    new XAttribute("rel", "stylesheet"),
+                    new XAttribute("href", name)
+                );
+                return customCss;
+            }
 
             if (BuildInOneFile)
             {
                 string res;
-                res = File.ReadAllText(@"css/css.css");
+                res = File.ReadAllText(name);
                 customCss = new XElement("style",
                         new XAttribute("type", "text/css"),
                         res
@@ -82,48 +97,61 @@
             {
                 customCss = new XElement("link",
                     new XAttribute("rel", "stylesheet"),
-                    new XAttribute("href", "css/css.css")
+                    new XAttribute("href", name)
                 );
             }
-                
-            head.Add(charset, httpEquiv, name, title, css, customCss);
-            return head;
+
+            return customCss;
+        }
+        public XElement GetJS(string name, bool IsLink = false)
+        {
+            XElement script = null;
+            if (IsLink)
+            {
+                script = new XElement("script", "", new XAttribute("src", name));
+                return script;
+            }
+
+            if (BuildInOneFile)
+            {
+                script = new XElement("script");
+                string res = File.ReadAllText(name);
+                script.Add(res);
+            }
+            else
+            {
+                script = new XElement("script", "", new XAttribute("src", name));
+            }
+
+            return script;
         }
 
         public XElement GetBody(TestItem testItem, TestEnvironmentInfo testEnvironmentInfo)
         {
             var body = new XElement("body");
 
-            var bootstrapJS = new XElement("script", "", new XAttribute("src", "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"));
-
-            var jQuery = new XElement("script", "", new XAttribute("src", "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"));
-
             var container = new XElement("div", new XAttribute("class", "container"),
                 GetEnvironment(testEnvironmentInfo),
                 GetReport(testItem)
             );
 
-            body.Add(container, jQuery, bootstrapJS);
-            if (BuildInOneFile)
-            {
-                var script = new XElement("script");
-                string res;
-                res = File.ReadAllText(@"filter js/init.js"); script.Add(res);
-                res = File.ReadAllText(@"filter js/filter.js"); script.Add(res);
-                res = File.ReadAllText(@"filter js/testFilter.js"); script.Add(res);
-                res = File.ReadAllText(@"filter js/logFilter.js"); script.Add(res);
-                res = File.ReadAllText(@"filter js/stepFilter.js"); script.Add(res);
-                body.Add(script);
-            }
-            else
-            {
-                var jsCustom = new XElement("script", "", new XAttribute("src", "filter js/init.js"));
-                var jsCustom1 = new XElement("script", "", new XAttribute("src", "filter js/filter.js"));
-                var jsCustom2 = new XElement("script", "", new XAttribute("src", "filter js/testFilter.js"));
-                var jsCustom3 = new XElement("script", "", new XAttribute("src", "filter js/logFilter.js"));
-                var jsCustom4 = new XElement("script", "", new XAttribute("src", "filter js/stepFilter.js"));
-                body.Add(jsCustom, jsCustom1, jsCustom2, jsCustom3, jsCustom4);
-            }
+            body.Add(container);
+
+            body.Add(GetJS("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js", true));
+            body.Add(GetJS("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", true));
+            
+
+            //body.Add(GetJS(@"filter js/init.js"));
+            //body.Add(GetJS(@"filter js/filter.js"));
+            //body.Add(GetJS(@"filter js/testFilter.js"));
+            //body.Add(GetJS(@"filter js/logFilter.js"));
+            //body.Add(GetJS(@"filter js/stepFilter.js"));
+
+            body.Add(GetJS(@"filter js 2.0/init.js"));
+            body.Add(GetJS(@"filter js 2.0/filter.js"));
+            body.Add(GetJS(@"filter js 2.0/testFilter.js"));
+            body.Add(GetJS(@"filter js 2.0/logFilter.js"));
+            body.Add(GetJS(@"filter js 2.0/stepFilter.js"));
 
             return body;
         }
@@ -203,8 +231,45 @@
             }
         }
 
+        public XElement GetOverallMagic(TestItem testItem)
+        {
+            if (testItem.Type == TestItemType.Test) return null;
+
+            var mainContainer = new XElement("div", new XAttribute("class", "checkboxes overall test-fltr-btns"));
+
+            mainContainer.Add(GetOverallCheckBox("Total",       testItem.GetTotal(), "passed failed skipped notexecuted"));
+            mainContainer.Add(GetOverallCheckBox("NotExecuted",       testItem.GetTotal(), "notexecuted"));
+            mainContainer.Add(GetOverallCheckBox("Passed",      testItem.GetWithStatus(TestItemStatus.Passed) , "passed"));
+            mainContainer.Add(GetOverallCheckBox("Failed",      testItem.GetWithStatus(TestItemStatus.Failed) , "failed"));
+            mainContainer.Add(GetOverallCheckBox("Skipped",     testItem.GetWithStatus(TestItemStatus.Skipped), "skipped"));
+
+          
+
+            return mainContainer;
+        }
+
+        
+        public XElement GetOverallCheckBox(string text, int count, string filters)
+        {
+            var checkBox = new XElement("div", 
+                new XAttribute("class", "checkbox")
+            );
+
+            var input = new XElement("input", new XAttribute("type", "checkbox"), new XAttribute("filter", filters));
+            var label = new XElement("label", text);
+            var labelCount = new XElement("label", count);
+
+            checkBox.Add(input);
+            checkBox.Add(label);
+            checkBox.Add(labelCount);
+
+            return checkBox;
+        }
+
+        
         public XElement GetOverall(TestItem testItem)
         {
+            return GetOverallMagic(testItem);
             if (testItem.Type == TestItemType.Test)
                 return null;
 
@@ -213,19 +278,23 @@
             var thead = new XElement("thead",
                 new XElement("tr",
                     new XAttribute("class", "test-fltr-btns"),
-                    new XElement("th", new XElement("button", "Total", new XAttribute("class", "btn test-fltr-btn-all"), new XAttribute("filter", "passed failed skipped"))),
-                    new XElement("th", new XElement("button", "Passed", new XAttribute("class", "btn test-fltr-btn-psd"), new XAttribute("filter", "passed"))),
-                    new XElement("th", new XElement("button", "Failed", new XAttribute("class", "btn test-fltr-btn-fld"), new XAttribute("filter", "failed"))),
-                    new XElement("th", new XElement("button", "Skipped", new XAttribute("class", "btn test-fltr-btn-skpd"), new XAttribute("filter", "skipped")))
+                    new XElement("th", new XElement("button", "Total",          new XAttribute("class", "btn test-fltr-btn-all"),       new XAttribute("filter", "passed failed skipped notexecuted unknown"))),
+                    new XElement("th", new XElement("button", "NotExecuted",    new XAttribute("class", "btn test-fltr-btn-notexctd"),  new XAttribute("filter", "notexecuted"))),
+                    new XElement("th", new XElement("button", "Passed",         new XAttribute("class", "btn test-fltr-btn-psd"),       new XAttribute("filter", "passed"))),
+                    new XElement("th", new XElement("button", "Failed",         new XAttribute("class", "btn test-fltr-btn-fld"),       new XAttribute("filter", "с"))),
+                    new XElement("th", new XElement("button", "Skipped",        new XAttribute("class", "btn test-fltr-btn-skpd"),      new XAttribute("filter", "skipped"))),
+                    new XElement("th", new XElement("button", "Unknown",        new XAttribute("class", "btn test-fltr-btn-unkwn"),     new XAttribute("filter", "unknown")))
                 )
             );
 
             var tbody = new XElement("tbody",
                 new XElement("tr",
                     new XElement("td", testItem.GetTotal()),
+                    new XElement("td", testItem.GetWithStatus(TestItemStatus.NotExecuted)),
                     new XElement("td", testItem.GetWithStatus(TestItemStatus.Passed)),
                     new XElement("td", testItem.GetWithStatus(TestItemStatus.Failed)),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Skipped))
+                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Skipped)),
+                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Unknown))
                 )
             );
 
@@ -383,7 +452,7 @@
                 return null;
 
             string name = (obj as TestItem)?.Name ?? (obj as Step)?.Name;
-            List<LogItem> messages = (obj as TestItem)?.LogMessages ?? (obj as Step)?.Messages;
+            var messages = (obj as TestItem)?.LogMessages ?? (obj as Step)?.Messages;
 
             var main = new XElement("div", new XAttribute("class", "logPanel"));
             var elem = new XElement("div", new XAttribute("class", "logs"));
@@ -420,7 +489,8 @@
                             GetMessage(msg),
                             GetException(msg)
                         );
-                        elem.Add(tmp);
+                       
+                       elem.Add(tmp);
                     }
 
                     var att = logItem as LogFile;
@@ -445,7 +515,6 @@
                                         new XElement("img", new XAttribute("src", att.FilePath))
                                     )
                                 );
-                                elem.Add(tmp);
                                 break;
                             case LoggedFileType.ZIP:
                                 tmp = new XElement("div",
@@ -462,7 +531,6 @@
                                         )
                                     )
                                 );
-                                elem.Add(tmp);
                                 break;
                             case LoggedFileType.TXT:
                                 tmp = new XElement("div",
@@ -479,17 +547,41 @@
                                         )
                                     )
                                 );
-                                elem.Add(tmp);
                                 break;
                             default:
                                 break;
                         }
+                        elem.Add(tmp);
                     }
                 }
             }
 
+
+            var up = new XElement("div",
+                new XAttribute("class", "log-slideup"),
+                new XElement("span",
+                    new XAttribute("class", "glyphicon glyphicon-menu-up"),
+                    ""
+                )
+             );
+           
+
+            var table = new XElement("table", new XAttribute("class", "logsContainer"));
+            var tbody = new XElement("tbody");
+            var row = new XElement("tr");
+            row.Add(new XElement("td", new XAttribute("class", "logTD"), elem));
+            row.Add(new XElement("td", new XAttribute("class", "slideupTD"), up));
+            tbody.Add(row);
+            table.Add(tbody);
+
             main.Add(logHeader);
-            main.Add(elem);
+            main.Add(table);
+
+            
+
+
+            
+            //main.Add(elem);
             return main;
         }
         public XElement GetTests(TestItem testItem)
@@ -501,8 +593,29 @@
                 {
                     acc.Add(GetReport(item));
                 }
-                return acc;
+                var up = new XElement("div",
+                   new XAttribute("class", "test-slideup"),
+                   new XElement("span",
+                       new XAttribute("class", "glyphicon glyphicon-menu-up"),
+                       ""
+                   )
+                );
+
+                var table = new XElement("table", new XAttribute("class", "testContainer"));
+                var tbody = new XElement("tbody");
+                var row = new XElement("tr");
+                row.Add(new XElement("td", new XAttribute("class", "slideupTD"), up));
+                row.Add(new XElement("td", new XAttribute("class", "testTD"), acc));
+
+                tbody.Add(row);
+                table.Add(tbody);
+
+                //return acc;
+                return table;
             }
+
+            
+
             return null;
         }
 
@@ -538,7 +651,26 @@
                     )
                 );
             }
-            return acc;
+
+            var up = new XElement("div",
+                   new XAttribute("class", "step-slideup"),
+                   new XElement("span",
+                       new XAttribute("class", "glyphicon glyphicon-menu-up"),
+                       ""
+                   )
+                );
+
+            var table = new XElement("table", new XAttribute("class", "stepContainer"));
+            var tbody = new XElement("tbody");
+            var row = new XElement("tr");
+            row.Add(new XElement("td", new XAttribute("class", "slideupTD"), up));
+            row.Add(new XElement("td", new XAttribute("class", "testTD"), acc));
+
+            tbody.Add(row);
+            table.Add(tbody);
+
+            return table;
+           // return acc;
         }
 
         public XElement GetReport(TestItem testItem)
@@ -552,6 +684,8 @@
                         overall
                 );
             }
+
+           
 
             XElement cont = new XElement("div",
                 new XAttribute("class", "test"),
@@ -568,9 +702,11 @@
                     GetLogs(testItem)
                 ),
                 GetSteps(testItem),
-                GetTests(testItem)
+               GetTests(testItem)
             );
 
+
+            
 
             return cont;
         }

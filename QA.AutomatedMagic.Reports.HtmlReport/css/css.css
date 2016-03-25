@@ -1,9 +1,18 @@
-﻿.environment {
+.container {
+    min-width: 90%;
+}
+.environment {
     margin-top: 3%;
 }
 
 .table.overall {
     margin: 0px;
+}
+.checkboxes.overall input{
+	margin-left: 0px;
+}
+.checkboxes.overall label{
+	width: 100px
 }
 
 
@@ -110,10 +119,13 @@
 
 .logs {
     clear: left;
+    width: 100%;
 }
 
 .log {
-     margin-bottom: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: justify;
  }
 
 .log-level {
@@ -134,6 +146,46 @@
 img {
 	max-width: 100%;
 	heigth: auto;
+}
+
+
+.logsContainer {
+    width: 100%;
+}
+
+.logTD{
+    width: 90%;
+}
+.slideupTD {
+    width: 2%;
+    height: 0;
+}
+
+.log-slideup {
+    height: 100%;
+    width: 100%;
+}
+
+.log-slideup:hover {
+    background-color: red;
+}
+
+.test-slideup {
+    height: 100%;
+    width: 100%;
+}
+
+.test-slideup:hover {
+    background-color: red;
+}
+
+.step-slideup {
+    height: 100%;
+    width: 100%;
+}
+
+.step-slideup:hover {
+    background-color: red;
 }
 
 .step-fltr-btns {
@@ -179,10 +231,25 @@ img {
 }
 
 .steps {
-    display: none;
-    margin-left: 6%;
+/*    display: none;*/
+/*    margin-left: 5%;*/
 }
 .tests {
+/*    display: none;*/
+/*    margin-left: 2%;*/
+}
+
+.testContainer {
+    width: 100%;
+     margin-left: 2%;
     display: none;
-    margin-left: 3%;
+}
+.stepContainer{
+    width: 100%;
+    margin-left: 5%;
+    display: none;
+}
+
+.slideupTD .glyphicon-menu-up{
+    font-size: 30px;
 }
