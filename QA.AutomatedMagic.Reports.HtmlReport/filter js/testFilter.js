@@ -1,6 +1,6 @@
 $(function () {
 	$(".btnexp").click(function (e) {
-		$(this).closest(".test").children('.tests').toggle(500);
+		$(this).closest(".test").find('.testContainer').first().toggle(500);
 		myFilter.prepare($(this).closest(".test").find('.test-fltr-btns').find("button").first());
 	});
 	
