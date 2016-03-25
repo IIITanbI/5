@@ -49,7 +49,8 @@
 
         public virtual void Skip()
         {
-            ItemStatus = TestItemStatus.Skipped;
+            if (ItemStatus == TestItemStatus.NotExecuted)
+                ItemStatus = TestItemStatus.Skipped;
         }
 
         public override string ToString()

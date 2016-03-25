@@ -41,8 +41,7 @@
 
                 AutomatedMagicManager.LoadAssemblies(_libPath, SearchOption.AllDirectories);
 
-                var lTypes = AutomatedMagicManager.LoadedMetaTypes;
-                var lManagers = AutomatedMagicManager.LoadedCommandManagers;
+                TestManager.Log.INFO(AutomatedMagicManager.GetReflectionInfo());
 
                 var projectConfig = XDocument.Load(runConfig.PathToProjectConfig);
                 var project = MetaType.Parse<TestProject>(projectConfig.Elements().First());
