@@ -54,6 +54,7 @@
       <manager type="InsertNewComponentFormManager"></manager>
 
       <manager type="JobManager"></manager>
+      <manager type="TutorialCardPageManager"></manager>
 
     </managers>
 
@@ -443,7 +444,7 @@
           <Manager>FrameworkManager</Manager>
           <Command>Sleep</Command>
           <args>
-            <arg type="Value">5</arg>
+            <arg type="Value">30</arg>
           </args>
         </TestStep>
       </Steps>
@@ -457,7 +458,7 @@
       <Steps>
         <TestStep name="GetGitHubIssues" description="Get GitHub issues for tutroial repository">
           <Manager>GitManager</Manager>
-          <Command>GetIssues</Command>
+          <Command>GetNewIssues</Command>
           <IsSkippedOnFail>True</IsSkippedOnFail>
           <args>
             <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
@@ -470,28 +471,6 @@
             <arg type="Context">GitRepositoryConfig.TutorialRepository</arg>
           </args>
         </TestStep>
-        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
-          <Manager>WebDriverManager</Manager>
-          <Command>Refresh</Command>
-        </TestStep>
-        <TestStep name="Sleep" description="Sleep">
-          <Manager>FrameworkManager</Manager>
-          <Command>Sleep</Command>
-          <args>
-            <arg type="Value">5</arg>
-          </args>
-        </TestStep>
-        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
-          <Manager>WebDriverManager</Manager>
-          <Command>Refresh</Command>
-        </TestStep>
-        <TestStep name="Sleep" description="Sleep">
-          <Manager>FrameworkManager</Manager>
-          <Command>Sleep</Command>
-          <args>
-            <arg type="Value">5</arg>
-          </args>
-        </TestStep>
         <TestStep name="OpenCreatedPageOnAuthor" description="Open created tutorial page on Author">
           <manager>AemPageManager</manager>
           <command>OpenPageOnAuthor</command>
@@ -501,6 +480,17 @@
             <arg type="Context">AemPage.TutorialPage</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
+        </TestStep>
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
+          </args>
+        </TestStep>
+        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
+          <Manager>WebDriverManager</Manager>
+          <Command>Refresh</Command>
         </TestStep>
         <TestStep name="Sleep" description="Sleep">
           <Manager>FrameworkManager</Manager>
@@ -526,6 +516,17 @@
             <arg type="Context">AemPage.TutorialPage</arg>
             <arg type="Context">LandscapeConfig.LandscapeConfig</arg>
           </args>
+        </TestStep>
+        <TestStep name="Sleep" description="Sleep">
+          <Manager>FrameworkManager</Manager>
+          <Command>Sleep</Command>
+          <args>
+            <arg type="Value">5</arg>
+          </args>
+        </TestStep>
+        <TestStep name="RefreshTutorialCatalogPage" description="Refresh created page to get tutorial cards">
+          <Manager>WebDriverManager</Manager>
+          <Command>Refresh</Command>
         </TestStep>
         <TestStep name="Sleep" description="Sleep">
           <Manager>FrameworkManager</Manager>
@@ -608,6 +609,65 @@
       </args>
     </TestStep>
 
+    <TestStep name="OpenTutorialCard" description="Open tutorial card page on Author">
+      <StepMarks>
+        <StepMark>VerifyCardPageOnAuthor</StepMark>
+      </StepMarks>
+      <Order>CasePre</Order>
+      <Manager>GitHubTutorialManager</Manager>
+      <Command>OpenTutorialCardOnAuthor</Command>
+      <args>
+        <arg type="Manager">WebDriverManager</arg>
+        <arg type="Context">GitHubTutorialTest.TutorialTest</arg>
+      </args>
+    </TestStep>
+    <TestStep name="OpenTutorialCard" description="Open tutorial card page on Publish">
+      <StepMarks>
+        <StepMark>VerifyCardPageOnPublish</StepMark>
+      </StepMarks>
+      <Order>CasePre</Order>
+      <Manager>GitHubTutorialManager</Manager>
+      <Command>OpenTutorialCardOnPublish</Command>
+      <args>
+        <arg type="Manager">WebDriverManager</arg>
+        <arg type="Context">GitHubTutorialTest.TutorialTest</arg>
+      </args>
+    </TestStep>
+    <TestStep name="GetCardData" description="Get card data from page on Author">
+      <StepMarks>
+        <StepMark>VerifyCardPageOnAuthor</StepMark>
+      </StepMarks>
+      <Order>CasePre</Order>
+      <Manager>TutorialCardPageManager</Manager>
+      <Command>GetTutorialCardOnAuthor</Command>
+      <args>
+        <arg type="Manager">WebDriverManager</arg>
+      </args>
+    </TestStep>
+    <TestStep name="GetCardData" description="Get card data from page on Publish">
+      <StepMarks>
+        <StepMark>VerifyCardPageOnPublish</StepMark>
+      </StepMarks>
+      <Order>CasePre</Order>
+      <Manager>TutorialCardPageManager</Manager>
+      <Command>GetTutorialCardOnPublish</Command>
+      <args>
+        <arg type="Manager">WebDriverManager</arg>
+      </args>
+    </TestStep>
+    <TestStep name="VerifyCardPage" description="Verify card page">
+      <StepMarks>
+        <StepMark>VerifyCardPage</StepMark>
+      </StepMarks>
+      <Order>CasePre</Order>
+      <Manager>GitHubTutorialManager</Manager>
+      <Command>VerifyCard</Command>
+      <args>
+        <arg type="Context">GitHubTutorialTest.TutorialTest</arg>
+        <arg type="StepResult">GetCardData</arg>
+      </args>
+    </TestStep>
+    
   </Steps>
 
   <Suites>
@@ -722,7 +782,7 @@
 
       <Suites>
 
-        <GenericTestSuite name="GenericSuiteForTutorials" description="Generic TestSuite for tutorial creating tests">
+        <GenericTestSuite name="GenericSuiteForTutorialsCreating" description="Generic TestSuite for tutorial creating tests">
           <StepMarks>
             <StepMark>ExportPages</StepMark>
             <StepMark>PrepareGit</StepMark>
@@ -1034,6 +1094,18 @@
                       <StepMark>VerifyCardsOnPublish</StepMark>
                     </StepMarks>
                   </TestCase>
+                  <TestCase name="VerifyCardPageOnAuthor" description="Verify tutorial card page data on Author">
+                    <StepMarks>
+                      <StepMark>VerifyCardPage</StepMark>
+                      <StepMark>VerifyCardPageOnAuthor</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardPageOnPublish" description="Verify tutorial card page data on Publish">
+                    <StepMarks>
+                      <StepMark>VerifyCardPage</StepMark>
+                      <StepMark>VerifyCardPageOnPublish</StepMark>
+                    </StepMarks>
+                  </TestCase>
                 </Tests>
               </TestSuite>
             </ChildTemplate>
@@ -1042,7 +1114,7 @@
         </GenericTestSuite>
 
 
-        <GenericTestSuite name="GenericSuiteForTutorials" description="Generic TestSuite for tutorial updating tests">
+        <GenericTestSuite name="GenericSuiteForTutorialsUpdating" description="Generic TestSuite for tutorial updating tests">
           <StepMarks>
             <StepMark>ExportPages</StepMark>
             <StepMark>PrepareGit</StepMark>
@@ -1109,7 +1181,7 @@
                               <tag>tutorial:technology/java</tag>
                             </tag>
                             <tag>
-                              <tag>tutorial:product/security</tag>
+                              <tag>tutorial:interest/security</tag>
                             </tag>
                           </Tags>
                           <Content>Tutorial921 updated content</Content>
@@ -1258,7 +1330,8 @@
                               <tag>tutorial:product/mobile</tag>
                             </tag>
                           </Tags>
-                          <Content>Tutorial1206 updated content</Content>
+                          <Content><![CDATA[# H1 tag
+Tutorial1206 updated content]]></Content>
 
                         </TutorialFile>
 
@@ -1342,6 +1415,18 @@
                   <TestCase name="VerifyCardsOnPublish" description="Verify tutorial cards on Publish">
                     <StepMarks>
                       <StepMark>VerifyCardsOnPublish</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardPageOnAuthor" description="Verify tutorial card page data on Author">
+                    <StepMarks>
+                      <StepMark>VerifyCardPage</StepMark>
+                      <StepMark>VerifyCardPageOnAuthor</StepMark>
+                    </StepMarks>
+                  </TestCase>
+                  <TestCase name="VerifyCardPageOnPublish" description="Verify tutorial card page data on Publish">
+                    <StepMarks>
+                      <StepMark>VerifyCardPage</StepMark>
+                      <StepMark>VerifyCardPageOnPublish</StepMark>
                     </StepMarks>
                   </TestCase>
                 </Tests>

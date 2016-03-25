@@ -47,6 +47,13 @@
             SWatch.Stop();
         }
 
+        public override TestInfo.TestItem GetTestInfo()
+        {
+            var ti = base.GetTestInfo();
+            ti.EnvironmentInfo = EnvironmentInfo;
+            return ti;
+        }
+
         public TestInfo.TestEnvironmentInfo EnvironmentInfo { get; private set; }
     }
 }

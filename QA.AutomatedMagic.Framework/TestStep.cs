@@ -28,6 +28,7 @@
 
         public override void Execute()
         {
+            if (!IsEnabled) return;
             ItemStatus = TestItemStatus.Unknown;
             Log.INFO($"Start executing {this}");
             Parent.Log.INFO($"Start executing {this}");
