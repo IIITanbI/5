@@ -65,10 +65,7 @@
 
             head.Add(GetCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", true));
             head.Add(GetCss(@"css/css.css"));
-            
 
-            //head.Add(GetCss(@"css/checkbox.css"));
-            //head.Add(GetCss(@"css/font-awesome.css"));
             return head;
         }
 
@@ -139,19 +136,14 @@
 
             body.Add(GetJS("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js", true));
             body.Add(GetJS("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", true));
-            
 
-            //body.Add(GetJS(@"filter js/init.js"));
-            //body.Add(GetJS(@"filter js/filter.js"));
-            //body.Add(GetJS(@"filter js/testFilter.js"));
-            //body.Add(GetJS(@"filter js/logFilter.js"));
-            //body.Add(GetJS(@"filter js/stepFilter.js"));
 
-            body.Add(GetJS(@"filter js 2.0/init.js"));
-            body.Add(GetJS(@"filter js 2.0/filter.js"));
-            body.Add(GetJS(@"filter js 2.0/testFilter.js"));
-            body.Add(GetJS(@"filter js 2.0/logFilter.js"));
-            body.Add(GetJS(@"filter js 2.0/stepFilter.js"));
+            body.Add(GetJS(@"filter js/init.js"));
+            body.Add(GetJS(@"filter js/filter.js"));
+            body.Add(GetJS(@"filter js/testFilter.js"));
+            body.Add(GetJS(@"filter js/logFilter.js"));
+            body.Add(GetJS(@"filter js/stepFilter.js"));
+
 
             return body;
         }
