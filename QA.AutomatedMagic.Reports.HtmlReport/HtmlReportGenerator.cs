@@ -334,6 +334,20 @@
 
             return btn;
         }
+        public XElement GetParentStepExpander(TestItem testItem)
+        {
+            var steps = testItem.ParentsSteps;
+            if (steps == null)
+                return null;
+
+            XElement btn = null;
+            if (steps.Count != 0)
+            {
+                btn = new XElement("button", new XAttribute("class", "btn btnparentstep btn-warning"), "Parent Steps");
+            }
+
+            return btn;
+        }
         public XElement GetStepExpander(BaseMetaObject obj)
         {
             var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
@@ -423,7 +437,6 @@
 
             return mainContainer;
         }
-
 
 
         public XElement GetLogs(BaseMetaObject obj)
@@ -600,6 +613,70 @@
         }
 
 
+
+        public XElement GetParentSteps(TestItem testItem)
+        {
+            var steps = testItem.ParentsSteps;
+
+
+            if (steps?.Count == null)
+                return null;
+
+            XElement acc = new XElement("div", new XAttribute("class", "parentSteps"));
+
+
+            var stepHeader = new XElement("div",
+               new XAttribute("class", "stepHeader"),
+               new XElement("div", "Parent steps:", new XAttribute("class", "stepHeaderName")),
+               new XElement("div", new XAttribute("class", "step-fltr-btn-exp"),
+                   new XElement("span", new XAttribute("class", "glyphicon glyphicon-chevron-right"))
+               ),
+               GetStepButtonsMagic(testItem)
+            );
+
+
+            //acc.Add(GetStepButtonsMagic(obj));
+            acc.Add(stepHeader);
+
+            foreach (var step in steps)
+            {
+                acc.Add(
+                    new XElement("div",
+                        new XAttribute("class", "step"),
+                        new XElement("div",
+                            new XAttribute("class", $"panel panel-{GetContainerColor(step.Status)}"),
+                            new XElement("div",
+                                new XAttribute("class", "panel-heading"),
+                                GetStepInfoTable(step),
+                                GetStepExpander(step)
+                            ),
+                            GetLogs(step)
+                        ),
+                        GetSteps(step)
+                    )
+                );
+            }
+
+            var up = new XElement("div",
+                   new XAttribute("class", "parentstep-slideup"),
+                   new XElement("span",
+                       new XAttribute("class", "glyphicon glyphicon-menu-up"),
+                       ""
+                   )
+                );
+
+            var table = new XElement("table", new XAttribute("class", "parentStepContainer"));
+            var tbody = new XElement("tbody");
+            var row = new XElement("tr");
+            row.Add(new XElement("td", new XAttribute("class", "slideupTD"), up));
+            row.Add(new XElement("td", new XAttribute("class", "testTD"), acc));
+
+            tbody.Add(row);
+            table.Add(tbody);
+
+            return table;
+            // return acc;
+        }
         public XElement GetSteps(BaseMetaObject obj)
         {
             var steps = obj is TestItem ? ((TestItem)obj).Steps : (obj is Step ? ((Step)obj).Steps : null);
@@ -624,6 +701,17 @@
 
            //acc.Add(GetStepButtonsMagic(obj));
             acc.Add(stepHeader);
+
+            if (obj is TestItem)
+            {
+                var testItem = obj as TestItem;
+                XElement pdiv = new XElement("div", new XAttribute("class", "parentSteps"));
+                pdiv.Add(GetParentStepExpander(testItem));
+                pdiv.Add(GetParentSteps(testItem));
+
+                acc.Add(pdiv);
+             
+            }
 
             foreach (var step in steps)
             {
@@ -693,12 +781,10 @@
                     div,
                     GetLogs(testItem)
                 ),
+                //GetParentSteps(testItem),
                 GetSteps(testItem),
-               GetTests(testItem)
+                GetTests(testItem)
             );
-
-
-            
 
             return cont;
         }
