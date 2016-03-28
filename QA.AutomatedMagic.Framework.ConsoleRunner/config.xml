@@ -496,7 +496,7 @@
           <Manager>FrameworkManager</Manager>
           <Command>Sleep</Command>
           <args>
-            <arg type="Value">5</arg>
+            <arg type="Value">15</arg>
           </args>
         </TestStep>
         <TestStep name="GetCardsFromPageOnAuthor" description="Get GitHub tutorial cards from TutorialCatalogPage on Author">
@@ -532,7 +532,7 @@
           <Manager>FrameworkManager</Manager>
           <Command>Sleep</Command>
           <args>
-            <arg type="Value">5</arg>
+            <arg type="Value">15</arg>
           </args>
         </TestStep>
         <TestStep name="GetCardsFromPageOnPublish" description="Get GitHub tutorial cards from TutorialCatalogPage on Publish">
