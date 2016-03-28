@@ -8,10 +8,24 @@
 .table.overall {
     margin: 0px;
 }
+
+
 .checkboxes.overall input{
 	margin-left: 0px;
 }
 .checkboxes.overall label{
+	width: 100px
+}
+
+.checkboxes.step-fltr-btns{
+	margin-left: 10px;
+	display: block;
+}
+
+.checkboxes.step-fltr-btns input{
+	margin-left: 0px;
+}
+.checkboxes.step-fltr-btns label{
 	width: 100px
 }
 

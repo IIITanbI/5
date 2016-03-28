@@ -138,12 +138,18 @@
             body.Add(GetJS("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", true));
 
 
-            body.Add(GetJS(@"filter js/init.js"));
-            body.Add(GetJS(@"filter js/filter.js"));
-            body.Add(GetJS(@"filter js/testFilter.js"));
-            body.Add(GetJS(@"filter js/logFilter.js"));
-            body.Add(GetJS(@"filter js/stepFilter.js"));
+            //body.Add(GetJS(@"filter js/init.js"));
+            //body.Add(GetJS(@"filter js/filter.js"));
+            //body.Add(GetJS(@"filter js/testFilter.js"));
+            //body.Add(GetJS(@"filter js/logFilter.js"));
+            //body.Add(GetJS(@"filter js/stepFilter.js"));
 
+
+            body.Add(GetJS(@"filter js 2.0/init.js"));
+            body.Add(GetJS(@"filter js 2.0/filter.js"));
+            body.Add(GetJS(@"filter js 2.0/testFilter.js"));
+            body.Add(GetJS(@"filter js 2.0/logFilter.js"));
+            body.Add(GetJS(@"filter js 2.0/stepFilter.js"));
 
             return body;
         }
@@ -230,7 +236,7 @@
             var mainContainer = new XElement("div", new XAttribute("class", "checkboxes overall test-fltr-btns"));
 
             mainContainer.Add(GetOverallCheckBox("Total",       testItem.GetTotal(), "passed failed skipped notexecuted"));
-            mainContainer.Add(GetOverallCheckBox("NotExecuted",       testItem.GetTotal(), "notexecuted"));
+            mainContainer.Add(GetOverallCheckBox("NotExecuted", testItem.GetWithStatus(TestItemStatus.NotExecuted), "notexecuted"));
             mainContainer.Add(GetOverallCheckBox("Passed",      testItem.GetWithStatus(TestItemStatus.Passed) , "passed"));
             mainContainer.Add(GetOverallCheckBox("Failed",      testItem.GetWithStatus(TestItemStatus.Failed) , "failed"));
             mainContainer.Add(GetOverallCheckBox("Skipped",     testItem.GetWithStatus(TestItemStatus.Skipped), "skipped"));
@@ -258,42 +264,22 @@
             return checkBox;
         }
 
-        
-        public XElement GetOverall(TestItem testItem)
+        public XElement GetStepCheckBox(string text, string filters)
         {
-            return GetOverallMagic(testItem);
-            if (testItem.Type == TestItemType.Test)
-                return null;
-
-            var table = new XElement("table", new XAttribute("class", "table overall"));
-
-            var thead = new XElement("thead",
-                new XElement("tr",
-                    new XAttribute("class", "test-fltr-btns"),
-                    new XElement("th", new XElement("button", "Total",          new XAttribute("class", "btn test-fltr-btn-all"),       new XAttribute("filter", "passed failed skipped notexecuted unknown"))),
-                    new XElement("th", new XElement("button", "NotExecuted",    new XAttribute("class", "btn test-fltr-btn-notexctd"),  new XAttribute("filter", "notexecuted"))),
-                    new XElement("th", new XElement("button", "Passed",         new XAttribute("class", "btn test-fltr-btn-psd"),       new XAttribute("filter", "passed"))),
-                    new XElement("th", new XElement("button", "Failed",         new XAttribute("class", "btn test-fltr-btn-fld"),       new XAttribute("filter", "с"))),
-                    new XElement("th", new XElement("button", "Skipped",        new XAttribute("class", "btn test-fltr-btn-skpd"),      new XAttribute("filter", "skipped"))),
-                    new XElement("th", new XElement("button", "Unknown",        new XAttribute("class", "btn test-fltr-btn-unkwn"),     new XAttribute("filter", "unknown")))
-                )
+            var checkBox = new XElement("div",
+                new XAttribute("class", "checkbox")
             );
 
-            var tbody = new XElement("tbody",
-                new XElement("tr",
-                    new XElement("td", testItem.GetTotal()),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.NotExecuted)),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Passed)),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Failed)),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Skipped)),
-                    new XElement("td", testItem.GetWithStatus(TestItemStatus.Unknown))
-                )
-            );
+            var input = new XElement("input", new XAttribute("type", "checkbox"), new XAttribute("filter", filters));
+            var label = new XElement("label", text);
 
-            table.Add(thead, tbody);
+            checkBox.Add(input);
+            checkBox.Add(label);
 
-            return table;
+            return checkBox;
         }
+
+
         public XElement GetTestInfoTable(TestItem testItem)
         {
             XElement infoTable = new XElement("table",
@@ -420,6 +406,8 @@
         }
         public XElement GetStepButtons(BaseMetaObject obj)
         {
+            return GetStepButtonsMagic(obj);
+
             var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
             if (steps?.Count == null)
                 return null;
@@ -437,6 +425,37 @@
 
             return bdiv;
         }
+        public XElement GetStepButtonsMagic(BaseMetaObject obj)
+        {
+            var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
+            if (steps?.Count == null)
+                return null;
+
+            //NotExecuted, Unknown, Passed, Failed, Skipped
+            //var bdiv = new XElement("div",
+            //    new XAttribute("class", "step-fltr-btns"),
+            //    new XElement("button", "All", new XAttribute("class", "btn step-fltr-btn-all"), new XAttribute("filter", "passed failed skipped unknown notexecuted")),
+            //    new XElement("button", "NotExecuted", new XAttribute("class", "btn step-fltr-btn-notexctd"), new XAttribute("filter", "notexecuted")),
+            //    new XElement("button", "Passed", new XAttribute("class", "btn step-fltr-btn-psd"), new XAttribute("filter", "passed")),
+            //    new XElement("button", "Failed", new XAttribute("class", "btn step-fltr-btn-fld"), new XAttribute("filter", "failed")),
+            //    new XElement("button", "Skipped", new XAttribute("class", "btn step-fltr-btn-skpd"), new XAttribute("filter", "skipped")),
+            //    new XElement("button", "Unknown", new XAttribute("class", "btn step-fltr-btn-unkwn"), new XAttribute("filter", "unknown"))
+            //);
+
+            var mainContainer = new XElement("div", new XAttribute("class", "checkboxes step-fltr-btns"));
+
+            mainContainer.Add(GetStepCheckBox("Total",       "passed failed skipped notexecuted"));
+            mainContainer.Add(GetStepCheckBox("NotExecuted", "notexecuted"));
+            mainContainer.Add(GetStepCheckBox("Passed",      "passed"));
+            mainContainer.Add(GetStepCheckBox("Failed",      "failed"));
+            mainContainer.Add(GetStepCheckBox("Skipped",     "skipped"));
+            mainContainer.Add(GetStepCheckBox("Unknown",     "unknown"));
+
+
+            return mainContainer;
+        }
+
+
 
         public XElement GetLogs(BaseMetaObject obj)
         {
@@ -667,7 +686,7 @@
 
         public XElement GetReport(TestItem testItem)
         {
-            XElement overall = GetOverall(testItem);
+            XElement overall = GetOverallMagic(testItem);
             XElement div = null;
             if (overall != null)
             {
