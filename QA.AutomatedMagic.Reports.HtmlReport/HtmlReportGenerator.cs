@@ -404,43 +404,12 @@
 
             return btns;
         }
-        public XElement GetStepButtons(BaseMetaObject obj)
-        {
-            return GetStepButtonsMagic(obj);
-
-            var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
-            if (steps?.Count == null)
-                return null;
-
-            //NotExecuted, Unknown, Passed, Failed, Skipped
-            var bdiv = new XElement("div",
-                new XAttribute("class", "step-fltr-btns"),
-                new XElement("button", "All", new XAttribute("class", "btn step-fltr-btn-all"), new XAttribute("filter", "passed failed skipped unknown notexecuted")),
-                new XElement("button", "NotExecuted", new XAttribute("class", "btn step-fltr-btn-notexctd"), new XAttribute("filter", "notexecuted")),
-                new XElement("button", "Passed", new XAttribute("class", "btn step-fltr-btn-psd"), new XAttribute("filter", "passed")),
-                new XElement("button", "Failed", new XAttribute("class", "btn step-fltr-btn-fld"), new XAttribute("filter", "failed")),
-                new XElement("button", "Skipped", new XAttribute("class", "btn step-fltr-btn-skpd"), new XAttribute("filter", "skipped")),
-                new XElement("button", "Unknown", new XAttribute("class", "btn step-fltr-btn-unkwn"), new XAttribute("filter", "unknown"))
-            );
-
-            return bdiv;
-        }
+        
         public XElement GetStepButtonsMagic(BaseMetaObject obj)
         {
             var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
             if (steps?.Count == null)
                 return null;
-
-            //NotExecuted, Unknown, Passed, Failed, Skipped
-            //var bdiv = new XElement("div",
-            //    new XAttribute("class", "step-fltr-btns"),
-            //    new XElement("button", "All", new XAttribute("class", "btn step-fltr-btn-all"), new XAttribute("filter", "passed failed skipped unknown notexecuted")),
-            //    new XElement("button", "NotExecuted", new XAttribute("class", "btn step-fltr-btn-notexctd"), new XAttribute("filter", "notexecuted")),
-            //    new XElement("button", "Passed", new XAttribute("class", "btn step-fltr-btn-psd"), new XAttribute("filter", "passed")),
-            //    new XElement("button", "Failed", new XAttribute("class", "btn step-fltr-btn-fld"), new XAttribute("filter", "failed")),
-            //    new XElement("button", "Skipped", new XAttribute("class", "btn step-fltr-btn-skpd"), new XAttribute("filter", "skipped")),
-            //    new XElement("button", "Unknown", new XAttribute("class", "btn step-fltr-btn-unkwn"), new XAttribute("filter", "unknown"))
-            //);
 
             var mainContainer = new XElement("div", new XAttribute("class", "checkboxes step-fltr-btns"));
 
@@ -642,7 +611,19 @@
 
             XElement acc = new XElement("div", new XAttribute("class", "steps"));
 
-            acc.Add(GetStepButtons(obj));
+
+            var stepHeader = new XElement("div",
+               new XAttribute("class", "stepHeader"),
+               new XElement("div", "Steps:", new XAttribute("class", "stepHeaderName")),
+               new XElement("div", new XAttribute("class", "step-fltr-btn-exp"),
+                   new XElement("span", new XAttribute("class", "glyphicon glyphicon-chevron-right"))
+               ),
+               GetStepButtonsMagic(obj)
+            );
+
+
+           //acc.Add(GetStepButtonsMagic(obj));
+            acc.Add(stepHeader);
 
             foreach (var step in steps)
             {
