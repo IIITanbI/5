@@ -63,7 +63,7 @@ $(function () {
         var $cur = $($btnsPanel[i]);
         var ff = new Filter();
         
-        ff.filterButtons = $cur.find("button");
+        ff.filterButtons = $cur.find("input");
         ff.defaultButton = ff.filterButtons[0];
 
 
@@ -73,6 +73,8 @@ $(function () {
          
         ff.childs = $cur.closest(".steps").children(".step");
 
+		ff.onButtonActivated = activated;
+        ff.onButtonDeactivated = deactivated;
         ff.getChildStatus = getChildStatus;
 
         ff.init();
@@ -81,7 +83,13 @@ $(function () {
         arr[i] = ff;
     }
     
+    function activated(button){
+        $(button).attr("checked"," true");
+    };
     
+    function deactivated(button){
+        $(button).removeAttr("checked");
+    };
     
     function getChildStatus(child) {
         var $needClass = "status";
