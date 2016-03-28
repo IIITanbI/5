@@ -261,6 +261,7 @@
 
         public override void Execute()
         {
+            if (!IsEnabled) return;
             SWatch.Start();
             Log.INFO($"Start executing {this}");
             Parent?.Log.INFO($"Start executing {this}");

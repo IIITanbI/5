@@ -11,6 +11,9 @@
     [MetaType("TestItem config")]
     public class TestItem : BaseMetaObject
     {
+        [MetaTypeObject("Environment info", IsRequired = false)]
+        public TestEnvironmentInfo EnvironmentInfo { get; set; } = null;
+
         [MetaTypeValue("Test item name")]
         public string Name { get; set; }
 
@@ -29,8 +32,11 @@
         [MetaTypeValue("Test item duration")]
         public TimeSpan Duration { get; set; }
 
-        [MetaTypeCollection("Test item steps", IsRequired = false)]
+        [MetaTypeCollection("List of item steps", IsRequired = false)]
         public List<Step> Steps { get; set; } = new List<Step>();
+        
+        [MetaTypeCollection("Test of parents steps", IsRequired = false)]
+        public List<Step> ParentsSteps { get; set; } = new List<Step>();
 
         [MetaTypeCollection("List of test item childes", IsRequired = false)]
         public List<TestItem> Childs { get; set; } = new List<TestItem>();

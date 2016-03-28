@@ -67,6 +67,7 @@
 
         public override void Execute()
         {
+            if (!IsEnabled) return;
             Log.INFO($"Start executing {this}");
             Parent?.Log.INFO($"Start executing {this}");
             ItemStatus = TestItemStatus.Unknown;
@@ -231,7 +232,10 @@
 
             foreach (var child in Children)
             {
-                ti.Childs.Add(child.GetTestInfo());
+                var childti = child.GetTestInfo();
+                ti.Childs.Add(childti);
+
+                childti.ParentsSteps.InsertRange(0, ti.Steps);
             }
 
             return ti;

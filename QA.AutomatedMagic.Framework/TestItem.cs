@@ -49,7 +49,7 @@
 
         public virtual void Skip()
         {
-            if (ItemStatus == TestItemStatus.NotExecuted)
+            if (ItemStatus == TestItemStatus.NotExecuted && IsEnabled)
                 ItemStatus = TestItemStatus.Skipped;
         }
 

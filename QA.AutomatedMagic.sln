@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.MagicServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Core", "QA.AutomatedMagic.Core\QA.AutomatedMagic.Core.csproj", "{CAF57862-9351-438F-8356-CEA1D24DC739}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework.UI.ReportViewer", "QA.AutomatedMagic.Framework.UI.ReportViewer\QA.AutomatedMagic.Framework.UI.ReportViewer.csproj", "{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{CAF57862-9351-438F-8356-CEA1D24DC739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAF57862-9351-438F-8356-CEA1D24DC739}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAF57862-9351-438F-8356-CEA1D24DC739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
