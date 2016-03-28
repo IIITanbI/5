@@ -100,5 +100,19 @@ $(function () {
         return $status;
     };
 
+
+	$(".step-fltr-btn-exp").click(function (e) {
+        var $cur = $(e.currentTarget).children("span");
+        var $elem = $(this).closest(".stepHeader").find(".step-fltr-btns");
+        $elem.toggle(300, function onCompleteToggle() {
+            if ($elem.is(":visible")) {
+                $cur.attr("class", "glyphicon glyphicon-chevron-left");
+                console.log("visible");
+            } else {
+                $cur.attr("class", "glyphicon glyphicon-chevron-right");
+                console.log("none");
+            }
+        });
+    });
    
 });

@@ -19,7 +19,7 @@
 
 .checkboxes.step-fltr-btns{
 	margin-left: 10px;
-	display: block;
+	//display: block;
 }
 
 .checkboxes.step-fltr-btns input{
@@ -193,6 +193,7 @@ img {
     background-color: red;
 }
 
+
 .step-slideup {
     height: 100%;
     width: 100%;
@@ -202,9 +203,13 @@ img {
     background-color: red;
 }
 
+.stepHeader {
+	margin-bottom: 10px;
+}
+
 .step-fltr-btns {
     margin-bottom: 20px;
-    display: flex;
+    display: none;
 }
 
 
