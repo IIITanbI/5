@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Reports.HtmlReport", "QA.AutomatedMagic.Reports.HtmlReport\QA.AutomatedMagic.Reports.HtmlReport.csproj", "{77FB2828-8499-4273-86D2-3EA8C66130DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{2FA59B45-AC0D-4B12-A2D8-903CF0A1D561}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework.UI.ReportViewer", "QA.AutomatedMagic.Framework.UI.ReportViewer\QA.AutomatedMagic.Framework.UI.ReportViewer.csproj", "{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.AutomatedMagic.Framework.Core", "QA.AutomatedMagic.Framework.Core\QA.AutomatedMagic.Framework.Core.csproj", "{9818C967-D9D1-4ACA-BDD5-D7F220225504}"
@@ -45,10 +43,6 @@ Global
 		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77FB2828-8499-4273-86D2-3EA8C66130DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FA59B45-AC0D-4B12-A2D8-903CF0A1D561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FA59B45-AC0D-4B12-A2D8-903CF0A1D561}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FA59B45-AC0D-4B12-A2D8-903CF0A1D561}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FA59B45-AC0D-4B12-A2D8-903CF0A1D561}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3457AB50-DC8F-4F13-8DA8-5036055ECA3F}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -36,10 +36,13 @@
                 var assemblyFiles = Directory.GetFiles(pathToLibFolder, "*.dll", searchOption).ToList();
                 assemblyFiles.AddRange(Directory.GetFiles(pathToLibFolder, "*.exe", searchOption));
 
+                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(CurrentDomain_ReflectionOnlyAssemblyResolve);
+
                 foreach (var assemblyFile in assemblyFiles)
                 {
                     try
                     {
+                        Console.WriteLine($"TRY LOAD ASSEMBLY: {assemblyFile}");
                         var reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
                         var customAttributes = reflectionOnlyAssembly.GetCustomAttributesData().ToList();
 
@@ -54,12 +57,17 @@
                     }
                     catch (Exception ex)
                     {
-                        //Console.WriteLine(ex);
+                        Console.WriteLine(ex);
                     }
                 }
             }
 
             LoadAssemblies(assemblies);
+        }
+
+        static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            return Assembly.ReflectionOnlyLoad(args.Name);
         }
 
         private static void LoadAssemblies(List<Assembly> assemblies)

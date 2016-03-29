@@ -13,10 +13,10 @@
         [MetaTypeValue("Path to Project config xml")]
         public string PathToProjectConfig { get; set; }
 
-        [MetaTypeValue("Need to copy libraries?")]
-        public bool NeedToCopyLibraries { get; set; }
+        [MetaTypeValue("Need to copy libraries?", IsRequired = false)]
+        public bool NeedToCopyLibraries { get; set; } = false;
 
-        [MetaTypeCollection("Paths to libraries", "path")]
-        public List<string> LibrariesPaths { get; set; }
+        [MetaTypeCollection("Paths to libraries", "path", IsRequired = false)]
+        public List<string> LibrariesPaths { get; set; } = null;
     }
 }
