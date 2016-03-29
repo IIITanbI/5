@@ -48,14 +48,13 @@ $(function () {
 
        if ($cur.closest(".step").length > 0){
            $parent = $cur.closest(".step");
-           $parent.find(".btnstep").first().click();
        }
        else if ($cur.closest(".test").length > 0){
 		   $parent = $cur.closest(".test");
-           $parent.find(".btnstep").first().click();
        }
-      else return;
+       else return;
        
+	   $parent.find(".btnstep").first().click();
        
        
        //var position = $parent.position();
@@ -64,4 +63,20 @@ $(function () {
        //window.scrollTo(position.left, position.top);
     });   
     
+	$(".parentstep-slideup").click(function (e) {
+       
+       var $cur = $(e.currentTarget);
+       var $parent = null;
+
+
+       if ($cur.closest(".step").length > 0){
+           $parent = $cur.closest(".step");
+       }
+       else if ($cur.closest(".test").length > 0){
+		   $parent = $cur.closest(".test");
+       }
+       else return;
+       
+	   $parent.find(".btnparentstep").first().click();
+    });   
 });

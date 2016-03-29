@@ -194,6 +194,7 @@ img {
 }
 
 
+
 .step-slideup {
     height: 100%;
     width: 100%;
@@ -202,6 +203,16 @@ img {
 .step-slideup:hover {
     background-color: red;
 }
+
+.parentstep-slideup {
+    height: 100%;
+    width: 100%;
+}
+
+.parentstep-slideup:hover {
+    background-color: red;
+}
+
 
 .stepHeader {
 	margin-bottom: 10px;
@@ -267,11 +278,19 @@ img {
    // margin-left: 2%;
     display: none;
 }
-.stepContainer{
+.stepContainer, .parentStepContainer{
     width: 100%;
 	//float: right;
     //margin-left: 5%;
     display: none;
+}
+.parentStepContainer{
+    margin-left: 3%;
+    width: 97%;
+}
+
+.parentSteps {
+	margin-bottom: 20px;
 }
 
 .slideupTD .glyphicon-menu-up{
