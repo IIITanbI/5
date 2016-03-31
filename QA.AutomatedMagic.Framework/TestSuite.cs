@@ -235,10 +235,23 @@
                 var childti = child.GetTestInfo();
                 ti.Childs.Add(childti);
 
-                childti.ParentsSteps.InsertRange(0, ti.Steps);
+                AddParentSteps(childti, ti.Steps);
             }
 
             return ti;
+        }
+
+        private void AddParentSteps(TestInfo.TestItem testItem, List<TestInfo.Step> steps)
+        {
+            testItem.ParentsSteps.InsertRange(0, steps);
+
+            if (testItem.Childs != null && testItem.Childs.Count > 0)
+            {
+                foreach (var child in testItem.Childs)
+                {
+                    AddParentSteps(child, steps);
+                }
+            }
         }
     }
 }

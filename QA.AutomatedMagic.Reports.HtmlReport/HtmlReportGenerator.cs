@@ -64,8 +64,8 @@
             head.Add(charset, httpEquiv, name, title);
 
             head.Add(GetCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", true));
-            head.Add(GetCss(@"css/css.css"));
-
+            //head.Add(GetCss(@"css/css.css"));
+            head.Add(GetCssFromString(Properties.Resources.css));
             return head;
         }
 
@@ -100,6 +100,17 @@
 
             return customCss;
         }
+        public XElement GetCssFromString(string css)
+        {
+            XElement customCss = null;
+
+            customCss = new XElement("style",
+                    new XAttribute("type", "text/css"),
+                    css
+            );
+
+            return customCss;
+        }
         public XElement GetJS(string name, bool IsLink = false)
         {
             XElement script = null;
@@ -123,6 +134,16 @@
             return script;
         }
 
+        public XElement GetJSFromString(string js)
+        {
+            XElement script = null;
+
+            script = new XElement("script");
+            script.Add(js);
+
+            return script;
+        }
+
         public XElement GetBody(TestItem testItem, TestEnvironmentInfo testEnvironmentInfo)
         {
             var body = new XElement("body");
@@ -137,19 +158,17 @@
             body.Add(GetJS("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js", true));
             body.Add(GetJS("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", true));
 
+            body.Add(GetJSFromString(Properties.Resources.init));
+            body.Add(GetJSFromString(Properties.Resources.filter));
+            body.Add(GetJSFromString(Properties.Resources.testFilter));
+            body.Add(GetJSFromString(Properties.Resources.logFilter));
+            body.Add(GetJSFromString(Properties.Resources.stepFilter));
 
-            //body.Add(GetJS(@"filter js/init.js"));
-            //body.Add(GetJS(@"filter js/filter.js"));
-            //body.Add(GetJS(@"filter js/testFilter.js"));
-            //body.Add(GetJS(@"filter js/logFilter.js"));
-            //body.Add(GetJS(@"filter js/stepFilter.js"));
-
-
-            body.Add(GetJS(@"filter js 2.0/init.js"));
-            body.Add(GetJS(@"filter js 2.0/filter.js"));
-            body.Add(GetJS(@"filter js 2.0/testFilter.js"));
-            body.Add(GetJS(@"filter js 2.0/logFilter.js"));
-            body.Add(GetJS(@"filter js 2.0/stepFilter.js"));
+            //body.Add(GetJS(@"filter js 2.0/init.js"));
+            //body.Add(GetJS(@"filter js 2.0/filter.js"));
+            //body.Add(GetJS(@"filter js 2.0/testFilter.js"));
+            //body.Add(GetJS(@"filter js 2.0/logFilter.js"));
+            //body.Add(GetJS(@"filter js 2.0/stepFilter.js"));
 
             return body;
         }
@@ -235,21 +254,21 @@
 
             var mainContainer = new XElement("div", new XAttribute("class", "checkboxes overall test-fltr-btns"));
 
-            mainContainer.Add(GetOverallCheckBox("Total",       testItem.GetTotal(), "passed failed skipped notexecuted"));
+            mainContainer.Add(GetOverallCheckBox("Total", testItem.GetTotal(), "passed failed skipped notexecuted"));
             mainContainer.Add(GetOverallCheckBox("NotExecuted", testItem.GetWithStatus(TestItemStatus.NotExecuted), "notexecuted"));
-            mainContainer.Add(GetOverallCheckBox("Passed",      testItem.GetWithStatus(TestItemStatus.Passed) , "passed"));
-            mainContainer.Add(GetOverallCheckBox("Failed",      testItem.GetWithStatus(TestItemStatus.Failed) , "failed"));
-            mainContainer.Add(GetOverallCheckBox("Skipped",     testItem.GetWithStatus(TestItemStatus.Skipped), "skipped"));
+            mainContainer.Add(GetOverallCheckBox("Passed", testItem.GetWithStatus(TestItemStatus.Passed), "passed"));
+            mainContainer.Add(GetOverallCheckBox("Failed", testItem.GetWithStatus(TestItemStatus.Failed), "failed"));
+            mainContainer.Add(GetOverallCheckBox("Skipped", testItem.GetWithStatus(TestItemStatus.Skipped), "skipped"));
 
-          
+
 
             return mainContainer;
         }
 
-        
+
         public XElement GetOverallCheckBox(string text, int count, string filters)
         {
-            var checkBox = new XElement("div", 
+            var checkBox = new XElement("div",
                 new XAttribute("class", "checkbox")
             );
 
@@ -380,14 +399,14 @@
             XElement ex = null;
             if (logMessage.ExceptionString != null)
             {
-                var messageLines = logMessage.ExceptionString.Split(new string[] {"\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var messageLines = logMessage.ExceptionString.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 ex = new XElement("div", new XAttribute("class", "log-exception"));
                 foreach (var line in messageLines)
                 {
                     ex.Add(new XElement("p", line));
                 }
             }
-            
+
             return ex;
         }
         public XElement GetMessage(LogItem logMessage)
@@ -418,7 +437,7 @@
 
             return btns;
         }
-        
+
         public XElement GetStepButtonsMagic(BaseMetaObject obj)
         {
             var steps = obj is TestItem ? ((TestItem)obj).Steps : obj is Step ? ((Step)obj).Steps : null;
@@ -427,12 +446,12 @@
 
             var mainContainer = new XElement("div", new XAttribute("class", "checkboxes step-fltr-btns"));
 
-            mainContainer.Add(GetStepCheckBox("Total",       "passed failed skipped notexecuted"));
+            mainContainer.Add(GetStepCheckBox("Total", "passed failed skipped notexecuted"));
             mainContainer.Add(GetStepCheckBox("NotExecuted", "notexecuted"));
-            mainContainer.Add(GetStepCheckBox("Passed",      "passed"));
-            mainContainer.Add(GetStepCheckBox("Failed",      "failed"));
-            mainContainer.Add(GetStepCheckBox("Skipped",     "skipped"));
-            mainContainer.Add(GetStepCheckBox("Unknown",     "unknown"));
+            mainContainer.Add(GetStepCheckBox("Passed", "passed"));
+            mainContainer.Add(GetStepCheckBox("Failed", "failed"));
+            mainContainer.Add(GetStepCheckBox("Skipped", "skipped"));
+            mainContainer.Add(GetStepCheckBox("Unknown", "unknown"));
 
 
             return mainContainer;
@@ -482,8 +501,8 @@
                             GetMessage(msg),
                             GetException(msg)
                         );
-                       
-                       elem.Add(tmp);
+
+                        elem.Add(tmp);
                     }
 
                     var att = logItem as LogFile;
@@ -557,7 +576,7 @@
                     ""
                 )
              );
-           
+
 
             var table = new XElement("table", new XAttribute("class", "logsContainer"));
             var tbody = new XElement("tbody");
@@ -570,10 +589,10 @@
             main.Add(logHeader);
             main.Add(table);
 
-            
 
 
-            
+
+
             //main.Add(elem);
             return main;
         }
@@ -607,7 +626,7 @@
                 return table;
             }
 
-            
+
 
             return null;
         }
@@ -682,7 +701,7 @@
             var steps = obj is TestItem ? ((TestItem)obj).Steps : (obj is Step ? ((Step)obj).Steps : null);
             string name = obj is Step ? ((Step)obj).Description : null;
 
-           
+
             if (steps?.Count == null)
                 return null;
 
@@ -699,7 +718,7 @@
             );
 
 
-           //acc.Add(GetStepButtonsMagic(obj));
+            //acc.Add(GetStepButtonsMagic(obj));
             acc.Add(stepHeader);
 
             if (obj is TestItem)
@@ -710,7 +729,7 @@
                 pdiv.Add(GetParentSteps(testItem));
 
                 acc.Add(pdiv);
-             
+
             }
 
             foreach (var step in steps)
@@ -750,7 +769,7 @@
             table.Add(tbody);
 
             return table;
-           // return acc;
+            // return acc;
         }
 
         public XElement GetReport(TestItem testItem)
@@ -765,7 +784,7 @@
                 );
             }
 
-           
+
 
             XElement cont = new XElement("div",
                 new XAttribute("class", "test"),
