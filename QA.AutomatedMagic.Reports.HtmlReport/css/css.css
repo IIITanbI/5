@@ -34,6 +34,9 @@
 .test-fltr-btns button {
     width: 70px;
 }
+.test-fltr-btns .checkbox:not([defaultexpander='true']) {
+	display: none;
+}
 
 .test-fltr-btns button.activated {
     border-width: 3px;
@@ -263,6 +266,7 @@ img {
 .steps {
 /*    display: none;*/
 /*    margin-left: 5%;*/
+	padding-left: 10px;
 }
 .tests {
 /*    display: none;*/

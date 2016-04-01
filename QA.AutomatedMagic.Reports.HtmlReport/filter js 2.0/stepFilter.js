@@ -67,7 +67,7 @@ $(function () {
 
         ff.init();
 
-        $cur.attr("for", i);
+        $btnsPanel[i].setAttribute("for", i);
         arr[i] = ff;
     }
     
