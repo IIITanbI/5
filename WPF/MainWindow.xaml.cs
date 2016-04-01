@@ -105,6 +105,9 @@ namespace WPF
             var test = GetOverall(this.testItem);
             container.AddChild(test);
 
+            var tt = GetTestInfoTable(this.testItem);
+            container.AddChild(tt);
+
             this.AddChild(stack);
             //this.AddChild(Btn1);
 
@@ -198,6 +201,96 @@ namespace WPF
             return main;
         }
 
+
+
+
+        public Grid GetTestInfoTable(TestItem testItem)
+        {
+
+            Grid iTable = new Grid();
+
+            RowDefinition row = new RowDefinition();
+            iTable.RowDefinitions.Add(row);
+            row = new RowDefinition();
+            iTable.RowDefinitions.Add(row);
+
+
+            const int columnCount = 7;
+
+            for (int i = 0; i < columnCount; i++)
+            {
+                var column = new ColumnDefinition();
+                column.Width = GridLength.Auto;
+                //column.Width = new GridLength(100, GridUnitType.Star);
+                iTable.ColumnDefinitions.Add(column);
+            }
+
+
+            TextBlock value = new TextBlock();
+            value.FontSize = 14;
+            value.FontWeight = FontWeights.Normal;
+            value.Foreground = new SolidColorBrush(Colors.Black);
+            value.VerticalAlignment = VerticalAlignment.Center;
+            value.HorizontalAlignment = HorizontalAlignment.Center;
+            value.Padding = new Thickness(10, 0, 10, 0);
+            value.Text = $"{testItem.Type}: {testItem.Description}";
+
+            TextBlock value1 = new TextBlock();
+            value1.FontSize = 14;
+            value1.FontWeight = FontWeights.Normal;
+            value1.Foreground = new SolidColorBrush(Colors.Black);
+            value1.VerticalAlignment = VerticalAlignment.Center;
+            value1.HorizontalAlignment = HorizontalAlignment.Center;
+            value1.Padding = new Thickness(10, 0, 10, 0);
+            value1.Text = $"{testItem.Type}: {testItem.Description}";
+
+            TextBlock value2 = new TextBlock();
+            value2.FontSize = 14;
+            value2.FontWeight = FontWeights.Normal;
+            value2.Foreground = new SolidColorBrush(Colors.Black);
+            value2.VerticalAlignment = VerticalAlignment.Center;
+            value2.HorizontalAlignment = HorizontalAlignment.Center;
+            value2.Padding = new Thickness(10, 0, 10, 0);
+            value2.Text = $"{testItem.Type}: {testItem.Description}";
+
+            Grid.SetRow(value, 0);
+            Grid.SetColumn(value, 0);
+            Grid.SetColumnSpan(value, 7);
+
+            Grid.SetRow(value1, 1);
+            Grid.SetColumn(value1, 0);
+
+            Grid.SetRow(value2, 1);
+            Grid.SetColumn(value2, 1);
+
+            iTable.Children.Add(value);
+            iTable.Children.Add(value1);
+            iTable.Children.Add(value2);
+
+
+            return iTable;
+            XElement infoTable = new XElement("table",
+                                    new XAttribute("class", "itemInfo"),
+                                    new XElement("tbody",
+                                        new XElement("tr",
+                                            new XElement("td",
+                                                new XAttribute("colspan", "3"),
+                                                $"{testItem.Type}: {testItem.Description}"
+                                            )
+                                        ),
+                                        new XElement("tr",
+                                            new XElement("td", $"Status: {testItem.Status}", new XAttribute("class", $"status{testItem.Status}")),
+                                            new XElement("td", $"Duration: {testItem.Duration}"),
+                                            new XElement("td", $"Name: {testItem.Name}")
+                                        )
+                                     )
+                                 );
+           // return infoTable;
+
+        }
+
+
+
         private Panel GetOverall(TestItem testItem)
         {
             if (testItem.Type == TestItemType.Test) return null;
@@ -207,7 +300,7 @@ namespace WPF
 
             panel.SetValue(StackPanelProperty, 123);
             panel1.SetValue(StackPanelProperty, 256);
-
+             
             
             var rr1 =  (int)panel1.GetValue(StackPanelProperty);
             var rr = (int)panel.GetValue(StackPanelProperty);
@@ -231,6 +324,11 @@ namespace WPF
 
             return panel;
         }
+
+
+
+
+
 
         public CheckBox GetOverallCheckBox(string text, int count, string filters, bool defaultExpander = false)
         {
